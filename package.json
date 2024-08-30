@@ -1,0 +1,21 @@
+{
+  "name": "skillhub",
+  "version": "1.0.0",
+  "description": "1. **Clone the Repository:**",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run client\" \"npm run server\"",
+    "client": "npm run dev --prefix client",
+    "server": "nodemon server/index.js --prefix server"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "skillhub": "file:"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.1.4"
+  }
+}

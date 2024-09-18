@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "react-router-dom": "^6.26.2",
     "skillhub": "file:"
   },
   "devDependencies": {

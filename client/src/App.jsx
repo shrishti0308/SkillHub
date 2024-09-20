@@ -1,6 +1,7 @@
 import './App.css'
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import Navbar from './components/navbar';
+import ProfilePage from './components/ProfilePage/ProfilePage';
 
 function App() {
 
@@ -10,6 +11,7 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<h1 className=' text-lg' >Site under development</h1>} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Routes>
       </div>
     </>

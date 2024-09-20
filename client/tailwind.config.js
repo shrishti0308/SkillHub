@@ -1,3 +1,6 @@
+// Import Tailwind's default colors
+import colors from 'tailwindcss/colors'
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -6,6 +9,16 @@ export default {
   ],
   theme: {
     colors: {
+      transparent: 'transparent',
+      current: 'currentColor',
+      black: colors.black,
+      white: colors.white,
+      gray: colors.gray,
+      emerald: colors.emerald,
+      indigo: colors.indigo,
+      yellow: colors.yellow,
+
+      // Your custom colors
       'grey': '#23272f',
       'dark': '#1a1d23',
       'light': '#f6f7f9',

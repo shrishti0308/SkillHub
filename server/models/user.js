@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema({
     info: {
         skills: [{ type: String }],
         portfolio: { type: String },
-        experience: { type: String },
+        experience: [{ type: String }],
     },
     previousWorks: [{
         title: { type: String, required: true },

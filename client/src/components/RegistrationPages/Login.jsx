@@ -56,13 +56,6 @@ const LoginPage = () => {
             </span>
           </div>
 
-          <div className="flex justify-between items-center text-sm text-gray-400">
-            <label className="flex items-center">
-              <input type="checkbox" name="remember" className="mr-2" /> Remember me
-            </label>
-            <a href="/forgot-password" className="hover:underline text-blue-600">Forgot password?</a>
-          </div>
-
           <button
             type="submit"
             style={{ backgroundColor: 'rgb(37, 99, 235)', color: 'white', border: '2px solid rgb(37, 99, 235)' }}
@@ -73,7 +66,7 @@ const LoginPage = () => {
         </form>
 
         <p className="mt-6 text-center text-sm text-gray-400">
-          Don't have an account?{' '}
+          {"Don't have an account? "}
           <a href="/signup" className="text-blue-600 hover:underline">Sign up</a>
         </p>
       </div>

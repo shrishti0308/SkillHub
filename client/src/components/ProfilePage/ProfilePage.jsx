@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FaPlus } from '@react-icons/all-files/fa/FaPlus';
 import { FaTimes } from '@react-icons/all-files/fa/FaTimes';
+import ImageUpload from './ProfileComponents/ImageUpload';
 
 const ProfilePage = () => {
     const user = {
@@ -8,7 +9,7 @@ const ProfilePage = () => {
         email: 'prince.vegeta@saiyanmail.com',
         bio: 'The Prince of all Saiyans, determined to surpass Kakarot.',
         info: {
-            skills: ['Combat Strategy', 'Super Saiyan', 'Energy Blast'],
+            skills: ['Combat Strategy', 'Super Saiyan', 'SSJ God', 'Final Flash'],
             portfolio: 'https://vegeta-saiyan-elite.com',
             experience: ['Leader of Saiyan Army', 'Fighter in Tournament of Power']
         },
@@ -81,6 +82,7 @@ const ProfilePage = () => {
         <div className="max-w-5xl mx-auto p-6 bg-dark shadow-lg rounded-lg">
             <h1 className="text-4xl font-bold text-light pb-6 border-b-4 border-emerald">Profile Settings</h1>
             <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-6">
+                <ImageUpload />
                 <div className="flex flex-col">
                     <label className="text-lg font-semibold text-light">Name</label>
                     <input
@@ -131,14 +133,34 @@ const ProfilePage = () => {
                             </div>
                         ))}
                     </div>
-                    <button
-                        type="button"
-                        onClick={() => handleAddField('skills')}
-                        className="mt-3 flex items-center text-emerald hover:text-indigo-400"
-                    >
-                        <FaPlus className="mr-2" /> Add Skill
-                    </button>
+
+                    {/* New Skill Input */}
+                    <div className="flex items-center mt-3">
+                        <input
+                            type="text"
+                            value={formData.newSkill || ''} // Track new skill separately
+                            onChange={(e) => setFormData({ ...formData, newSkill: e.target.value })}
+                            placeholder="Add a new skill"
+                            className="w-full p-2 bg-grey border border-gray-500 rounded-lg focus:ring-2 focus:ring-emerald focus:outline-none text-light"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => {
+                                if (formData.newSkill.trim()) {
+                                    setFormData({
+                                        ...formData,
+                                        skills: [...formData.skills, formData.newSkill],
+                                        newSkill: '', // Reset input after adding skill
+                                    });
+                                }
+                            }}
+                            className="ml-2 text-emerald hover:text-indigo-400"
+                        >
+                            <FaPlus />
+                        </button>
+                    </div>
                 </div>
+
 
                 {/* Experience Section */}
                 <div className="flex flex-col">

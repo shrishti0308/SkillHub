@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const fs = require('fs'); // for deleting old images
 
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -25,6 +26,7 @@ const userSchema = new mongoose.Schema({
         skills: [{ type: String }],
         portfolio: { type: String },
         experience: [{ type: String }],
+        profilePic: { type: String } // Store image file path
     },
     previousWorks: [{
         title: { type: String, required: true },

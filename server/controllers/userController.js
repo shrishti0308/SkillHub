@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { handleProfilePicUpload } = require('../middlewares/uploadMiddleware');
 
 const jwtSecret = 'skill_hub_secret_key';
 
@@ -76,6 +77,16 @@ exports.updateUserProfile = async (req, res) => {
         res.status(500).json({ success: false, message: 'Error updating profile', error });
     }
 };
+
+
+// Upload profile picture
+exports.uploadProfilePic = [handleProfilePicUpload, (req, res) => {
+    if (req.profilePicPath) {
+        return res.status(200).json({ success: true, message: 'Profile picture uploaded successfully', profilePic: req.profilePicPath });
+    } else {
+        return res.status(400).json({ success: false, message: 'No picture uploaded' });
+    }
+}];
 
 // Get all users (Admin only)
 exports.getAllUsers = async (req, res) => {

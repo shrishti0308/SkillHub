@@ -6,7 +6,7 @@ const jwtSecret = 'skill_hub_secret_key';
 
 // Register a new user
 exports.registerUser = async (req, res) => {
-    const { name, email, password, role, bio, info } = req.body;
+    const { name, username, email, password, role, bio, info } = req.body;
     try {
         const existingUser = await User.findOne({ email });
         if (existingUser) return res.status(400).json({ success: false, message: 'User already exists' });
@@ -14,6 +14,7 @@ exports.registerUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = new User({
             name,
+            username,
             email,
             password: hashedPassword,
             role,
@@ -32,9 +33,10 @@ exports.registerUser = async (req, res) => {
 
 // Login a user
 exports.loginUser = async (req, res) => {
-    const { email, password } = req.body;
+    const { usernameOrEmail, password } = req.body;
     try {
-        const user = await User.findOne({ email });
+        // Find user by either username or email
+        const user = await User.findOne({ $or: [{ email: usernameOrEmail }, { username: usernameOrEmail }] });
         if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
         const isMatch = await bcrypt.compare(password, user.password);
@@ -46,6 +48,7 @@ exports.loginUser = async (req, res) => {
         res.status(500).json({ success: false, message: 'Error logging in', error });
     }
 };
+
 
 // Get logged-in user's profile
 exports.getUserProfile = async (req, res) => {

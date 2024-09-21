@@ -12,7 +12,8 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-indigo-600 to-blue-500 flex justify-center items-center">
-      <div className="bg-gray-800 py-10 px-8 rounded-lg shadow-lg w-full max-w-md">
+      <div className="bg-gray-800 py-10 px-8 rounded-lg shadow-lg min-w-[325px] sm:min-w-[60%] lg:min-w-[35%] max-w-[90%]">
+        <img src="/logo.png" className=' mx-auto w-20' alt="" />
         <h2 className="text-3xl text-white font-bold text-center mb-6">Welcome Back</h2>
 
         <button className="bg-gray-700 text-gray-300 w-full py-3 rounded-md flex justify-center items-center mb-6 hover:bg-gray-600 transition duration-200">
@@ -62,8 +63,8 @@ const LoginPage = () => {
             <a href="/forgot-password" className="hover:underline text-blue-600">Forgot password?</a>
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             style={{ backgroundColor: 'rgb(37, 99, 235)', color: 'white', border: '2px solid rgb(37, 99, 235)' }}
             className="w-full py-3 rounded-md font-semibold hover:bg-blue-700 transition duration-200 text-xl"
           >

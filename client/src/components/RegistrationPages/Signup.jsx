@@ -45,7 +45,7 @@ const SignupPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-indigo-600 to-blue-500 flex justify-center items-center">
-      <div className="bg-gray-800 p-10 rounded-lg shadow-lg w-full max-w-md text-center">
+      <div className="bg-gray-800 p-10 rounded-lg shadow-lg text-center max-w-[90%]">
         {!showRoleSelection ? (
           <>
             <h2 className="text-3xl mb-2 text-white font-semibold">Create an Account</h2>
@@ -130,8 +130,8 @@ const SignupPage = () => {
                 </div>
               )}
 
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 style={{ backgroundColor: 'rgb(37, 99, 235)', color: 'white', border: '2px solid rgb(37, 99, 235)' }}
                 className="w-full py-3 rounded-md font-semibold hover:bg-blue-700 transition duration-200 text-xl"
               >
@@ -151,26 +151,46 @@ const SignupPage = () => {
             <h2 className="text-2xl mb-5 text-white font-semibold">How do you like to join?</h2>
             <div className="grid grid-cols-1 gap-4">
               {['Freelancer', 'Enterprise', 'Hybrid'].map((roleOption, index) => (
-                <div key={index} className="bg-gray-700 p-5 rounded-lg shadow-md transition hover:shadow-lg cursor-pointer">
-                  <input type="radio" id={roleOption.toLowerCase()} name="role" value={roleOption.toLowerCase()} required className="mr-2" onChange={(e) => setRole(e.target.value)} />
-                  <label htmlFor={roleOption.toLowerCase()} className="text-lg text-white font-semibold">{roleOption}</label>
-                  <p className="description text-gray-400 text-sm mt-2">
-                    {roleOption === 'Freelancer' && (
-                      <>Engage in projects by completing tasks assigned by clients. <br />* Commission: 0.5%</>
-                    )}
-                    {roleOption === 'Enterprise' && (
-                      <>Post projects for freelancers to undertake. <br />* Commission: 1%</>
-                    )}
-                    {roleOption === 'Hybrid' && (
-                      <>Participate in both posting and completing projects, offering the greatest flexibility. <br />* Commission: 1.5%</>
-                    )}
-                  </p>
-                </div>
+                <label
+                  key={index}
+                  className="relative flex cursor-pointer items-center p-5 rounded-lg shadow-md transition hover:shadow-lg"
+                  htmlFor={roleOption.toLowerCase()}
+                  data-ripple-dark="true"
+                >
+                  <div className=' relative' >
+                    <input
+                      name="role"
+                      type="radio"
+                      id={roleOption.toLowerCase()}
+                      value={roleOption.toLowerCase()}
+                      className="absolute peer h-5 w-5 cursor-pointer appearance-none rounded-full border border-white checked:border-blue-400 transition-all  before:content[''] before:absolute before:-top-[50%] before:-left-[50%] before:block before:h-9 before:w-9 before:rounded-full before:bg-blue-400 before:opacity-0 before:transition-opacity hover:before:opacity-10 transform -translate-x-1/2 -translate-y-1/2"
+                      onChange={(e) => setRole(e.target.value)}
+                      required
+                    />
+                    <span className="absolute bg-blue-400 w-3 h-3 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></span>
+                  </div>
+
+                  <div className=" max-w-[80%] mx-auto">
+                    <span className="text-2xl text-white font-semibold capitalize">{roleOption}</span>
+                    <p className="description text-gray-300 text-md mt-2">
+                      {roleOption === 'Freelancer' && (
+                        <>Engage in projects by completing tasks assigned by clients. <br />* Commission: 0.5%</>
+                      )}
+                      {roleOption === 'Enterprise' && (
+                        <>Post projects for freelancers to undertake. <br />* Commission: 1%</>
+                      )}
+                      {roleOption === 'Hybrid' && (
+                        <>Participate in both posting and completing projects, offering the greatest flexibility. <br />* Commission: 1.5%</>
+                      )}
+                    </p>
+                  </div>
+                </label>
               ))}
+
             </div>
 
-            <button 
-              type="button" 
+            <button
+              type="button"
               style={{ backgroundColor: 'rgb(37, 99, 235)', color: 'white', border: '2px solid rgb(37, 99, 235)' }}
               className="w-full py-3 rounded-md font-semibold hover:bg-blue-700 transition duration-200 text-xl mt-5"
               onClick={handleRoleSelection}

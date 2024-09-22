@@ -7,7 +7,7 @@ function App() {
 
   return (
     <>
-      <div className=' bg-dark text-light w-screen min-h-screen overflow-x-hidden'>
+      <div className=' bg-dark text-light min-h-screen overflow-hidden'>
         <Navbar />
         <Routes>
           {/* <Route path="/" element={<h1 className=' text-lg' >Site under development</h1>} /> */}

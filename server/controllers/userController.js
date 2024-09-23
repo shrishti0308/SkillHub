@@ -64,12 +64,13 @@ exports.getUserProfile = async (req, res) => {
 
 // Update logged-in user's profile
 exports.updateUserProfile = async (req, res) => {
-    const { name, bio, info, skills, portfolio } = req.body;
+    const { name, bio, skills, experience, portfolio, previousWorks } = req.body;
     try {
         await User.findByIdAndUpdate(req.user.id, {
             name,
             bio,
-            info: { skills, portfolio },
+            info: { skills, portfolio, experience },
+            previousWorks,
         }, { new: true });
 
         res.status(200).json({ success: true, message: 'Profile updated successfully' });

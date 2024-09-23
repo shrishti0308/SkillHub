@@ -1,41 +1,47 @@
-import React, { useState } from 'react';
-import { FaPlus } from '@react-icons/all-files/fa/FaPlus';
-import { FaTimes } from '@react-icons/all-files/fa/FaTimes';
+import React, { useEffect, useState } from 'react';
+import { FaPlus, FaTimes } from 'react-icons/fa';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUserProfile, updateUserProfile, selectUserProfile } from '../../redux/reducers/ProfileSlice'; // Adjust import path
 import ImageUpload from './ProfileComponents/ImageUpload';
+import axiosInstance from '../../api/axiosInstance';
 
 const ProfilePage = () => {
-    const user = {
-        name: 'Vegeta',
-        email: 'prince.vegeta@saiyanmail.com',
-        bio: 'The Prince of all Saiyans, determined to surpass Kakarot.',
-        info: {
-            skills: ['Combat Strategy', 'Super Saiyan', 'SSJ God', 'Final Flash'],
-            portfolio: 'https://vegeta-saiyan-elite.com',
-            experience: ['Leader of Saiyan Army', 'Fighter in Tournament of Power']
-        },
-        previousWorks: [
-            {
-                title: 'Battle with Frieza',
-                description: 'Fought against the tyrant Frieza on Namek, pushing my limits.',
-                link: 'https://dragonball.com/frieza-saga'
-            },
-            {
-                title: 'Tournament of Power',
-                description: 'Represented Universe 7 and showcased my pride as a Saiyan warrior.',
-                link: 'https://dragonball.com/tournament-of-power'
-            }
-        ],
-    };
+    const dispatch = useDispatch();
+    const userProfile = useSelector(selectUserProfile);
 
     const [formData, setFormData] = useState({
-        name: user.name || '',
-        email: user.email || '',
-        bio: user.bio || '',
-        skills: user.info?.skills || [''],
-        portfolio: user.info?.portfolio || '',
-        experience: user.info?.experience || [''],
-        previousWorks: user.previousWorks || [{ title: '', description: '', link: '' }]
+        name: userProfile.name || '',
+        email: userProfile.email || '',
+        bio: userProfile.bio || '',
+        skills: userProfile.info?.skills || [''],
+        portfolio: userProfile.info?.portfolio || '',
+        experience: userProfile.info?.experience || [''],
+        previousWorks: userProfile.previousWorks || [{ title: '', description: '', link: '' }],
+        newSkill: '' // Track new skill input
     });
+
+    useEffect(() => {
+        const fetchUserProfile = async () => {
+            try {
+                const response = await axiosInstance.get('/user/profile');
+                const data = response.data.user;
+                setFormData({
+                    name: data.name,
+                    email: data.email,
+                    bio: data.bio,
+                    skills: data.info.skills,
+                    portfolio: data.info.portfolio,
+                    experience: data.info.experience,
+                    previousWorks: data.previousWorks
+                });
+                dispatch(setUserProfile(data)); // Store in Redux
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+            }
+        };
+
+        fetchUserProfile();
+    }, [dispatch]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -73,9 +79,15 @@ const ProfilePage = () => {
         setFormData({ ...formData, previousWorks: updatedWorks });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Updated profile data:', formData);
+        try {
+            const response = await axiosInstance.put('/user/profile', formData); // Send updated data
+            console.log('Profile updated successfully:', response.data);
+            dispatch(updateUserProfile(formData));
+        } catch (error) {
+            console.error('Error updating profile:', error.response?.data || error.message);
+        }
     };
 
     return (
@@ -83,6 +95,7 @@ const ProfilePage = () => {
             <h1 className="text-4xl font-bold text-light pb-6 border-b-4 border-emerald">Profile Settings</h1>
             <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-6">
                 <ImageUpload />
+
                 <div className="flex flex-col">
                     <label className="text-lg font-semibold text-light">Name</label>
                     <input
@@ -138,7 +151,7 @@ const ProfilePage = () => {
                     <div className="flex items-center mt-3">
                         <input
                             type="text"
-                            value={formData.newSkill || ''} // Track new skill separately
+                            value={formData.newSkill || ''}
                             onChange={(e) => setFormData({ ...formData, newSkill: e.target.value })}
                             placeholder="Add a new skill"
                             className="w-full p-2 bg-grey border border-gray-500 rounded-lg focus:ring-2 focus:ring-emerald focus:outline-none text-light"
@@ -150,7 +163,7 @@ const ProfilePage = () => {
                                     setFormData({
                                         ...formData,
                                         skills: [...formData.skills, formData.newSkill],
-                                        newSkill: '', // Reset input after adding skill
+                                        newSkill: '',
                                     });
                                 }
                             }}
@@ -160,7 +173,6 @@ const ProfilePage = () => {
                         </button>
                     </div>
                 </div>
-
 
                 {/* Experience Section */}
                 <div className="flex flex-col">
@@ -197,7 +209,7 @@ const ProfilePage = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {formData.previousWorks.map((work, index) => (
                             <div key={index} className="bg-grey p-4 pt-2 rounded-lg shadow-lg space-y-2">
-                                <div className='flex justify-end' >
+                                <div className='flex justify-end'>
                                     <button
                                         type="button"
                                         onClick={() => handleDeletePreviousWork(index)}
@@ -239,19 +251,6 @@ const ProfilePage = () => {
                     </button>
                 </div>
 
-                {/* Portfolio Link */}
-                <div className="flex flex-col">
-                    <label className="text-lg font-semibold text-light">Portfolio</label>
-                    <input
-                        type="text"
-                        name="portfolio"
-                        value={formData.portfolio}
-                        onChange={handleChange}
-                        className="w-full p-3 bg-grey border border-gray-500 rounded-lg focus:ring-2 focus:ring-emerald focus:outline-none text-light"
-                    />
-                </div>
-
-                {/* Update Profile Button */}
                 <button
                     type="submit"
                     className="mt-6 w-1/2 mx-auto bg-gray-800 hover:bg-grey text-white font-bold py-3 rounded-lg shadow-lg transition duration-300"

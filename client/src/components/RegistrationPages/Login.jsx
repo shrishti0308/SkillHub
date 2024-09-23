@@ -2,12 +2,32 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
+import { useDispatch } from 'react-redux';
+import { login } from '../../redux/actions/authActions'; // Adjust path if necessary
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const LoginPage = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate(); // Initialize navigate
   const [showPassword, setShowPassword] = useState(false);
+  const [usernameOrEmail, setUsernameOrEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    try {
+      await dispatch(login(usernameOrEmail, password)); // Dispatch the login action
+      console.log('User logged in successfully');
+      navigate('/'); // Redirect to home page
+    } catch (error) {
+      setErrorMessage(error.message);
+    }
   };
 
   return (
@@ -15,6 +35,8 @@ const LoginPage = () => {
       <div className="bg-gray-800 py-10 px-8 rounded-lg shadow-lg min-w-[325px] sm:min-w-[60%] lg:min-w-[35%] max-w-[90%]">
         <img src="/logo.png" className=' mx-auto w-20' alt="" />
         <h2 className="text-3xl text-white font-bold text-center mb-6">Welcome Back</h2>
+
+        {errorMessage && <p className="text-red-500 text-center">{errorMessage}</p>}
 
         <button className="bg-gray-700 text-gray-300 w-full py-3 rounded-md flex justify-center items-center mb-6 hover:bg-gray-600 transition duration-200">
           <FontAwesomeIcon icon={faGoogle} className="mr-2" />
@@ -27,12 +49,14 @@ const LoginPage = () => {
           <div className="flex-grow h-px bg-gray-600"></div>
         </div>
 
-        <form action="/login" method="POST" className="space-y-6">
+        <form onSubmit={handleLogin} className="space-y-6">
           <div className="relative">
             <input
               type="text"
               id="email-username"
               name="email_username"
+              value={usernameOrEmail}
+              onChange={(e) => setUsernameOrEmail(e.target.value)}
               placeholder="Email or Username"
               className="w-full p-3 border-2 border-blue-400 bg-gray-700 text-white rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-150"
               required
@@ -44,6 +68,8 @@ const LoginPage = () => {
               type={showPassword ? 'text' : 'password'}
               id="password"
               name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
               className="w-full p-3 border-2 border-blue-400 bg-gray-700 text-white rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-150"
               required

@@ -25,10 +25,10 @@ const upload = multer({
 // Middleware function for handling profile picture upload
 const handleProfilePicUpload = async (req, res, next) => {
     if (!req.file) {
-        return next(); // No file to upload, proceed to the next middleware
+        return next();
     }
 
-    const userId = req.body.userId; // Pass userId in the request
+    const userId = req.user.id; // Pass userId in the request
     const user = await User.findById(userId);
 
     if (!user) return res.status(404).json({ message: 'User not found' });

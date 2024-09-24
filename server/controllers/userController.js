@@ -62,15 +62,31 @@ exports.getUserProfile = async (req, res) => {
     }
 };
 
-// Update logged-in user's profile
 exports.updateUserProfile = async (req, res) => {
     const { name, bio, skills, experience, portfolio, previousWorks } = req.body;
+
     try {
+        // Retrieve the current user data
+        const user = await User.findById(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Merge the existing `info` object with the new fields
+        const updatedInfo = {
+            ...user.info, // Keep existing data
+            skills: skills || user.info.skills, // Update only if new data is provided
+            portfolio: portfolio || user.info.portfolio,
+            experience: experience || user.info.experience,
+        };
+
+        // Update the user profile
         await User.findByIdAndUpdate(req.user.id, {
             name,
             bio,
-            info: { skills, portfolio, experience },
-            previousWorks,
+            info: updatedInfo, // Use the merged info object
+            previousWorks: previousWorks || user.previousWorks, // Keep previous works if not provided
         }, { new: true });
 
         res.status(200).json({ success: true, message: 'Profile updated successfully' });
@@ -78,6 +94,7 @@ exports.updateUserProfile = async (req, res) => {
         res.status(500).json({ success: false, message: 'Error updating profile', error });
     }
 };
+
 
 
 // Upload profile picture

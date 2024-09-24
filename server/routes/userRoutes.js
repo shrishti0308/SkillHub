@@ -5,6 +5,8 @@ const { upload } = require('../middlewares/uploadMiddleware');
 const { authenticateJWT } = require('../middlewares/authMiddleware');
 const { validateUserInput } = require('../middlewares/validationMiddleware');
 
+router.use(express.urlencoded({ extended: true }));
+
 // Route for user registration
 router.post('/register', validateUserInput, userController.registerUser);
 

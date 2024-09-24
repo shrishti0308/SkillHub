@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema({
         skills: [{ type: String }],
         portfolio: { type: String },
         experience: [{ type: String }],
-        profilePic: { type: String } // Store image file path
+        profilePic: { type: String }
     },
     previousWorks: [{
         title: { type: String, required: true },

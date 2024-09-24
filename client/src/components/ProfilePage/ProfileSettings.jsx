@@ -8,6 +8,8 @@ import axiosInstance from '../../api/axiosInstance';
 const ProfileSettings = () => {
     const dispatch = useDispatch();
     const userProfile = useSelector(selectUserProfile);
+    const [profilePic, setProfilePic] = useState(null);
+    const [profilePicPath, setProfilePicPath] = useState(null)
 
     const [formData, setFormData] = useState({
         name: userProfile.name || '',
@@ -34,6 +36,7 @@ const ProfileSettings = () => {
                     experience: data.info.experience,
                     previousWorks: data.previousWorks
                 });
+                setProfilePicPath(data.info.profilePic)
                 dispatch(setUserProfile(data)); // Store in Redux
             } catch (error) {
                 console.error('Error fetching user profile:', error);
@@ -81,10 +84,24 @@ const ProfileSettings = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         try {
-            const response = await axiosInstance.put('/user/profile', formData); // Send updated data
-            console.log('Profile updated successfully:', response.data);
+            // First, update the user profile information
+            await axiosInstance.put('/user/profile', formData);
             dispatch(updateUserProfile(formData));
+            console.log('Profile updated successfully');
+
+            if (profilePic) {
+                const formDataPic = new FormData();
+                formDataPic.append('profilePic', profilePic);
+                await axiosInstance.post('/user/upload-profile-pic', formDataPic, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+            }
+
+            location.reload();
         } catch (error) {
             console.error('Error updating profile:', error.response?.data || error.message);
         }
@@ -94,7 +111,7 @@ const ProfileSettings = () => {
         <div className="max-w-5xl mx-auto p-6 bg-dark shadow-lg rounded-lg">
             <h1 className="text-4xl font-bold text-light pb-6 border-b-4 border-emerald">Profile Settings</h1>
             <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-6">
-                <ImageUpload />
+                <ImageUpload profilePicPath={profilePicPath} setProfilePic={setProfilePic} />
 
                 <div className="flex flex-col">
                     <label className="text-lg font-semibold text-light">Name</label>

@@ -4,12 +4,12 @@ import { TbLogout } from "react-icons/tb";
 
 const Navbar = () => {
   return (
-    <div className="flex items-center justify-between bg-grey p-4 shadow-md w-full fixed top-0 left-0">
+    <div className="flex z-10 items-center justify-between bg-grey p-4 z-1 shadow-md w-full fixed top-0 left-0">
       <div className="flex items-center space-x-2">
         <img 
-          src="./logo.png"  // Replace with your logo image path
+          src="./logo.png" 
           alt="Logo"
-          className="h-8 w-8"       // Adjust size of the logo as needed
+          className="h-8 w-8"  
         />
         <h3 className="text-2xl font-bold">SkillHub</h3>
       </div>

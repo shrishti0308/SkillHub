@@ -2,7 +2,7 @@ import { Route, BrowserRouter as Router, Routes, useLocation } from 'react-route
 import Navbar from './components/navbar';
 import LoginPage from './components/RegistrationPages/Login';
 import SignupPage from './components/RegistrationPages/Signup';
-import ProfilePage from './components/ProfilePage/ProfilePage';
+import ProfileSettings from './components/ProfilePage/ProfileSettings';
 
 function App() {
   const location = useLocation();
@@ -19,7 +19,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/" element={<h1 className=' text-lg' >Site under development</h1>} />
-          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile" element={<ProfileSettings />} />
         </Routes>
       </div>
     </>

@@ -5,7 +5,7 @@ import { setUserProfile, updateUserProfile, selectUserProfile } from '../../redu
 import ImageUpload from './ProfileComponents/ImageUpload';
 import axiosInstance from '../../api/axiosInstance';
 
-const ProfilePage = () => {
+const ProfileSettings = () => {
     const dispatch = useDispatch();
     const userProfile = useSelector(selectUserProfile);
 
@@ -262,4 +262,4 @@ const ProfilePage = () => {
     );
 };
 
-export default ProfilePage;
+export default ProfileSettings;

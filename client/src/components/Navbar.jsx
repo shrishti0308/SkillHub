@@ -4,7 +4,7 @@ import { TbLogout } from "react-icons/tb";
 
 const Navbar = () => {
   return (
-    <div className="flex items-center justify-between bg-grey p-4 z-1 shadow-md w-full fixed top-0 left-0">
+    <div className="flex z-10 items-center justify-between bg-grey p-4 z-1 shadow-md w-full fixed top-0 left-0">
       <div className="flex items-center space-x-2">
         <img 
           src="./logo.png" 

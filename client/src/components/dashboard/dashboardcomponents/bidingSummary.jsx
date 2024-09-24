@@ -47,7 +47,7 @@ const BiddingSummary = () => {
                     </div>
                 ))} */}
                 <div className="bg-grey p-5 rounded-xl shadow-lg transform transition-all hover:scale-105 hover:shadow-2xl">
-                    <h3 className="text-xl font-semibold text-white mb-3">
+                    <h3 className="text-xl font-semibold text-cyan-blue mb-3">
                         bid1
                     </h3>
                     <p className="text-light mb-2">Bid Amount: <span className="font-medium text-light">$342543</span></p>
@@ -60,7 +60,7 @@ const BiddingSummary = () => {
                     </p>
                 </div>
                 <div className="bg-grey p-5 rounded-xl shadow-lg transform transition-all hover:scale-105 hover:shadow-2xl">
-                    <h3 className="text-xl font-semibold text-white mb-3">
+                    <h3 className="text-xl font-semibold text-cyan-blue mb-3">
                         bid2
                     </h3>
                     <p className="text-light mb-2">Bid Amount: <span className="font-medium text-light">$342543</span></p>
@@ -73,7 +73,7 @@ const BiddingSummary = () => {
                     </p>
                 </div>
                 <div className="bg-grey p-5 rounded-xl shadow-lg transform transition-all hover:scale-105 hover:shadow-2xl">
-                    <h3 className="text-xl font-semibold text-white mb-3">
+                    <h3 className="text-xl font-semibold text-cyan-blue mb-3">
                         bid3
                     </h3>
                     <p className="text-light mb-2">Bid Amount: <span className="font-medium text-light">$342543</span></p>

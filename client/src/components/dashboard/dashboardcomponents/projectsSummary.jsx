@@ -24,11 +24,11 @@ const ProjectsSummary = ({ userId }) => {
             <h2 className="text-xl font-semibold mb-6">Your Projects</h2>
 
             {/* Header Row */}
-            <div className="grid grid-cols-12 gap-4 text-gray-600 bg-gray-100 p-4 rounded-lg font-semibold">
-                <span className="col-span-4">Title</span>
-                <span className="col-span-4">Description</span>
-                <span className="col-span-2">Employer</span>
-                <span className="col-span-2 text-right">Status</span>
+            <div className="grid grid-cols-4 text-left bg-grey text-cyan-blue font-medium rounded-t-lg">
+                <div className="p-3">Title</div>
+                <div className="p-3">Description</div>
+                <div className="p-3">Employer</div>
+                <div className="p-3">Status</div>
             </div>
 
             {/* Projects List */}
@@ -55,62 +55,50 @@ const ProjectsSummary = ({ userId }) => {
                         </span>
                     </div>
                 ))} */}
-                <div
-                    className="grid grid-cols-12 gap-4 p-4 transition duration-200"
-                >
-                    <span className="col-span-4 font-semibold text-gray-800">
-                        job1
-                    </span>
-
-                    <span className="col-span-4 text-gray-600 truncate">
-                        descfjfshkgbfvhdfbvkjfdvg 
-                    </span>
-
-                    <span className="col-span-2 text-gray-600">
-                        shrishteaaaa
-                    </span>
-
-                    <span className={`col-span-2 text-right font-semibold ${jobstatus === 'completed' ? 'text-emerald-500' : jobstatus === 'in-progress' ? 'text-yellow-500' : 'text-gray-500'}`}>
-                        {jobstatus}
-                    </span>
+                <div className="grid grid-cols-4 text-left bg-grey text-white border-none my-2">
+                    <div className="p-3">job1</div>
+                    <div className="p-3">descfjfshkgbfvhdfbvkjfdvg </div>
+                    <div className="p-3">shrishteaaaa</div>
+                    <div className="p-3">
+                        <span className={`px-2 py-1 ${
+                            jobstatus === 'in-progress' ? 'border-emerald-500 text-emerald-100'
+                            : jobstatus === 'completed' ? 'border-indigo-500 text-indigo-100'
+                            : 'bg-red-500'
+                        }
+                        text-center border text-xs`}>
+                            {jobstatus}
+                        </span>
+                    </div>
                 </div>
-                <div
-                    className="grid grid-cols-12 gap-4 p-4 transition duration-200"
-                >
-                    <span className="col-span-4 font-semibold text-gray-800">
-                        job2
-                    </span>
-
-                    <span className="col-span-4 text-gray-600 truncate">
-                        descfjfshkgbfvhdfbvkjfdvg 
-                    </span>
-
-                    <span className="col-span-2 text-gray-600">
-                        shrishteaaaa
-                    </span>
-
-                    <span className={`col-span-2 text-right font-semibold ${jobstatus === 'completed' ? 'text-emerald-500' : jobstatus === 'in-progress' ? 'text-yellow-500' : 'text-gray-500'}`}>
-                        {jobstatus}
-                    </span>
+                <div className="grid grid-cols-4 text-left bg-grey text-white border-none my-2">
+                    <div className="p-3">job1</div>
+                    <div className="p-3">descfjfshkgbfvhdfbvkjfdvg </div>
+                    <div className="p-3">shrishteaaaa</div>
+                    <div className="p-3">
+                        <span className={`px-2 py-1 ${
+                            jobstatus === 'in-progress' ? 'border-emerald-500 text-emerald-100'
+                            : jobstatus === 'completed' ? 'border-indigo-500 text-indigo-100'
+                            : 'bg-red-500'
+                        }
+                        text-center border text-xs`}>
+                            {jobstatus}
+                        </span>
+                    </div>
                 </div>
-                <div
-                    className="grid grid-cols-12 gap-4 p-4 transition duration-200"
-                >
-                    <span className="col-span-4 font-semibold text-gray-800">
-                        job3
-                    </span>
-
-                    <span className="col-span-4 text-gray-600 truncate">
-                        descfjfshkgbfvhdfbvkjfdvg 
-                    </span>
-
-                    <span className="col-span-2 text-gray-600">
-                        shrishteaaaa
-                    </span>
-
-                    <span className={`col-span-2 text-right font-semibold ${jobstatus === 'completed' ? 'text-emerald-500' : jobstatus === 'in-progress' ? 'text-yellow-500' : 'text-gray-500'}`}>
-                        {jobstatus}
-                    </span>
+                <div className="grid grid-cols-4 text-left bg-grey text-white border-none my-2">
+                    <div className="p-3">job1</div>
+                    <div className="p-3">descfjfshkgbfvhdfbvkjfdvg </div>
+                    <div className="p-3">shrishteaaaa</div>
+                    <div className="p-3">
+                        <span className={`px-2 py-1 ${
+                            jobstatus === 'in-progress' ? 'border-emerald-500 text-emerald-100'
+                            : jobstatus === 'completed' ? 'border-indigo-500 text-indigo-100'
+                            : 'bg-red-500'
+                        }
+                        text-center border text-xs`}>
+                            {jobstatus}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>

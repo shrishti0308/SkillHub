@@ -2,8 +2,6 @@ import React from 'react';
 import Sidebar from './dashboardcomponents/Sidebar';
 import { useSelector } from 'react-redux'; 
 import { selectIsSidebarMinimized } from '../../features/dashboard/sidebarSlice';
-
-const Dashboard = () => {
 import { selectIsSidebarMinimized } from '../../redux/reducers/dashboard/sidebarSlice';
 import EarningsSummary from './dashboardcomponents/earningsSummary';
 import BiddingSummary from './dashboardcomponents/bidingSummary';

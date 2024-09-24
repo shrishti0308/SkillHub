@@ -1,6 +1,9 @@
 import React from 'react';
 import Sidebar from './dashboardcomponents/Sidebar';
 import { useSelector } from 'react-redux'; 
+import { selectIsSidebarMinimized } from '../../features/dashboard/sidebarSlice';
+
+const Dashboard = () => {
 import { selectIsSidebarMinimized } from '../../redux/reducers/dashboard/sidebarSlice';
 import EarningsSummary from './dashboardcomponents/earningsSummary';
 import BiddingSummary from './dashboardcomponents/bidingSummary';
@@ -22,6 +25,9 @@ const Dashboard = () => {
         <div className="flex justify-between items-center bg-dark p-4 mb-4">
           <span className="text-xl font-semibold">Welcome</span>
         </div>
+
+        
+        
         
         <div className="flex flex-col space-y-4">
           <RecentJobsSummary />

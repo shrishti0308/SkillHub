@@ -8,7 +8,7 @@ import { GrMoney } from "react-icons/gr";
 import { FaLaptopCode } from "react-icons/fa";
 import { RiAccountCircleLine } from "react-icons/ri";
 import { useDispatch, useSelector } from 'react-redux'; 
-import { toggleSidebar, selectIsSidebarMinimized } from '../../../features/dashboard/sidebarSlice'; 
+import { toggleSidebar, selectIsSidebarMinimized } from '../../../redux/reducers/dashboard/sidebarSlice'; 
 
 function Sidebar() {
     const dispatch = useDispatch();

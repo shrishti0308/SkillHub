@@ -52,7 +52,7 @@ exports.loginUser = async (req, res) => {
 
 
 // Get logged-in user's profile
-exports.getUserProfile = async (req, res) => {
+exports.getUserDetails = async (req, res) => {
     try {
         const user = await User.findById(req.user.id).select('-password');
         if (!user) return res.status(404).json({ success: false, message: 'User not found' });
@@ -105,6 +105,18 @@ exports.uploadProfilePic = [handleProfilePicUpload, (req, res) => {
         return res.status(400).json({ success: false, message: 'No picture uploaded' });
     }
 }];
+
+exports.getUserProfile = async (req, res) => {
+    try {
+        const user = await User.findOne({ username: req.params.username });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+    }
+};
 
 // Get all users (Admin only)
 exports.getAllUsers = async (req, res) => {

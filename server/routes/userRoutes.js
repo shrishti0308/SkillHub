@@ -14,10 +14,13 @@ router.post('/register', validateUserInput, userController.registerUser);
 router.post('/login', userController.loginUser);
 
 // Route for getting a user's own profile (JWT protected)
-router.get('/profile', authenticateJWT, userController.getUserProfile);
+router.get('/profile', authenticateJWT, userController.getUserDetails);
 
 // Route for updating user's own profile (JWT protected)
 router.put('/profile', authenticateJWT, userController.updateUserProfile);
+
+// Route for getting a user's profile
+router.get('/:username', userController.getUserProfile);
 
 // Upload profile picture
 router.post('/upload-profile-pic', authenticateJWT, upload.single('profilePic'), userController.uploadProfilePic);

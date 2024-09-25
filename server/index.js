@@ -6,6 +6,8 @@ const PORT = 3000;
 
 const userRoutes = require('./routes/userRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
+const jobRoutes = require('./routes/jobRoutes');
+
 
 connectDB();
 
@@ -24,6 +26,7 @@ app.get('/', (req, res) => {
 
 app.use('/user', userRoutes);
 app.use('/review', reviewRoutes);
+app.use('/jobs',jobRoutes); 
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

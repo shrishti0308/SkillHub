@@ -19,3 +19,6 @@ exports.getFilteredJobs = async (req, res) => {
         res.status(500).json({ message: 'Error retrieving jobs', error: err.message });
     }
 };
+
+
+

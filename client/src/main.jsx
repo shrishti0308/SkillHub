@@ -10,5 +10,5 @@ createRoot(document.getElementById('root')).render(
     <Provider store={store}>
       <APPwithRouter />
     </Provider>
-  </StrictMode>,
+  </StrictMode>
 )

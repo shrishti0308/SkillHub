@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
-import authReducer from './authReducer';
+import authReducer from './user/authSlice';
 import sidebarReducer from './dashboard/sidebarSlice';
-import profileReducer from './ProfileSlice';
+import profileReducer from './user/ProfileSlice';
 
 const rootReducer = combineReducers({
     auth: authReducer,

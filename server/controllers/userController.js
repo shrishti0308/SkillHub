@@ -52,7 +52,7 @@ exports.loginUser = async (req, res) => {
 
 
 // Get logged-in user's profile
-exports.getUserProfile = async (req, res) => {
+exports.getUserDetails = async (req, res) => {
     try {
         const user = await User.findById(req.user.id).select('-password');
         if (!user) return res.status(404).json({ success: false, message: 'User not found' });
@@ -62,15 +62,31 @@ exports.getUserProfile = async (req, res) => {
     }
 };
 
-// Update logged-in user's profile
 exports.updateUserProfile = async (req, res) => {
     const { name, bio, skills, experience, portfolio, previousWorks } = req.body;
+
     try {
+        // Retrieve the current user data
+        const user = await User.findById(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Merge the existing `info` object with the new fields
+        const updatedInfo = {
+            ...user.info, // Keep existing data
+            skills: skills || user.info.skills, // Update only if new data is provided
+            portfolio: portfolio || user.info.portfolio,
+            experience: experience || user.info.experience,
+        };
+
+        // Update the user profile
         await User.findByIdAndUpdate(req.user.id, {
             name,
             bio,
-            info: { skills, portfolio, experience },
-            previousWorks,
+            info: updatedInfo, // Use the merged info object
+            previousWorks: previousWorks || user.previousWorks, // Keep previous works if not provided
         }, { new: true });
 
         res.status(200).json({ success: true, message: 'Profile updated successfully' });
@@ -78,6 +94,7 @@ exports.updateUserProfile = async (req, res) => {
         res.status(500).json({ success: false, message: 'Error updating profile', error });
     }
 };
+
 
 
 // Upload profile picture
@@ -88,6 +105,18 @@ exports.uploadProfilePic = [handleProfilePicUpload, (req, res) => {
         return res.status(400).json({ success: false, message: 'No picture uploaded' });
     }
 }];
+
+exports.getUserProfile = async (req, res) => {
+    try {
+        const user = await User.findOne({ username: req.params.username });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+    }
+};
 
 // Get all users (Admin only)
 exports.getAllUsers = async (req, res) => {

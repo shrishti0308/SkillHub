@@ -13,6 +13,7 @@ const initialState = {
             bidAccepted: false,
         },
     ],
+    job: null,
 };
 
 const jobsSlice = createSlice({
@@ -22,14 +23,18 @@ const jobsSlice = createSlice({
         setRecentJobs: (state, action) => {
             state.recentJobs = action.payload;
         },
+        setJobById : (state,action)=>{
+            state.job = action.payload;
+        },
         updateRecentJobs: (state, action) => {
             state.recentJobs = { ...state.recentJobs, ...action.recentJobs };
         },
     },
 });
 
-export const { setRecentJobs, updateRecentJobs } = jobsSlice.actions;
+export const { setRecentJobs, updateRecentJobs ,setJobById } = jobsSlice.actions;
 
 export const selectRecentJobs = (state) => state.jobs.recentJobs;
+export const selectJobById = (state) => state.jobs.job;
 
 export default jobsSlice.reducer;

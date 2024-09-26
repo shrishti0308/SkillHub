@@ -33,7 +33,7 @@ function Sidebar() {
                 <div className={`w-full flex flex-col justify-between h-3/4`}>
                     <div className='w-3/4 ml-10 flex flex-col justify-start'>
 
-                        <Link to="/" className={`flex my-3 ${activeSection === '/' ? 'bg-dark border-l-4 border-cyan-blue' : ''} px-4 py-2 hover:bg-dark text-cyan-blue`}>
+                        <Link to="/jobs" className={`flex my-3 ${activeSection === '/' ? 'bg-dark border-l-4 border-cyan-blue' : ''} px-4 py-2 hover:bg-dark text-cyan-blue`}>
                             <MdOutlineWorkOutline className='text-xl mr-3'/>
                             Jobs
                         </Link>

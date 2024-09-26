@@ -6,4 +6,7 @@ const jobController = require('../controllers/jobController');
 // Route to get filtered jobs
 router.get('/jobs', authenticateJWT, jobController.getFilteredJobs);
 
+// Route to get a specific job by ID
+router.get('/:id', authenticateJWT, jobController.getJobById);
+
 module.exports = router;

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const fs = require('fs'); // for deleting old images
+const fs = require('fs');
 
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true },

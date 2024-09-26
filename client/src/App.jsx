@@ -3,7 +3,8 @@ import Navbar from './components/navbar';
 import LoginPage from './components/RegistrationPages/Login';
 import SignupPage from './components/RegistrationPages/Signup';
 import ProfileSettings from './components/ProfilePage/ProfileSettings';
-import FreelancerDashboard from './components/Dashboard/FreelancerDashboard';
+import FreelancerDashboard from './components/dashboard/FreelancerDashboard';
+import Jobs from './components/JobsPage/Jobs';
 
 function App() {
   const location = useLocation();
@@ -22,6 +23,10 @@ function App() {
           <Route path='/freelancer'element={<FreelancerDashboard />}/>
           <Route path="/" element={<h1 className=' text-lg' >Site under development</h1>} />
           <Route path="/profile" element={<ProfileSettings />} />
+          <Route path="/jobs/*" element={<Jobs/>} />
+          {/* <Route path="/bidings" element={<Bidings/>} />
+          <Route path="/earnings" element={<Earnings/>} />
+          <Route path="/projects" element={<Projects/>} />  */}
         </Routes>
       </div>
     </>

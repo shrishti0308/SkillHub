@@ -1,5 +1,5 @@
 import React from 'react';
-import Sidebar from './Dashboardcomponents/Sidebar';
+import Sidebar from '../Dashboard/Dashboardcomponents/Sidebar';
 import { selectIsSidebarMinimized } from '../../redux/reducers/dashboard/sidebarSlice';
 import EarningsSummary from './Dashboardcomponents/EarningsSummary';
 // import BiddingSummary from './Dashboardcomponents/BidingSummary';

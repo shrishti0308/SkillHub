@@ -1,5 +1,7 @@
 const Job = require('../models/job');
+const Bid = require('../models/bid');
 
+// Get recent jobs
 exports.getFilteredJobs = async (req, res) => {
     try {
         const userId = req.user.id;  
@@ -7,7 +9,6 @@ exports.getFilteredJobs = async (req, res) => {
 
         let filter = { status: 'open' };  
 
-        
         if (userRole === 'freelancer' || userRole === 'hybrid') {
             filter.employer = { $ne: userId };  
         }
@@ -20,5 +21,19 @@ exports.getFilteredJobs = async (req, res) => {
     }
 };
 
+// Get a particular job by ID
+exports.getJobById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const job = await Job.findById(id).populate('employer freelancer');
 
+        if (!job) {
+            return res.status(404).json({ message: 'Job not found' });
+        }
+
+        res.status(200).json({ job });
+    } catch (err) {
+        res.status(500).json({ message: 'Error retrieving job', error: err.message });
+    }
+};
 

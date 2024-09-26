@@ -1,9 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 import axiosInstance from '../../../api/axiosInstance';
 
-// Initialize state with token from localStorage
+// Initialize state with token and role from localStorage
 const initialState = {
     accessToken: localStorage.getItem('accessToken') || null,
+    role: localStorage.getItem('role') || null, // Add role to the initial state
 };
 
 const authSlice = createSlice({
@@ -11,8 +12,10 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         setAccessToken: (state, action) => {
-            state.accessToken = action.payload;
-            localStorage.setItem('accessToken', action.payload);
+            state.accessToken = action.payload.token;
+            state.role = action.payload.role;
+            localStorage.setItem('accessToken', action.payload.token);
+            localStorage.setItem('role', action.payload.role); // Store role in localStorage
         },
     },
 });
@@ -28,7 +31,7 @@ export const signup = (userInfo, password, role) => async (dispatch) => {
 
         if (response.data.success) {
             const accessToken = response.data.token;
-            dispatch(setAccessToken(accessToken));
+            dispatch(setAccessToken({ token: accessToken, role }));
         }
     } catch (error) {
         throw new Error(error.response?.data?.message || 'Error registering user');
@@ -45,7 +48,8 @@ export const login = (usernameOrEmail, password) => async (dispatch) => {
 
         if (response.data.success) {
             const accessToken = response.data.token;
-            dispatch(setAccessToken(accessToken));
+            const role = response.data.role; // Assuming role is returned in response
+            dispatch(setAccessToken({ token: accessToken, role })); // Dispatch token and role
         }
     } catch (error) {
         throw new Error(error.response?.data?.message || 'Error logging in user');
@@ -54,6 +58,9 @@ export const login = (usernameOrEmail, password) => async (dispatch) => {
 
 // Selector to get accessToken from state
 export const selectAccessToken = (state) => state.auth.accessToken;
+
+// Selector to get role from state
+export const selectRole = (state) => state.auth.role;
 
 // Export the action created automatically by the slice
 export const { setAccessToken } = authSlice.actions;

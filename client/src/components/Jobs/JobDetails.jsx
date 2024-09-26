@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import axiosInstance from '../../api/axiosInstance';
+import { selectRole } from '../../redux/Features/user/authSlice';
 
 // JobDetails Component
 const JobDetails = () => {
@@ -9,6 +11,8 @@ const JobDetails = () => {
     const [bids, setBids] = useState([]);
     const [bidAmount, setBidAmount] = useState('');
     const [error, setError] = useState('');
+
+    const role = useSelector(selectRole);
 
     useEffect(() => {
         // Fetch job details
@@ -60,22 +64,30 @@ const JobDetails = () => {
                 </p>
 
                 {/* Bidding Form */}
-                <h2 className="text-xl font-bold mt-6">Place a Bid</h2>
-                <div className="flex items-center mb-4">
-                    <input
-                        type="number"
-                        value={bidAmount}
-                        onChange={(e) => setBidAmount(e.target.value)}
-                        placeholder="Enter your bid amount"
-                        className="bg-gray-700 border border-gray-600 rounded-md p-2 flex-grow"
-                    />
-                    <button
-                        onClick={handleBidSubmit}
-                        className="bg-blue-600 p-2 rounded-md ml-4 hover:bg-blue-700 transition duration-200"
-                    >
-                        Submit Bid
-                    </button>
-                </div>
+                {(role === 'hybrid' || role === 'freelancer') && (
+                    <>
+                        <h2 className="text-xl font-bold mt-6">Place a Bid</h2>
+                        <div className="flex items-center mb-4">
+                            <input
+                                type="number"
+                                value={bidAmount}
+                                onChange={(e) => setBidAmount(e.target.value)}
+                                placeholder="Enter your bid amount"
+                                className="bg-gray-700 border border-gray-600 rounded-md p-2 flex-grow"
+                            />
+                            <button
+                                onClick={handleBidSubmit}
+                                className="bg-blue-600 p-2 rounded-md ml-4 hover:bg-blue-700 transition duration-200"
+                            >
+                                Submit Bid
+                            </button>
+                        </div>
+                    </>
+                )}
+
+                {role === 'enterprise' && (
+                    <p className="text-red-500">You cannot place a bid as an enterprise.</p>
+                )}
 
                 {/* Displaying bids */}
                 <h2 className="text-xl font-bold mt-6">Bids for this Job</h2>

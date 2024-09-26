@@ -5,27 +5,27 @@ const LandingPage = () => {
     <div className="text-white" style={{ backgroundColor: '#B0E0E6' }}>
       {/* Hero Section */}
       <section
-  className="h-screen flex flex-col justify-center items-center bg-cover bg-center bg-no-repeat relative"
-  style={{ backgroundImage: 'url(freelance.png)' }}
->
-  <div className="bg-black bg-opacity-60 p-8 rounded-lg shadow-2xl">
-    <h1 className="text-5xl font-bold mb-4 text-center text-yellow-300 drop-shadow-lg">
-      Welcome to Freelancer Hub
-    </h1>
-    <p className="text-lg text-center mb-6 text-gray-300">
-      Connect with top talent, find freelance jobs, and grow your business.
-    </p>
-    {/* Centering the button */}
-    <div className="flex justify-center">
-      <a
-        href="#features"
-        className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105"
+        className="h-screen flex flex-col justify-center items-center bg-cover bg-center bg-no-repeat relative"
+        style={{ backgroundImage: 'url(freelance.png)' }}
       >
-        Get Started
-      </a>
-    </div>
-  </div>
-</section>
+        <div className="bg-black bg-opacity-60 p-8 rounded-lg shadow-2xl">
+          <h1 className="text-5xl font-bold mb-4 text-center text-yellow-300 drop-shadow-lg">
+            Welcome to Skill Hub
+          </h1>
+          <p className="text-lg text-center mb-6 text-gray-300">
+            Connect with top talent, find freelance jobs, and grow your business.
+          </p>
+          {/* Centering the button */}
+          <div className="flex justify-center">
+            <a
+              href="#features"
+              className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105"
+            >
+              Get Started
+            </a>
+          </div>
+        </div>
+      </section>
 
 
       {/* Get Work Done in 150+ Categories Section */}
@@ -138,7 +138,7 @@ const LandingPage = () => {
         <div className="container mx-auto px-6">
           <h2 className="text-4xl font-bold text-center mb-8 text-white">Make it Real with Freelancer</h2>
           <p className="text-lg font-bold text-center mb-12 max-w-5xl mx-auto text-white">
-            Freelancer Hub is a thriving community where creativity and opportunity converge. With our user-friendly interface, freelancers can create impactful profiles, and businesses can find talent with ease. Join us and turn your ideas into reality!
+            Skill Hub is a thriving community where creativity and opportunity converge. With our user-friendly interface, freelancers can create impactful profiles, and businesses can find talent with ease. Join us and turn your ideas into reality!
           </p>
         </div>
       </section>
@@ -184,7 +184,7 @@ const LandingPage = () => {
       {/* Footer */}
       <footer className="py-8" style={{ backgroundColor: '#B0E0E6' }}>
         <div className="container mx-auto text-center">
-          <p className="text-gray-500">© 2024 Freelancer Hub. All rights reserved.</p>
+          <p className="text-gray-500">© 2024 Skill Hub. All rights reserved.</p>
         </div>
       </footer>
     </div>

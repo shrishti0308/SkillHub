@@ -23,7 +23,7 @@ function App() {
         {/* {!hideNavbarRoutes.includes(location.pathname) && <Navbar />} */}
 
         <Routes>
-          <Route path="/" element={<h1 className='text-lg'>Site under development</h1>} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/marketplace" element={<Marketplace />} />
@@ -31,10 +31,9 @@ function App() {
           <Route path="/user/:username" element={<ProfilePage />} />
           <Route path="/jobs/:id" element={<JobDetails />} />
           <Route path="/jobs/new" element={<PostJob />} />
-          <Route path="/freelancer-dashboard" element={<FreelancerDashboard />} /> 
-          <Route path="/landingpage" element={<LandingPage />} /> 
-          <Route path='/jobs' element={<Jobs/>}/>
-          <Route path='/bidings' element={<Bids/>}/>
+          <Route path="/freelancer-dashboard" element={<FreelancerDashboard />} />
+          <Route path='/jobs' element={<Jobs />} />
+          <Route path='/bidings' element={<Bids />} />
         </Routes>
       </div>
     </>

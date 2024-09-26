@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
     recentJobs: [
@@ -36,7 +36,7 @@ const jobsSlice = createSlice({
         setRecentJobs: (state, action) => {
             state.recentJobs = action.payload;
         },
-        setJobById : (state,action)=>{
+        setJobById: (state, action) => {
             state.job = action.payload;
         },
         updateRecentJobs: (state, action) => {
@@ -45,13 +45,13 @@ const jobsSlice = createSlice({
         resetBidSuccess: (state) => {
             state.bidAccepted = false;
         },
-        setBidSuccess:(state)=>{
+        setBidSuccess: (state) => {
             state.bidAccepted = true;
         }
     },
 });
 
-export const { setRecentJobs, updateRecentJobs ,setJobById, resetBidSuccess,setBidSuccess } = jobsSlice.actions;
+export const { setRecentJobs, updateRecentJobs, setJobById, resetBidSuccess, setBidSuccess } = jobsSlice.actions;
 
 export const selectRecentJobs = (state) => state.jobs.recentJobs;
 export const selectJobById = (state) => state.jobs.job;

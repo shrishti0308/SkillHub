@@ -2,7 +2,7 @@ const Job = require('../models/job');
 
 exports.getFilteredJobs = async (req, res) => {
     try {
-        const userId = req.user._id;  
+        const userId = req.user.id;  
         const userRole = req.user.role; 
 
         let filter = { status: 'open' };  

@@ -4,7 +4,7 @@ const Transaction = require('../models/transaction');
 // Controller to get recent transactions of the logged-in user
 exports.getRecentTransactions = async (req, res) => {
   try {
-    const userId = req.user._id; // Get the logged-in user's ID from the JWT token
+    const userId = req.user.id; // Get the logged-in user's ID from the JWT token
     const recentTransactions = await Transaction.find({ user: userId })
       .populate('job') // Populate job details if needed
       .sort({ createdAt: -1 }) // Sort by most recent

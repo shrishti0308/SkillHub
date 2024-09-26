@@ -2,7 +2,7 @@ import React from 'react';
 import Sidebar from './Dashboardcomponents/Sidebar';
 import { selectIsSidebarMinimized } from '../../redux/reducers/dashboard/sidebarSlice';
 import EarningsSummary from './Dashboardcomponents/EarningsSummary';
-import BiddingSummary from './Dashboardcomponents/BidingSummary';
+// import BiddingSummary from './Dashboardcomponents/BidingSummary';
 import ProjectsSummary from './Dashboardcomponents/ProjectsSummary';
 import RecentJobsSummary from './Dashboardcomponents/recentJobsSummary';
 import { useSelector } from 'react-redux';
@@ -23,7 +23,7 @@ const FreelancerDashboard = () => {
         
         <div className="flex flex-col space-y-4">
           <RecentJobsSummary />
-          <BiddingSummary />
+          {/* <BiddingSummary /> */}
           <ProjectsSummary />
           <EarningsSummary />
           <div className='mt-4'>fooooooter</div>

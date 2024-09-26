@@ -1,14 +1,16 @@
 const Bid = require('../models/bid');
-const Job = require('../models/job');
+const mongoose = require('mongoose'); 
 
-// Controller to get recent bids of the logged-in user for recent jobs
 exports.getRecentBids = async (req, res) => {
   try {
-    const freelancerId = req.user._id; // Get the logged-in user's ID from JWT token
-    const recentBids = await Bid.find({ freelancer: freelancerId })
-      .populate('job') // Populate job details
-      .sort({ createdAt: -1 }) // Sort by most recent
-      .limit(10); // Limit to recent 10 bids (you can adjust this)
+    const freelancerId = req.user.id; 
+    console.log('Freelancer ID from token:', freelancerId);
+
+    const freelancerObjectId = new mongoose.Types.ObjectId(freelancerId);
+
+    const recentBids = await Bid.find({ freelancer: freelancerObjectId }); 
+
+    console.log('Recent bids found:', recentBids);
 
     if (!recentBids.length) {
       return res.status(404).json({ message: 'No recent bids found for this user' });

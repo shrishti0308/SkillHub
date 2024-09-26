@@ -3,7 +3,7 @@ const Job = require('../models/job');
 // Controller to get recent projects for the logged-in freelancer
 exports.getRecentProjects = async (req, res) => {
   try {
-    const userId = req.user._id; // Get logged-in freelancer's ID from JWT token
+    const userId = req.user.id; // Get logged-in freelancer's ID from JWT token
 
     // Find jobs where the freelancer is the logged-in user and the job is either in-progress or closed
     const recentProjects = await Job.find({

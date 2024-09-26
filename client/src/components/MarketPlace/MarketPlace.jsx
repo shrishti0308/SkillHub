@@ -92,14 +92,14 @@ const Marketplace = () => {
 
                     <input
                         type="number"
-                        placeholder="Min Budget"
+                        placeholder="Min Budget (₹)"
                         className="bg-gray-800 border border-gray-700 rounded-full px-4 py-2 w-32 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={budgetMin}
                         onChange={(e) => setBudgetMin(e.target.value)}
                     />
                     <input
                         type="number"
-                        placeholder="Max Budget"
+                        placeholder="Max Budget (₹)"
                         className="bg-gray-800 border border-gray-700 rounded-full px-4 py-2 w-32 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={budgetMax}
                         onChange={(e) => setBudgetMax(e.target.value)}
@@ -130,25 +130,49 @@ const Marketplace = () => {
                                     {job.title}
                                 </h2>
                                 {/* Job Description */}
-                                <p className="text-gray-400 mt-4 line-clamp-3">{job.description}</p>
+                                <p className="text-gray-300 mt-4 line-clamp-3 italic">{job.description}</p>
 
-                                {/* Budget & Skills */}
-                                <p className="mt-6 font-semibold text-lg">
-                                    Budget: <span className="text-blue-400">${job.budget.min} - ${job.budget.max}</span>
-                                </p>
-                                <p className="mt-2">
-                                    Skills Required: <span className="text-blue-400">{job.skillsRequired.join(', ')}</span>
-                                </p>
+                                {/* Budget Section */}
+                                <div className="mt-6 flex items-center text-blue-200 space-x-3">
+                                    <p className="font-semibold text-lg">
+                                        Budget: <span className="text-yellow-300">₹{job.budget.min} - ₹{job.budget.max}</span>
+                                    </p>
+                                </div>
 
-                                {/* Categories */}
-                                <p className="mt-2">
-                                    Categories: <span className="text-blue-400">{job.categories.join(', ')}</span>
-                                </p>
+                                {/* Skills Required Section */}
+                                <div className="mt-2">
+                                    <p className="text-lg font-medium text-pink-400">Skills Required:</p>
+                                    <div className="flex flex-wrap gap-2 mt-1">
+                                        {job.skillsRequired.map((skill, index) => (
+                                            <span
+                                                key={index}
+                                                className="bg-pink-500 bg-opacity-20 text-pink-300 px-3 py-1 rounded-full text-sm font-medium"
+                                            >
+                                                {skill}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
 
-                                {/* View Details Link */}
+                                {/* Categories Section */}
+                                <div className="mt-2">
+                                    <p className="text-lg font-medium text-indigo-400">Categories:</p>
+                                    <div className="flex flex-wrap gap-2 mt-1">
+                                        {job.categories.map((category, index) => (
+                                            <span
+                                                key={index}
+                                                className="bg-indigo-500 bg-opacity-20 text-indigo-300 px-3 py-1 rounded-full text-sm font-medium"
+                                            >
+                                                {category}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* View Details Button */}
                                 <a
                                     href={`/jobs/${job._id}`}
-                                    className="mt-8 inline-block text-blue-400 hover:underline text-lg font-semibold"
+                                    className="mt-8 inline-block bg-blue-600 text-white px-5 py-2 rounded-full hover:bg-blue-700 transition text-lg font-semibold shadow-lg"
                                 >
                                     View Details
                                 </a>

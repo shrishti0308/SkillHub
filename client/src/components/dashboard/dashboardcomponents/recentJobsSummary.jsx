@@ -53,7 +53,7 @@ const RecentJobsSummary = () => {
                     <div className="p-3">{job.description}</div>
                     <div className="p-3">${job.budget}</div>
                     <div className="p-3">
-                        <span className={`px-2 py-1 rounded-full ${
+                        <span className={`px-2 py-1 ${
                             job.status === 'open' ? 'border-yellow-500 text-yellow-100' 
                             : job.status === 'in-progress' ? 'border-emerald-500 text-emerald-100'
                             : job.status === 'completed' ? 'border-indigo-500 text-indigo-100'

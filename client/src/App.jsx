@@ -5,6 +5,7 @@ import SignupPage from './components/RegistrationPages/Signup';
 import ProfileSettings from './components/ProfilePage/ProfileSettings';
 import FreelancerDashboard from './components/dashboard/FreelancerDashboard';
 import Jobs from './components/JobsPage/Jobs';
+import Bids from './components/BidingsPage/Bids';
 
 function App() {
   const location = useLocation();
@@ -24,9 +25,9 @@ function App() {
           <Route path="/" element={<h1 className=' text-lg' >Site under development</h1>} />
           <Route path="/profile" element={<ProfileSettings />} />
           <Route path="/jobs/*" element={<Jobs/>} />
-          {/* <Route path="/bidings" element={<Bidings/>} />
-          <Route path="/earnings" element={<Earnings/>} />
-          <Route path="/projects" element={<Projects/>} />  */}
+          <Route path="/bidings/*" element={<Bids/>} />
+          {/* <Route path="/earnings" element={<Earnings/>} /> */}
+          {/* <Route path="/projects" element={<Projects/>} />  */}
         </Routes>
       </div>
     </>

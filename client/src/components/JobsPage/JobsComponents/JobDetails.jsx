@@ -1,34 +1,39 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import axiosInstance from '../../../api/axiosInstance';
-import { setJobById, selectJobById } from '../../../redux/reducers/dashboard/jobsSlice';
+import { setJobById, selectJobById, setBidSuccess, resetBidSuccess } from '../../../redux/reducers/dashboard/jobsSlice';
 import { useParams } from 'react-router-dom';
 
 const JobDetails = () => {
     const { jobId } = useParams();
     const dispatch = useDispatch();
-    const job = useSelector(selectJobById);
-    const [bidAmount, setBidAmount] = useState('');
-    const [bidSuccess, setBidSuccess] = useState(false);
+    const job = useSelector(selectJobById);  // Fetch job details from Redux
+    const bidSuccess = useSelector((state) => state.jobs.bidSuccess);  // Fetch bid success state from Redux
+    const [amount, setAmount] = useState('');
 
     useEffect(() => {
         const fetchJobDetails = async () => {
             try {
                 const response = await axiosInstance.get(`/job/${jobId}`);
-                dispatch(setJobById(response.data.job));
+                dispatch(setJobById(response.data.job));  // Set job in Redux state
             } catch (error) {
                 console.error('Error fetching job details:', error);
             }
         };
 
         fetchJobDetails();
+
+        // Reset bid success when component mounts
+        return () => {
+            dispatch(resetBidSuccess());
+        };
     }, [dispatch, jobId]);
 
     const handleBidSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axiosInstance.post(`/job/jobs/${jobId}/bid`, { bidAmount });
-            setBidSuccess(true); // Set bid success state
+            await axiosInstance.post(`/job/${jobId}/bid`, { amount: parseFloat(amount) });  // Send bid amount to backend
+            dispatch(setBidSuccess(true));  // Set success state in Redux
         } catch (error) {
             console.error('Error submitting bid:', error);
         }
@@ -52,8 +57,8 @@ const JobDetails = () => {
                         Bid Amount:
                         <input
                             type="number"
-                            value={bidAmount}
-                            onChange={(e) => setBidAmount(e.target.value)}
+                            value={amount}
+                            onChange={(e) => setAmount(e.target.value)}
                             required
                             className="ml-2 p-2 rounded text-dark"
                         />

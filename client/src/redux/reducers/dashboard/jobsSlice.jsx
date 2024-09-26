@@ -14,6 +14,7 @@ const initialState = {
         },
     ],
     job: null,
+    bidAccepted: false,
 };
 
 const jobsSlice = createSlice({
@@ -29,10 +30,16 @@ const jobsSlice = createSlice({
         updateRecentJobs: (state, action) => {
             state.recentJobs = { ...state.recentJobs, ...action.recentJobs };
         },
+        resetBidSuccess: (state) => {
+            state.bidAccepted = false;
+        },
+        setBidSuccess:(state)=>{
+            state.bidAccepted = true;
+        }
     },
 });
 
-export const { setRecentJobs, updateRecentJobs ,setJobById } = jobsSlice.actions;
+export const { setRecentJobs, updateRecentJobs ,setJobById, resetBidSuccess,setBidSuccess } = jobsSlice.actions;
 
 export const selectRecentJobs = (state) => state.jobs.recentJobs;
 export const selectJobById = (state) => state.jobs.job;

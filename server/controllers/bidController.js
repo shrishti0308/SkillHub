@@ -1,16 +1,14 @@
 const Bid = require('../models/bid');
+const User = require('../models/user');
 const mongoose = require('mongoose'); 
 
 exports.getRecentBids = async (req, res) => {
   try {
     const freelancerId = req.user.id; 
-    console.log('Freelancer ID from token:', freelancerId);
 
     const freelancerObjectId = new mongoose.Types.ObjectId(freelancerId);
 
     const recentBids = await Bid.find({ freelancer: freelancerObjectId }); 
-
-    console.log('Recent bids found:', recentBids);
 
     if (!recentBids.length) {
       return res.status(404).json({ message: 'No recent bids found for this user' });
@@ -21,34 +19,42 @@ exports.getRecentBids = async (req, res) => {
     res.status(500).json({ message: 'Error retrieving recent bids', error: error.message });
   }
 };
-// Place a bid on a job
-exports.createBid = async (req, res) => {
-  try {
-      const { amount } = req.body;
-      const { jobId } = req.params;
-      const freelancerId = req.user.id; 
 
-      const job = await Job.findById(jobId);
 
-      if (!job) {
-          return res.status(404).json({ message: 'Job not found' });
-      }
+// Controller to get bid details by ID
+const getBidDetails = async (req, res) => {
+    try {
+        const { bidId } = req.params;
+        
+        // Fetch bid details from DB
+        const bid = await Bid.findById(bidId)
+            .populate('freelancer', 'name username') // Populate freelancer info
+            .populate('job', 'title'); // Populate job info
+            
+        if (!bid) {
+            return res.status(404).json({ message: 'Bid not found' });
+        }
 
-      if (job.status !== 'open') {
-          return res.status(400).json({ message: 'Job is not open for bids' });
-      }
-
-      const newBid = new Bid({
-          amount,
-          job: jobId,
-          freelancer: freelancerId,
-      });
-
-      await newBid.save();
-
-      res.status(201).json({ message: 'Bid placed successfully', bid: newBid });
-  } catch (err) {
-      res.status(500).json({ message: 'Error placing bid', error: err.message });
-  }
+        res.status(200).json({ bid });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+    }
 };
+
+// // Controller to get all bids for a specific job (for comparison)
+// exports.getAllBidsForJob = async (req, res) => {
+//     const { jobId } = req.params;
+//     try {
+//         const bids = await Bid.find({ job: jobId }).populate('freelancer', 'name').exec();
+
+//         if (!bids.length) {
+//             return res.status(404).json({ success: false, message: 'No bids found for this job' });
+//         }
+
+//         res.status(200).json({ success: true, bids });
+//     } catch (error) {
+//         console.error('Error fetching bids for job:', error);
+//         res.status(500).json({ success: false, message: 'Error fetching bids for job', error });
+//     }
+// };
 

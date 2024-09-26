@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { createJob, getMarketplaceJobs, getJobById, updateJob } = require('../controllers/jobController');
+const { authenticateJWT } = require('../middlewares/authMiddleware');
 
 // Create a job (employer)
-router.post('/create', createJob);
+router.post('/create', authenticateJWT, createJob);
 
 // Get all jobs for marketplace
 router.get('/marketplace', getMarketplaceJobs);

@@ -1,10 +1,10 @@
-const Job = require('../models/Job');
+const Job = require('../models/job');
 
 // Create a new job
 const createJob = async (req, res) => {
     try {
         const { title, description, budget, categories, skillsRequired } = req.body;
-        const employer = req.user._id;
+        const employer = req.user.id;
 
         const newJob = new Job({
             title,
@@ -18,6 +18,7 @@ const createJob = async (req, res) => {
         await newJob.save();
         res.status(201).json(newJob);
     } catch (error) {
+        console.log(error)
         res.status(500).json({ error: 'Error creating job' });
     }
 };

@@ -8,6 +8,8 @@ const PORT = 3000;
 
 const userRoutes = require('./routes/userRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
+const jobRoutes = require('./routes/jobRoutes');
+const bidRoutes = require('./routes/bidRoutes');
 
 connectDB();
 
@@ -29,6 +31,8 @@ app.get('/', (req, res) => {
 });
 
 app.use('/user', userRoutes);
+app.use('/jobs', jobRoutes);
+app.use('/bids', bidRoutes);
 app.use('/review', reviewRoutes);
 
 app.listen(PORT, () => {

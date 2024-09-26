@@ -3,7 +3,7 @@ import authReducer from './user/authSlice';
 import sidebarReducer from './dashboard/sidebarSlice';
 import profileReducer from './user/ProfileSlice';
 import bidingReducer from '../reducers/dashboard/bidingSlice';
-import jobsReducer from '../reducers/dashboard/jobsSlice';
+import jobsReducer from './dashboard/jobsSlice';
 
 const rootReducer = combineReducers({
     auth: authReducer,

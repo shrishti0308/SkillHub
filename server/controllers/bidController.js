@@ -48,22 +48,34 @@ const acceptBid = async (req, res) => {
         }
 
         // Check if the user trying to accept the bid is the job poster
-        const currentUserId = req.user.id; // Assuming you have user info in req.user
+        const currentUserId = req.user.id;
         if (job.employer.toString() !== currentUserId) {
             return res.status(403).json({ error: 'You are not authorized to accept this bid.' });
         }
+
+        // Update the accepted bid's status
+        bid.status = 'accepted';
+        await bid.save();
 
         // Update job details
         job.freelancer = bid.freelancer;
         job.status = 'in-progress';
         job.bidAccepted = true;
 
+        // Reject all other bids for this job
+        await Bid.updateMany(
+            { job: job._id, _id: { $ne: bid._id } }, // Find bids for this job, excluding the accepted bid
+            { status: 'rejected' } // Update their status to 'rejected'
+        );
+
         await job.save();
         res.status(200).json({ message: 'Bid accepted', job });
     } catch (error) {
+        console.log(error);
         res.status(500).json({ error: 'Error accepting bid' });
     }
 };
+
 
 
 const getRecentBids = async (req, res) => {

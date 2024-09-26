@@ -142,7 +142,7 @@ const PostJob = () => {
                         <label className="block mb-2 text-sm font-semibold">Skills Required</label>
                         <div className="flex flex-wrap gap-2 mb-3">
                             {skillsRequired.map((skill, index) => (
-                                <div key={index} className="flex items-center space-x-2 bg-green-600 p-2 rounded">
+                                <div key={index} className="flex items-center space-x-2 bg-gray-600 p-2 rounded">
                                     <span>{skill}</span>
                                     <button
                                         type="button"

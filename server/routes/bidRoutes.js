@@ -10,7 +10,7 @@ router.post('/place', authenticateJWT, placeBid);
 router.get('/:jobId', getBidsForJob);
 
 // Accept a bid (employer)
-router.put('/accept/:bidId', acceptBid);
+router.put('/accept/:bidId', authenticateJWT, acceptBid);
 
 const bidController = require('../controllers/bidController');
 

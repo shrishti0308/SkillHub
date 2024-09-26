@@ -24,6 +24,14 @@ const authSlice = createSlice({
             state.username = action.payload;
             localStorage.setItem('username', action.payload);
         },
+        logout: (state) => {
+            state.accessToken = null;
+            state.role = null;
+            state.username = null;
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('role');
+            localStorage.removeItem('username');
+        },
     },
 });
 
@@ -79,7 +87,7 @@ export const selectRole = (state) => state.auth.role;
 export const selectUsername = (state) => state.auth.username;
 
 // Export the actions created automatically by the slice
-export const { setAccessToken, setRole, setUsername } = authSlice.actions;
+export const { setAccessToken, setRole, setUsername, logout } = authSlice.actions; // Export logout action
 
 // Export the reducer to add it to the store
 export default authSlice.reducer;

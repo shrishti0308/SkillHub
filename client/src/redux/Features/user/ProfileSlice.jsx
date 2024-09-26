@@ -10,6 +10,7 @@ const initialState = {
             skills: [],
             portfolio: '',
             experience: [],
+            profilePic: ''
         },
         previousWorks: [],
     },

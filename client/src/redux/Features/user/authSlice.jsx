@@ -1,10 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
 import axiosInstance from '../../../api/axiosInstance';
 
-// Initialize state with token and role from localStorage
+// Initialize state with token, role, and username from localStorage
 const initialState = {
     accessToken: localStorage.getItem('accessToken') || null,
-    role: localStorage.getItem('role') || null, // Add role to the initial state
+    role: localStorage.getItem('role') || null,
+    username: localStorage.getItem('username') || null,
 };
 
 const authSlice = createSlice({
@@ -12,10 +13,16 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         setAccessToken: (state, action) => {
-            state.accessToken = action.payload.token;
-            state.role = action.payload.role;
-            localStorage.setItem('accessToken', action.payload.token);
-            localStorage.setItem('role', action.payload.role); // Store role in localStorage
+            state.accessToken = action.payload;
+            localStorage.setItem('accessToken', action.payload);
+        },
+        setRole: (state, action) => {
+            state.role = action.payload;
+            localStorage.setItem('role', action.payload);
+        },
+        setUsername: (state, action) => {
+            state.username = action.payload;
+            localStorage.setItem('username', action.payload);
         },
     },
 });
@@ -31,7 +38,10 @@ export const signup = (userInfo, password, role) => async (dispatch) => {
 
         if (response.data.success) {
             const accessToken = response.data.token;
-            dispatch(setAccessToken({ token: accessToken, role }));
+            const username = response.data.username; // Assuming username is returned in response
+            dispatch(setAccessToken(accessToken)); // Dispatch access token
+            dispatch(setRole(role)); // Dispatch role
+            dispatch(setUsername(username)); // Dispatch username
         }
     } catch (error) {
         throw new Error(error.response?.data?.message || 'Error registering user');
@@ -49,7 +59,10 @@ export const login = (usernameOrEmail, password) => async (dispatch) => {
         if (response.data.success) {
             const accessToken = response.data.token;
             const role = response.data.role; // Assuming role is returned in response
-            dispatch(setAccessToken({ token: accessToken, role })); // Dispatch token and role
+            const username = response.data.username; // Assuming username is returned in response
+            dispatch(setAccessToken(accessToken)); // Dispatch access token
+            dispatch(setRole(role)); // Dispatch role
+            dispatch(setUsername(username)); // Dispatch username
         }
     } catch (error) {
         throw new Error(error.response?.data?.message || 'Error logging in user');
@@ -62,8 +75,11 @@ export const selectAccessToken = (state) => state.auth.accessToken;
 // Selector to get role from state
 export const selectRole = (state) => state.auth.role;
 
-// Export the action created automatically by the slice
-export const { setAccessToken } = authSlice.actions;
+// Selector to get username from state
+export const selectUsername = (state) => state.auth.username;
+
+// Export the actions created automatically by the slice
+export const { setAccessToken, setRole, setUsername } = authSlice.actions;
 
 // Export the reducer to add it to the store
 export default authSlice.reducer;

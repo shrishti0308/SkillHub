@@ -13,7 +13,7 @@ const Jobs = () => {
             <Sidebar />
             <Routes>
                 <Route path="/" element={<JobsList />} />
-                <Route path="/:jobId" element={<JobDetails />} />
+                <Route path="/user/:jobId" element={<JobDetails />} />
             </Routes>
         </div>
     );

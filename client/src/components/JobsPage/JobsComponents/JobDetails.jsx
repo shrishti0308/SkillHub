@@ -14,7 +14,7 @@ const JobDetails = () => {
     useEffect(() => {
         const fetchJobDetails = async () => {
             try {
-                const response = await axiosInstance.get(`/job/${jobId}`);
+                const response = await axiosInstance.get(`/job/user/${jobId}`);
                 dispatch(setJobById(response.data.job));  // Set job in Redux state
             } catch (error) {
                 console.error('Error fetching job details:', error);

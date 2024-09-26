@@ -1,5 +1,7 @@
-const Bid = require('../models/Bid');
-const Job = require('../models/Job');
+const Bid = require('../models/bid');
+const mongoose = require('mongoose');
+const Job = require('../models/job') 
+
 
 // Place a new bid
 const placeBid = async (req, res) => {
@@ -51,14 +53,7 @@ const acceptBid = async (req, res) => {
     }
 };
 
-module.exports = {
-    placeBid,
-    getBidsForJob,
-    acceptBid,
-};
-const mongoose = require('mongoose'); 
-
-exports.getRecentBids = async (req, res) => {
+const getRecentBids = async (req, res) => {
   try {
     const freelancerId = req.user.id; 
 
@@ -97,20 +92,10 @@ const getBidDetails = async (req, res) => {
     }
 };
 
-// // Controller to get all bids for a specific job (for comparison)
-// exports.getAllBidsForJob = async (req, res) => {
-//     const { jobId } = req.params;
-//     try {
-//         const bids = await Bid.find({ job: jobId }).populate('freelancer', 'name').exec();
-
-//         if (!bids.length) {
-//             return res.status(404).json({ success: false, message: 'No bids found for this job' });
-//         }
-
-//         res.status(200).json({ success: true, bids });
-//     } catch (error) {
-//         console.error('Error fetching bids for job:', error);
-//         res.status(500).json({ success: false, message: 'Error fetching bids for job', error });
-//     }
-// };
-
+module.exports = {
+    placeBid,
+    getBidsForJob,
+    acceptBid,
+    getRecentBids,
+    getBidDetails
+};

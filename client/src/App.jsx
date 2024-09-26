@@ -3,7 +3,7 @@ import Navbar from './components/navbar';
 import LoginPage from './components/RegistrationPages/Login';
 import SignupPage from './components/RegistrationPages/Signup';
 import ProfileSettings from './components/ProfilePage/ProfileSettings';
-import FreelancerDashboard from './components/dashboard/FreelancerDashboard';
+import FreelancerDashboard from './components/Dashboard/FreelancerDashboard';
 
 function App() {
   const location = useLocation();

@@ -1,40 +1,29 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createSlice } from '@reduxjs/toolkit';
 
-export const fetchBidsForUser = createAsyncThunk('bids/fetchBidsForUser', async (_, { getState, rejectWithValue }) => {
-    try {
-        const { auth } = getState();
-        const response = await axios.get(`/api/bids/user/${auth.userId}`);
-        return response.data;
-    } catch (error) {
-        return rejectWithValue(error.response.data);
-    }
-});
+// Initial state for bids
+const initialState = {
+    bids: [],
+};
 
+// Create the slice
 const biddingSlice = createSlice({
     name: 'bids',
-    initialState: {
-        bids: [],
-        status: 'idle',
-        error: null,
-    },
+    initialState,
     reducers: {
-        // You can define additional reducers here if needed
-    },
-    extraReducers: (builder) => {
-        builder
-            .addCase(fetchBidsForUser.pending, (state) => {
-                state.status = 'loading';
-            })
-            .addCase(fetchBidsForUser.fulfilled, (state, action) => {
-                state.status = 'succeeded';
-                state.bids = action.payload;
-            })
-            .addCase(fetchBidsForUser.rejected, (state, action) => {
-                state.status = 'failed';
-                state.error = action.payload;
-            });
+        setBids: (state, action) => {
+            state.bids = action.payload;
+        },
+        updateBids: (state,action) => {
+            state.bids = {...state.bids,...action.bids};
+        },
     },
 });
 
+// Export the actions
+export const { setBids, updateBids } = biddingSlice.actions;
+
+// Export the selector
+export const selectBidsForUser = (state) => state.bids.bids;
+
+// Export the reducer
 export default biddingSlice.reducer;

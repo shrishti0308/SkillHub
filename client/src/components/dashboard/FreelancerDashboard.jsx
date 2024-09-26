@@ -1,17 +1,16 @@
 import React from 'react';
-import Sidebar from './dashboardcomponents/Sidebar';
-import { useSelector } from 'react-redux'; 
+import Sidebar from '../Dashboard/Dashboardcomponents/Sidebar';
 import { selectIsSidebarMinimized } from '../../redux/reducers/dashboard/sidebarSlice';
-import EarningsSummary from './dashboardcomponents/earningsSummary';
-import BiddingSummary from './dashboardcomponents/bidingSummary';
-import ProjectsSummary from './dashboardcomponents/projectsSummary';
-import RecentJobsSummary from './dashboardcomponents/recentJobsSummary';
+import EarningsSummary from './Dashboardcomponents/EarningsSummary';
+import BiddingSummary from './Dashboardcomponents/bidingSummary';
+import ProjectsSummary from './Dashboardcomponents/ProjectsSummary';
+import RecentJobsSummary from './Dashboardcomponents/RecentJobsSummary';
+import { useSelector } from 'react-redux';
 
 const FreelancerDashboard = () => {
-  const isSidebarMinimized = useSelector(selectIsSidebarMinimized);
-
-  return (
-    <div className="flex h-screen">
+    const isSidebarMinimized = useSelector(selectIsSidebarMinimized);
+    return (
+      <div className="flex h-screen">
       {/* Sidebar */}
       <Sidebar />
       
@@ -31,7 +30,7 @@ const FreelancerDashboard = () => {
         </div>
       </div>
     </div>
-  );
+    );
 };
 
 export default FreelancerDashboard;

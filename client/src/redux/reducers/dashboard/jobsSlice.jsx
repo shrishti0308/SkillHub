@@ -1,40 +1,47 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createSlice } from '@reduxjs/toolkit';
 
-// Async thunk to fetch available jobs from the API
-export const fetchAvailableJobs = createAsyncThunk('jobs/fetchAvailableJobs', async (_, { rejectWithValue }) => {
-    try {
-        const response = await axios.get('/api/jobs');
-        return response.data;
-    } catch (error) {
-        return rejectWithValue(error.response.data);
-    }
-});
+const initialState = {
+    recentJobs: [
+        {
+            _id: "66f436640adb04612cb0c37f",
+            title: "Frontend Development for E-commerce Website",
+            description: "Develop frontend components for an e-commerce website using React and Redux.",
+            budget: 1000,
+            employer: "66f2a5f3b8add7538ab0b02e",
+            status: "open",
+            freelancer: null,
+            bidAccepted: false,
+        },
+    ],
+    job: null,
+    bidAccepted: false,
+};
 
 const jobsSlice = createSlice({
     name: 'jobs',
-    initialState: {
-        jobs: [],
-        status: 'idle',
-        error: null,
-    },
+    initialState,
     reducers: {
-        // You can define additional reducers here if needed
-    },
-    extraReducers: (builder) => {
-        builder
-            .addCase(fetchAvailableJobs.pending, (state) => {
-                state.status = 'loading';
-            })
-            .addCase(fetchAvailableJobs.fulfilled, (state, action) => {
-                state.status = 'succeeded';
-                state.jobs = action.payload;
-            })
-            .addCase(fetchAvailableJobs.rejected, (state, action) => {
-                state.status = 'failed';
-                state.error = action.payload;
-            });
+        setRecentJobs: (state, action) => {
+            state.recentJobs = action.payload;
+        },
+        setJobById : (state,action)=>{
+            state.job = action.payload;
+        },
+        updateRecentJobs: (state, action) => {
+            state.recentJobs = { ...state.recentJobs, ...action.recentJobs };
+        },
+        resetBidSuccess: (state) => {
+            state.bidAccepted = false;
+        },
+        setBidSuccess:(state)=>{
+            state.bidAccepted = true;
+        }
     },
 });
+
+export const { setRecentJobs, updateRecentJobs ,setJobById, resetBidSuccess,setBidSuccess } = jobsSlice.actions;
+
+export const selectRecentJobs = (state) => state.jobs.recentJobs;
+export const selectJobById = (state) => state.jobs.job;
 
 export default jobsSlice.reducer;

@@ -6,6 +6,8 @@ import ProfileSettings from './components/ProfilePage/ProfileSettings';
 import ProfilePage from './components/ProfilePage/ProfilePage';
 import FreelancerDashboard from './components/dashboard/FreelancerDashboard';
 import LandingPage from './components/LandingPage/LandingPage';
+import Jobs from './components/JobsPage/Jobs';
+import Bids from './components/BidingsPage/Bids';
 
 function App() {
   const location = useLocation();
@@ -24,7 +26,6 @@ function App() {
           <Route path="/freelancer-dashboard" element={<FreelancerDashboard />} /> 
           <Route path="/landingpage" element={<LandingPage />} /> 
           <Route path="/profile" element={<ProfileSettings />} />
-          <Route path="/user/:username" element={<ProfilePage />} />
         </Routes>
       </div>
     </>

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom'; // Import Link for navigation
 import axiosInstance from '../../../api/axiosInstance';
 import { selectRecentJobs, setRecentJobs } from '../../../redux/reducers/dashboard/jobsSlice';
 
-const RecentJobsSummary = () => {
+const JobsList = () => {
     const dispatch = useDispatch();
     const jobs = useSelector(selectRecentJobs);
 
@@ -17,11 +18,10 @@ const RecentJobsSummary = () => {
                 console.log(response.data.jobs);
 
                 // Dispatch the data to the global state (redux)
-                dispatch(setRecentJobs(response.data));
+                dispatch(setRecentJobs(response.data.jobs));
 
                 // If more than 5 jobs, slice to get the first 5, else set all jobs
                 setJobsToDisplay(response.data.jobs.length > 5 ? response.data.jobs.slice(0, 5) : response.data.jobs);
-
             } catch (error) {
                 console.error('Error fetching jobs:', error);
             }
@@ -36,7 +36,7 @@ const RecentJobsSummary = () => {
 
     return (
         <div className='p-6'>
-            <h2 className="text-xl font-semibold text-white mb-4">Recent Jobs</h2>
+            <h2 className="text-xl font-semibold text-white mb-4">Jobs</h2>
 
             {/* Table-like layout using grid */}
             <div className="grid grid-cols-4 text-left bg-grey text-cyan-blue font-medium rounded-t-lg">
@@ -46,19 +46,24 @@ const RecentJobsSummary = () => {
                 <div className="p-3">Status</div>
             </div>
 
-            {/* Map through jobsToDisplay and display entries */}
+            {/* Map through jobsToDisplay and display entries as buttons */}
             {jobsToDisplay.map((job) => (
                 <div key={job._id} className="grid grid-cols-4 text-left bg-grey text-white border-b border-gray-700 my-2">
-                    <div className="p-3">{job.title}</div>
+                    <div className="p-3">
+                        {/* Link to navigate to JobDetails with jobId */}
+                        <Link to={`/jobs/${job._id}`}>
+                            <span className="text-blue-500 hover:underline cursor-pointer">
+                                {job.title}
+                            </span>
+                        </Link>
+                    </div>
                     <div className="p-3">{job.description}</div>
                     <div className="p-3">${job.budget}</div>
                     <div className="p-3">
-                        <span className={`px-2 py-1 ${
-                            job.status === 'open' ? 'border-yellow-500 text-yellow-100' 
+                        <span className={`px-2 py-1 rounded-full ${job.status === 'open' ? 'border-yellow-500 text-yellow-100' 
                             : job.status === 'in-progress' ? 'border-emerald-500 text-emerald-100'
                             : job.status === 'completed' ? 'border-indigo-500 text-indigo-100'
-                            : 'bg-red-500'
-                        } text-center border text-xs`}>
+                            : 'bg-red-500'} text-center border text-xs`}>
                             {job.status}
                         </span>
                     </div>
@@ -68,4 +73,4 @@ const RecentJobsSummary = () => {
     );
 };
 
-export default RecentJobsSummary;
+export default JobsList;

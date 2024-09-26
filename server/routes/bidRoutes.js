@@ -11,4 +11,16 @@ router.get('/:jobId', getBidsForJob);
 // Accept a bid (employer)
 router.put('/accept/:bidId', acceptBid);
 
+const bidController = require('../controllers/bidController');
+const { authenticateJWT } = require('../middlewares/authMiddleware');
+
+router.get('/recent-bids', authenticateJWT, bidController.getRecentBids);
+
+// Route to get details of a specific bid (including all bids for the job)
+router.get('/:bidId/details',authenticateJWT, bidController.getBidDetails);
+
 module.exports = router;
+
+
+
+

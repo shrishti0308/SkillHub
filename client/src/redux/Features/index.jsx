@@ -1,16 +1,12 @@
 import { combineReducers } from 'redux';
-import authReducer from './authReducer';
+import authReducer from './user/authSlice';
 import sidebarReducer from './dashboard/sidebarSlice';
-import profileReducer from './ProfileSlice';
-import jobReducer from './dashboard/jobsSlice';
-import bidReducer from './dashboard/bidingSlice';
+import profileReducer from './user/ProfileSlice';
 
 const rootReducer = combineReducers({
     auth: authReducer,
     sidebar: sidebarReducer,
     profile: profileReducer,
-    jobs: jobReducer,
-    bids: bidReducer,
 });
 
 export default rootReducer;

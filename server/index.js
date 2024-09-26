@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
+const path = require('path');  // Add this to manage file paths
+
 const app = express();
 const PORT = 3000;
 
@@ -24,6 +26,10 @@ const corsOptions = {
 app.use(cors(corsOptions)); // Use CORS with options
 app.use(express.json());
 
+// Host the public folder statically
+app.use('/public', express.static(path.join(__dirname, 'public')));
+
+// Root endpoint
 app.get('/', (req, res) => {
   res.send('Hello, My lord!');
 });

@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaPen } from 'react-icons/fa';
 
-const ImageUpload = () => {
-  const [imagePreview, setImagePreview] = useState("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4wwamJudSULmAczK67AZw1EpjcfcApne6HA&s");
+const ImageUpload = ({ profilePicPath, setProfilePic }) => {
+  const [imagePreview, setImagePreview] = useState(`http://localhost:3000/public${profilePicPath}`);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    setImagePreview(`http://localhost:3000/public${profilePicPath}`)
+  }, [profilePicPath])
+
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -13,7 +18,8 @@ const ImageUpload = () => {
         setError('Only JPG, JPEG, and PNG files are allowed');
         return;
       }
-      setError(""); // Clear error if the file is valid
+      setError("");
+      setProfilePic(file); // Pass the file to the parent component
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
@@ -66,7 +72,7 @@ const ImageUpload = () => {
           accept="image/jpeg, image/jpg, image/png"
           onChange={handleImageUpload}
         />
-        <div className=' p-2 border border-white rounded-full bg-grey absolute bottom-0 right-1' >
+        <div className=' p-2 border border-white rounded-full bg-grey absolute bottom-0 right-1'>
           <FaPen />
         </div>
       </label>

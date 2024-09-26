@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { useDispatch } from 'react-redux';
-import { signup } from '../../redux/actions/authActions'; // Adjust path if necessary
+import { signup } from '../../redux/Features/user/authSlice'; // Adjust path if necessary
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import axios from '../../api/axiosInstance';
 

@@ -63,15 +63,10 @@ const updateJob = async (req, res) => {
     }
 };
 
-module.exports = {
-    createJob,
-    getMarketplaceJobs,
-    getJobById,
-    updateJob,
-};
+
 
 // Get recent jobs
-exports.getFilteredJobs = async (req, res) => {
+const getFilteredJobs = async (req, res) => {
     try {
         const userId = req.user.id;  
         const userRole = req.user.role; 
@@ -91,7 +86,7 @@ exports.getFilteredJobs = async (req, res) => {
 };
 
 // Get a particular job by ID
-exports.getJobById = async (req, res) => {
+const getJobByIdAuthCheck = async (req, res) => {
     try {
         const { id } = req.params;
         const job = await Job.findById(id).populate('employer freelancer');
@@ -107,7 +102,7 @@ exports.getJobById = async (req, res) => {
 };
 
 // Place a bid on a job
-exports.createBid = async (req, res) => {
+const createBid = async (req, res) => {
     try {
         const { amount } = req.body;
         const { jobId } = req.params;
@@ -137,4 +132,12 @@ exports.createBid = async (req, res) => {
     }
   };
   
-  
+  module.exports = {
+    createJob,
+    getMarketplaceJobs,
+    getJobById,
+    updateJob,
+    getFilteredJobs,
+    getJobByIdAuthCheck,
+    createBid
+};

@@ -92,14 +92,14 @@ const Marketplace = () => {
 
                     <input
                         type="number"
-                        placeholder="Min Budget (₹)"
+                        placeholder="Min Budget"
                         className="bg-gray-800 border border-gray-700 rounded-full px-4 py-2 w-32 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={budgetMin}
                         onChange={(e) => setBudgetMin(e.target.value)}
                     />
                     <input
                         type="number"
-                        placeholder="Max Budget (₹)"
+                        placeholder="Max Budget"
                         className="bg-gray-800 border border-gray-700 rounded-full px-4 py-2 w-32 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={budgetMax}
                         onChange={(e) => setBudgetMax(e.target.value)}
@@ -118,7 +118,7 @@ const Marketplace = () => {
                         {filteredJobs.map(job => (
                             <div
                                 key={job._id}
-                                className="border border-gray-700 rounded-2xl p-8 bg-gradient-to-r from-blue-900 to-gray-800 shadow-xl hover:shadow-2xl transition transform hover:-translate-y-2 relative"
+                                className="border border-gray-700 rounded-2xl p-8 bg-gray-800 shadow-xl hover:shadow-2xl transition transform hover:-translate-y-2 relative"
                             >
                                 {/* Badge */}
                                 <span className="absolute top-2 right-2 bg-gradient-to-br from-green-400 to-blue-500 text-xs text-white px-3 py-1 rounded-full">
@@ -186,3 +186,5 @@ const Marketplace = () => {
 };
 
 export default Marketplace;
+
+

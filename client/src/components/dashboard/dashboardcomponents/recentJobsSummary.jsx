@@ -1,23 +1,38 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAvailableJobs } from '../../../redux/reducers/dashboard/jobsSlice';
+import axiosInstance from '../../../api/axiosInstance';
+import { selectRecentJobs, setRecentJobs } from '../../../redux/reducers/dashboard/jobsSlice';
 
 const RecentJobsSummary = () => {
-    // const dispatch = useDispatch();
-    // const { jobs, status, error } = useSelector((state) => state.jobs);
+    const dispatch = useDispatch();
+    const jobs = useSelector(selectRecentJobs);
 
-    // useEffect(() => {
-    //     dispatch(fetchAvailableJobs());
-    // }, [dispatch]);
+    // Local state to manage jobs to display
+    const [jobsToDisplay, setJobsToDisplay] = useState([]);
 
-    // if (status === 'loading') {
-    //     return <p className="text-white">Loading...</p>;
-    // }
+    useEffect(() => {
+        const fetchRecentJobs = async () => {
+            try {
+                const response = await axiosInstance.get('/job/jobs');
+                console.log(response.data.jobs);
 
-    // if (status === 'failed') {
-    //     return <p className="text-red-500">Error: {error}</p>;
-    // }
-    const jobstatus = 'open';
+                // Dispatch the data to the global state (redux)
+                dispatch(setRecentJobs(response.data));
+
+                // If more than 5 jobs, slice to get the first 5, else set all jobs
+                setJobsToDisplay(response.data.jobs.length > 5 ? response.data.jobs.slice(0, 5) : response.data.jobs);
+
+            } catch (error) {
+                console.error('Error fetching jobs:', error);
+            }
+        };
+
+        fetchRecentJobs();
+    }, [dispatch]);
+
+    if (jobsToDisplay.length === 0) {
+        return <p className="text-white">No jobs available.</p>;
+    }
 
     return (
         <div className='p-6'>
@@ -31,91 +46,26 @@ const RecentJobsSummary = () => {
                 <div className="p-3">Status</div>
             </div>
 
-            {/* Map through jobs */}
-            {/* {jobs.slice(0, 5).map((job) => (
-                <div key={job._id} className="grid grid-cols-4 text-left bg-gray-900 text-white border-b border-gray-700">
+            {/* Map through jobsToDisplay and display entries */}
+            {jobsToDisplay.map((job) => (
+                <div key={job._id} className="grid grid-cols-4 text-left bg-grey text-white border-b border-gray-700 my-2">
                     <div className="p-3">{job.title}</div>
                     <div className="p-3">{job.description}</div>
                     <div className="p-3">${job.budget}</div>
                     <div className="p-3">
                         <span className={`px-2 py-1 rounded-full ${
-                            job.status === 'open' ? 'bg-green-500' 
-                            : job.status === 'in-progress' ? 'bg-yellow-500'
-                            : job.status === 'completed' ? 'bg-blue-500'
+                            job.status === 'open' ? 'border-yellow-500 text-yellow-100' 
+                            : job.status === 'in-progress' ? 'border-emerald-500 text-emerald-100'
+                            : job.status === 'completed' ? 'border-indigo-500 text-indigo-100'
                             : 'bg-red-500'
-                        } text-white`}>
+                        } text-center border text-xs`}>
                             {job.status}
                         </span>
                     </div>
                 </div>
-            ))} */}
-            <div className="grid grid-cols-4 text-left bg-grey text-white border-b border-gray-700 my-2">
-                <div className="p-3">painting</div>
-                <div className="p-3">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ea nam alias vitae. Hic ad dicta, mollitia perspiciatis dolor quod rem!</div>
-                <div className="p-3">$20</div>
-                <div className="p-3">
-                    <span className={`px-2 py-1 ${
-                        jobstatus === 'open' ? 'border-yellow-500 text-yellow-100' 
-                        : jobstatus === 'in-progress' ? 'border-emerald-500 text-emerald-100'
-                        : jobstatus === 'completed' ? 'border-indigo-500 text-indigo-100'
-                        : 'bg-red-500'
-                    }
-                     text-center border text-xs`}>
-                        {jobstatus}
-                    </span>
-                </div>
-            </div>
-            <div className="grid grid-cols-4 text-left bg-grey text-white border-b border-gray-700 my-2">
-                <div className="p-3">painting</div>
-                <div className="p-3">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ea nam alias vitae. Hic ad dicta, mollitia perspiciatis dolor quod rem!</div>
-                <div className="p-3">$20</div>
-                <div className="p-3">
-                    <span className={`px-2 py-1 ${
-                        jobstatus === 'open' ? 'border-yellow-500 text-yellow-100' 
-                        : jobstatus === 'in-progress' ? 'border-emerald-500 text-emerald-100'
-                        : jobstatus === 'completed' ? 'border-indigo-500 text-indigo-100'
-                        : 'bg-red-500'
-                    }
-                     text-center border text-xs`}>
-                        {jobstatus}
-                    </span>
-                </div>
-            </div>
-            <div className="grid grid-cols-4 text-left bg-grey text-white border-b border-gray-700 my-2">
-                <div className="p-3">painting</div>
-                <div className="p-3">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ea nam alias vitae. Hic ad dicta, mollitia perspiciatis dolor quod rem!</div>
-                <div className="p-3">$20</div>
-                <div className="p-3">
-                    <span className={`px-2 py-1 ${
-                        jobstatus === 'open' ? 'border-yellow-500 text-yellow-100' 
-                        : jobstatus === 'in-progress' ? 'border-emerald-500 text-emerald-100'
-                        : jobstatus === 'completed' ? 'border-indigo-500 text-indigo-100'
-                        : 'bg-red-500'
-                    }
-                     text-center border text-xs`}>
-                        {jobstatus}
-                    </span>
-                </div>
-            </div>
-            <div className="grid grid-cols-4 text-left bg-grey text-white border-b border-gray-700 my-2">
-                <div className="p-3">painting</div>
-                <div className="p-3">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ea nam alias vitae. Hic ad dicta, mollitia perspiciatis dolor quod rem!</div>
-                <div className="p-3">$20</div>
-                <div className="p-3">
-                    <span className={`px-2 py-1 ${
-                        jobstatus === 'open' ? 'border-yellow-500 text-yellow-100' 
-                        : jobstatus === 'in-progress' ? 'border-emerald-500 text-emerald-100'
-                        : jobstatus === 'completed' ? 'border-indigo-500 text-indigo-100'
-                        : 'bg-red-500'
-                    }
-                     text-center border text-xs`}>
-                        {jobstatus}
-                    </span>
-                </div>
-            </div>
+            ))}
         </div>
     );
 };
 
 export default RecentJobsSummary;
-

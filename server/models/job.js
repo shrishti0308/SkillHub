@@ -20,6 +20,8 @@ const jobSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    categories: [{ type: String }], // Categories for jobs
+    skillsRequired: [{ type: String }], // Skills required for the job
 }, { timestamps: true });
 
 module.exports = mongoose.model('Job', jobSchema);

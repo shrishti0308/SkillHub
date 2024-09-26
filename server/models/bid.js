@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+
 const bidSchema = new mongoose.Schema({
     amount: { type: Number, required: true },
     job: {

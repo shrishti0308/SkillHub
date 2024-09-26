@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import axiosInstance from '../../../api/axiosInstance';
 import { setBids, selectBidsForUser } from '../../../redux/reducers/dashboard/bidingSlice';
-import { selectRecentJobs } from '../../../redux/reducers/dashboard/jobsSlice'; 
+import { selectRecentJobs } from '../../../redux/Features/dashboard/jobsSlice'; 
 
 const BiddingSummary = () => {
     const dispatch = useDispatch();

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom'; // Import Link for navigation
 import axiosInstance from '../../../api/axiosInstance';
-import { selectRecentJobs, setRecentJobs } from '../../../redux/reducers/dashboard/jobsSlice';
+import { selectRecentJobs, setRecentJobs } from '../../../redux/Features/dashboard/jobsSlice';
 
 const JobsList = () => {
     const dispatch = useDispatch();

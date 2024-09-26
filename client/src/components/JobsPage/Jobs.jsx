@@ -4,7 +4,7 @@ import { Routes, Route } from 'react-router-dom';
 import JobsList from './JobsComponents/JobsList';
 import JobDetails from './JobsComponents/jobDetails';
 import Sidebar from '../Dashboard/Dashboardcomponents/Sidebar';
-import { selectIsSidebarMinimized } from '../../redux/reducers/dashboard/sidebarSlice';
+import { selectIsSidebarMinimized } from '../../redux/Features/dashboard/sidebarSlice';
 
 const Jobs = () => {
     const isSidebarMinimized = useSelector(selectIsSidebarMinimized);

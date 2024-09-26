@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import axiosInstance from '../../../api/axiosInstance';
-import { setJobById, selectJobById, setBidSuccess, resetBidSuccess } from '../../../redux/reducers/dashboard/jobsSlice';
+import { setJobById, selectJobById, setBidSuccess, resetBidSuccess } from '../../../redux/Features/dashboard/jobsSlice';
 import { useParams } from 'react-router-dom';
 
 const JobDetails = () => {

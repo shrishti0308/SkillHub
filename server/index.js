@@ -33,8 +33,8 @@ app.use('/review', reviewRoutes);
 app.use('/job',jobRoutes); 
 app.use('/bid',bidRoutes);
 app.use('/project', projectRoutes);
-app.use('./wallet',walletRoutes);
-app.use('./transaction',transactionRoutes);
+app.use('/wallet',walletRoutes);
+app.use('/transaction',transactionRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

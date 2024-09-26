@@ -8,6 +8,9 @@ import Marketplace from './components/Marketplace/MarketPlace';
 import FreelancerDashboard from './components/dashboard/FreelancerDashboard';
 import JobDetails from './components/Jobs/JobDetails';
 import PostJob from './components/Jobs/PostJob';
+import LandingPage from './components/LandingPage/LandingPage';
+import Jobs from './components/JobsPage/Jobs';
+import Bids from './components/BidingsPage/Bids';
 
 function App() {
   const location = useLocation();
@@ -24,11 +27,14 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/marketplace" element={<Marketplace />} />
-          <Route path='/freelancer' element={<FreelancerDashboard />} />
           <Route path="/profile" element={<ProfileSettings />} />
           <Route path="/user/:username" element={<ProfilePage />} />
           <Route path="/jobs/:id" element={<JobDetails />} />
           <Route path="/jobs/new" element={<PostJob />} />
+          <Route path="/freelancer-dashboard" element={<FreelancerDashboard />} /> 
+          <Route path="/landingpage" element={<LandingPage />} /> 
+          <Route path='/jobs' element={<Jobs/>}/>
+          <Route path='/bidings' element={<Bids/>}/>
         </Routes>
       </div>
     </>

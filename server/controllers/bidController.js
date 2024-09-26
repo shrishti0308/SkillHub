@@ -1,5 +1,7 @@
 const Bid = require('../models/bid');
-const Job = require('../models/job');
+const mongoose = require('mongoose');
+const Job = require('../models/job') 
+
 
 // Place a new bid
 const placeBid = async (req, res) => {
@@ -53,8 +55,49 @@ const acceptBid = async (req, res) => {
     }
 };
 
+const getRecentBids = async (req, res) => {
+  try {
+    const freelancerId = req.user.id; 
+
+    const freelancerObjectId = new mongoose.Types.ObjectId(freelancerId);
+
+    const recentBids = await Bid.find({ freelancer: freelancerObjectId }); 
+
+    if (!recentBids.length) {
+      return res.status(404).json({ message: 'No recent bids found for this user' });
+    }
+
+    res.status(200).json({ recentBids });
+  } catch (error) {
+    res.status(500).json({ message: 'Error retrieving recent bids', error: error.message });
+  }
+};
+
+
+// Controller to get bid details by ID
+const getBidDetails = async (req, res) => {
+    try {
+        const { bidId } = req.params;
+        
+        // Fetch bid details from DB
+        const bid = await Bid.findById(bidId)
+            .populate('freelancer', 'name username') // Populate freelancer info
+            .populate('job', 'title'); // Populate job info
+            
+        if (!bid) {
+            return res.status(404).json({ message: 'Bid not found' });
+        }
+
+        res.status(200).json({ bid });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+    }
+};
+
 module.exports = {
     placeBid,
     getBidsForJob,
     acceptBid,
+    getRecentBids,
+    getBidDetails
 };

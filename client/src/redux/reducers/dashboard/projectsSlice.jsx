@@ -1,15 +1,18 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import axiosInstance from '../../../api/axiosInstance'; // Use axiosInstance instead of axios
 
 // Async thunk to fetch projects taken up by the freelancer
 export const fetchFreelancerJobs = createAsyncThunk(
     'jobs/fetchFreelancerJobs',
     async (userId, { rejectWithValue }) => {
         try {
-            const response = await axios.get(`/api/jobs/freelancer/${userId}`);
+            // Axios instance will automatically add baseURL and token
+            const response = await axiosInstance.get(`/api/jobs/freelancer/${userId}`);
             return response.data;
         } catch (error) {
-            return rejectWithValue(error.response.data);
+            return rejectWithValue(
+                error.response ? error.response.data : "Network Error"
+            );
         }
     }
 );
@@ -33,7 +36,7 @@ const jobsSlice = createSlice({
             })
             .addCase(fetchFreelancerJobs.rejected, (state, action) => {
                 state.status = 'failed';
-                state.error = action.payload;
+                state.error = action.payload || 'Failed to fetch jobs';
             });
     },
 });

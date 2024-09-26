@@ -29,4 +29,5 @@ const jobSchema = new mongoose.Schema({
     skillsRequired: [{ type: String }], // Skills required for the job
 }, { timestamps: true });
 
-module.exports = mongoose.model('Job', jobSchema);
+const Job = mongoose.models.Job || mongoose.model('Job', jobSchema);
+module.exports = Job;

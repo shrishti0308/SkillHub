@@ -5,6 +5,7 @@ import SignupPage from './components/RegistrationPages/Signup';
 import ProfileSettings from './components/ProfilePage/ProfileSettings';
 import ProfilePage from './components/ProfilePage/ProfilePage';
 import FreelancerDashboard from './components/dashboard/FreelancerDashboard';
+import LandingPage from './components/LandingPage/LandingPage';
 
 function App() {
   const location = useLocation();
@@ -20,8 +21,8 @@ function App() {
           <Route path="/" element={<h1 className='text-lg'>Site under development</h1>} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
-          <Route path='/freelancer'element={<FreelancerDashboard />}/>
-          <Route path="/" element={<h1 className=' text-lg' >Site under development</h1>} />
+          <Route path="/freelancer-dashboard" element={<FreelancerDashboard />} /> 
+          <Route path="/landingpage" element={<LandingPage />} /> 
           <Route path="/profile" element={<ProfileSettings />} />
           <Route path="/user/:username" element={<ProfilePage />} />
         </Routes>

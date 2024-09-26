@@ -50,9 +50,8 @@ const Marketplace = () => {
 
     return (
         <div className="relative min-h-screen text-white p-8 overflow-hidden">
-            {/* Gradient Background with Animated Blobs */}
+            {/* Background Animation */}
             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-purple-800 via-gray-900 to-black overflow-hidden">
-                {/* Animated Blob Shapes */}
                 <div className="absolute -top-32 -left-32 w-96 h-96 bg-blue-500 opacity-30 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
                 <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-purple-700 opacity-30 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
                 <div className="absolute top-1/2 left-1/3 w-96 h-96 bg-pink-500 opacity-30 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
@@ -78,7 +77,6 @@ const Marketplace = () => {
 
                 {/* Filters */}
                 <div className="flex flex-wrap justify-center space-x-4 mb-8">
-                    {/* Category Filter */}
                     <select
                         className="bg-gray-800 border border-gray-700 rounded-full px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={selectedCategory}
@@ -92,7 +90,6 @@ const Marketplace = () => {
                         ))}
                     </select>
 
-                    {/* Budget Range Filters */}
                     <input
                         type="number"
                         placeholder="Min Budget"
@@ -117,28 +114,41 @@ const Marketplace = () => {
                 ) : error ? (
                     <p className="text-red-500 text-center text-2xl">{error}</p>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                         {filteredJobs.map(job => (
                             <div
                                 key={job._id}
-                                className="border border-gray-700 rounded-lg p-6 bg-gray-800 shadow-lg transition transform hover:-translate-y-2 hover:shadow-xl"
+                                className="border border-gray-700 rounded-2xl p-8 bg-gradient-to-r from-blue-900 to-gray-800 shadow-xl hover:shadow-2xl transition transform hover:-translate-y-2 relative"
                             >
-                                <h2 className="text-2xl font-semibold text-blue-400 hover:text-blue-500 transition">
+                                {/* Badge */}
+                                <span className="absolute top-2 right-2 bg-gradient-to-br from-green-400 to-blue-500 text-xs text-white px-3 py-1 rounded-full">
+                                    New
+                                </span>
+
+                                {/* Job Title */}
+                                <h2 className="text-3xl font-bold text-white hover:text-blue-500 transition">
                                     {job.title}
                                 </h2>
-                                <p className="text-gray-400 mt-2">{job.description}</p>
-                                <p className="mt-4 font-semibold text-lg">
+                                {/* Job Description */}
+                                <p className="text-gray-400 mt-4 line-clamp-3">{job.description}</p>
+
+                                {/* Budget & Skills */}
+                                <p className="mt-6 font-semibold text-lg">
                                     Budget: <span className="text-blue-400">${job.budget.min} - ${job.budget.max}</span>
                                 </p>
                                 <p className="mt-2">
                                     Skills Required: <span className="text-blue-400">{job.skillsRequired.join(', ')}</span>
                                 </p>
+
+                                {/* Categories */}
                                 <p className="mt-2">
                                     Categories: <span className="text-blue-400">{job.categories.join(', ')}</span>
                                 </p>
+
+                                {/* View Details Link */}
                                 <a
                                     href={`/jobs/${job._id}`}
-                                    className="mt-6 inline-block text-blue-500 hover:underline text-lg"
+                                    className="mt-8 inline-block text-blue-400 hover:underline text-lg font-semibold"
                                 >
                                     View Details
                                 </a>

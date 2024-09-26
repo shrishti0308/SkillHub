@@ -8,7 +8,7 @@ const { validateUserInput } = require('../middlewares/validationMiddleware');
 router.use(express.urlencoded({ extended: true }));
 
 // Route for user registration
-router.post('/register', validateUserInput, userController.registerUser);
+router.post('/register', userController.registerUser);
 
 // Route for user login
 router.post('/login', userController.loginUser);

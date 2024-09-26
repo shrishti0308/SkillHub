@@ -7,7 +7,8 @@ const Job = require('../models/job')
 const placeBid = async (req, res) => {
     try {
         const { amount, jobId } = req.body;
-        const freelancer = req.user._id; // Assuming authenticated user
+        const freelancer = req.user.id;
+        console.log(jobId)
 
         const newBid = new Bid({
             amount,
@@ -18,6 +19,7 @@ const placeBid = async (req, res) => {
         await newBid.save();
         res.status(201).json(newBid);
     } catch (error) {
+        console.log(error)
         res.status(500).json({ error: 'Error placing bid' });
     }
 };

@@ -17,6 +17,18 @@ const initialState = {
     bidAccepted: false,
 };
 
+export const createJob = createAsyncThunk(
+    'jobs/createJob',
+    async (jobData, { rejectWithValue }) => {
+        try {
+            const response = await axios.post('/api/jobs', jobData); // Adjust API path as needed
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response.data); // Return error if the request fails
+        }
+    }
+);
+
 const jobsSlice = createSlice({
     name: 'jobs',
     initialState,

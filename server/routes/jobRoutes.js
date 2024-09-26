@@ -4,7 +4,7 @@ const { createJob, getMarketplaceJobs, getJobById, updateJob ,getFilteredJobs, g
 const { authenticateJWT } = require('../middlewares/authMiddleware');
 
 // Create a job (employer)
-router.post('/create', createJob);
+router.post('/create', authenticateJWT, createJob);
 
 // Get all jobs for marketplace
 router.get('/marketplace', getMarketplaceJobs);

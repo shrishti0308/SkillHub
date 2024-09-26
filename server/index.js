@@ -35,6 +35,8 @@ app.get('/', (req, res) => {
 });
 
 app.use('/user', userRoutes);
+app.use('/jobs', jobRoutes);
+app.use('/bids', bidRoutes);
 app.use('/review', reviewRoutes);
 app.use('/job',jobRoutes); 
 app.use('/bid',bidRoutes);

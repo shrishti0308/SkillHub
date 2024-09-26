@@ -4,7 +4,10 @@ import LoginPage from './components/RegistrationPages/Login';
 import SignupPage from './components/RegistrationPages/Signup';
 import ProfileSettings from './components/ProfilePage/ProfileSettings';
 import ProfilePage from './components/ProfilePage/ProfilePage';
+import Marketplace from './components/Marketplace/MarketPlace';
 import FreelancerDashboard from './components/dashboard/FreelancerDashboard';
+import JobDetails from './components/Jobs/JobDetails';
+import PostJob from './components/Jobs/PostJob';
 import LandingPage from './components/LandingPage/LandingPage';
 import Jobs from './components/JobsPage/Jobs';
 import Bids from './components/BidingsPage/Bids';
@@ -17,15 +20,19 @@ function App() {
   return (
     <>
       <div className='bg-dark text-light w-screen min-h-screen overflow-x-hidden'>
-        {!hideNavbarRoutes.includes(location.pathname) && <Navbar />}
+        {/* {!hideNavbarRoutes.includes(location.pathname) && <Navbar />} */}
 
         <Routes>
           <Route path="/" element={<h1 className='text-lg'>Site under development</h1>} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/profile" element={<ProfileSettings />} />
+          <Route path="/user/:username" element={<ProfilePage />} />
+          <Route path="/jobs/:id" element={<JobDetails />} />
+          <Route path="/jobs/new" element={<PostJob />} />
           <Route path="/freelancer-dashboard" element={<FreelancerDashboard />} /> 
           <Route path="/landingpage" element={<LandingPage />} /> 
-          <Route path="/profile" element={<ProfileSettings />} />
           <Route path='/jobs' element={<Jobs/>}/>
           <Route path='/bidings' element={<Bids/>}/>
         </Routes>

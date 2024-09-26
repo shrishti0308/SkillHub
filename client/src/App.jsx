@@ -11,7 +11,7 @@ import PostJob from './components/Jobs/PostJob';
 import LandingPage from './components/LandingPage/LandingPage';
 import Jobs from './components/JobsPage/Jobs';
 import Bids from './components/BidingsPage/Bids';
-
+import About from './components/About';
 function App() {
   const location = useLocation();
 
@@ -34,6 +34,8 @@ function App() {
           <Route path="/freelancer-dashboard" element={<FreelancerDashboard />} />
           <Route path='/jobs' element={<Jobs />} />
           <Route path='/bidings' element={<Bids />} />
+          <Route path="/about" element={<About/>} />
+
         </Routes>
       </div>
     </>

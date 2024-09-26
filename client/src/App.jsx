@@ -26,6 +26,8 @@ function App() {
           <Route path="/freelancer-dashboard" element={<FreelancerDashboard />} /> 
           <Route path="/landingpage" element={<LandingPage />} /> 
           <Route path="/profile" element={<ProfileSettings />} />
+          <Route path='/jobs' element={<Jobs/>}/>
+          <Route path='/bidings' element={<Bids/>}/>
         </Routes>
       </div>
     </>

@@ -1,6 +1,6 @@
 const Bid = require('../models/bid');
 const mongoose = require('mongoose');
-const Job = require('../models/job') 
+const Job = require('../models/job')
 
 
 // Place a new bid
@@ -34,7 +34,6 @@ const getBidsForJob = async (req, res) => {
     }
 };
 
-// Accept a bid
 const acceptBid = async (req, res) => {
     try {
         const bid = await Bid.findById(req.params.bidId);
@@ -42,8 +41,19 @@ const acceptBid = async (req, res) => {
             return res.status(404).json({ error: 'Bid not found' });
         }
 
-        // Update job status and freelancer
+        // Find the job associated with the bid
         const job = await Job.findById(bid.job);
+        if (!job) {
+            return res.status(404).json({ error: 'Job not found' });
+        }
+
+        // Check if the user trying to accept the bid is the job poster
+        const currentUserId = req.user.id; // Assuming you have user info in req.user
+        if (job.employer.toString() !== currentUserId) {
+            return res.status(403).json({ error: 'You are not authorized to accept this bid.' });
+        }
+
+        // Update job details
         job.freelancer = bid.freelancer;
         job.status = 'in-progress';
         job.bidAccepted = true;
@@ -55,22 +65,23 @@ const acceptBid = async (req, res) => {
     }
 };
 
+
 const getRecentBids = async (req, res) => {
-  try {
-    const freelancerId = req.user.id; 
+    try {
+        const freelancerId = req.user.id;
 
-    const freelancerObjectId = new mongoose.Types.ObjectId(freelancerId);
+        const freelancerObjectId = new mongoose.Types.ObjectId(freelancerId);
 
-    const recentBids = await Bid.find({ freelancer: freelancerObjectId }); 
+        const recentBids = await Bid.find({ freelancer: freelancerObjectId });
 
-    if (!recentBids.length) {
-      return res.status(404).json({ message: 'No recent bids found for this user' });
+        if (!recentBids.length) {
+            return res.status(404).json({ message: 'No recent bids found for this user' });
+        }
+
+        res.status(200).json({ recentBids });
+    } catch (error) {
+        res.status(500).json({ message: 'Error retrieving recent bids', error: error.message });
     }
-
-    res.status(200).json({ recentBids });
-  } catch (error) {
-    res.status(500).json({ message: 'Error retrieving recent bids', error: error.message });
-  }
 };
 
 
@@ -78,12 +89,12 @@ const getRecentBids = async (req, res) => {
 const getBidDetails = async (req, res) => {
     try {
         const { bidId } = req.params;
-        
+
         // Fetch bid details from DB
         const bid = await Bid.findById(bidId)
             .populate('freelancer', 'name username') // Populate freelancer info
             .populate('job', 'title'); // Populate job info
-            
+
         if (!bid) {
             return res.status(404).json({ message: 'Bid not found' });
         }

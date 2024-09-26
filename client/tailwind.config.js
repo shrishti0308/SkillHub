@@ -1,5 +1,4 @@
-// Import Tailwind's default colors
-import colors, { slate } from 'tailwindcss/colors'
+import colors from 'tailwindcss/colors';
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -20,10 +19,10 @@ export default {
       blue: colors.blue,
       slate: colors.slate,
 
-      // Your custom colors
+      // Custom colors
       'grey': '#23272f',
       'dark': '#1a1d23',
-      'cyan-blue':'#58c4dc',
+      'cyan-blue': '#58c4dc',
       'light': '#f6f7f9',
     },
   },

@@ -33,19 +33,31 @@ const JobDetails = () => {
 
     const handleBidSubmit = async () => {
         try {
-            const response = await axiosInstance.post(`/bids/place`, {
+            await axiosInstance.post(`/bids/place`, {
                 amount: bidAmount,
                 jobId: id,
             });
-            setBids([...bids, response.data]);
             setBidAmount('');
+            location.reload();
         } catch (err) {
             setError('Error submitting bid');
         }
     };
 
+    const handleAcceptBid = async (bidId) => {
+        try {
+            await axiosInstance.put(`/bids/accept/${bidId}`);
+            location.reload();
+        } catch (err) {
+            setError('Error accepting bid');
+        }
+    };
+
     if (error) return <div className="text-red-500 text-center">{error}</div>;
     if (!job) return <div className="text-center">Loading...</div>;
+
+    // Get the accepted bid if it exists
+    const acceptedBid = bids.find(bid => bid.status === 'accepted');
 
     return (
         <div className="min-h-screen bg-gray-900 text-white p-8 flex flex-col items-center">
@@ -95,7 +107,40 @@ const JobDetails = () => {
                     </a>
                 </div>
 
-                {(role === 'hybrid' || role === 'freelancer') && job.employer.username !== username && (
+                {/* Display accepted bid if it exists */}
+                {acceptedBid && (
+                    <div className="mt-6 mb-4">
+                        <h2 className="text-2xl font-bold mb-2">Accepted Bid</h2>
+                        <li className="bg-gray-700 p-4 rounded-md flex items-center justify-between">
+                            <div className="flex items-center">
+                                {acceptedBid.freelancer.info.profilePic ? (
+                                    <img
+                                        src={`http://localhost:3000/public${acceptedBid.freelancer.info.profilePic}`}
+                                        alt={`${acceptedBid.freelancer.name}'s profile`}
+                                        className="w-10 h-10 rounded-full mr-2"
+                                    />
+                                ) : (
+                                    <FontAwesomeIcon icon={faUserCircle} className="w-10 h-10 text-gray-500 mr-2" />
+                                )}
+                                <a href={`/user/${acceptedBid.freelancer.username}`} className="text-blue-400 hover:underline">
+                                    {acceptedBid.freelancer.name}
+                                </a>
+                            </div>
+                            <div className="flex items-center">
+                                <span className="font-semibold mr-2">Bid Amount:</span>
+                                <span className="bg-yellow-500 text-black rounded-full px-3 py-1 text-sm mr-2">
+                                    ₹{acceptedBid.amount}
+                                </span>
+                                <span className={`px-2 py-1 rounded-full text-xs font-semibold bg-gray-500 text-white`}>
+                                    {acceptedBid.status.charAt(0).toUpperCase() + acceptedBid.status.slice(1)}
+                                </span>
+                            </div>
+                        </li>
+                    </div>
+                )}
+
+                {/* Conditional rendering for placing bids */}
+                {(role === 'hybrid' || role === 'freelancer') && job.employer.username !== username && !job.bidAccepted && (
                     <div className="mt-6">
                         <h2 className="text-2xl font-bold mb-2">Place a Bid</h2>
                         <div className="flex items-center mb-4">
@@ -116,14 +161,10 @@ const JobDetails = () => {
                     </div>
                 )}
 
-                {role === 'enterprise' && (
-                    <p className="text-red-500">You cannot place a bid as an enterprise.</p>
-                )}
-
                 <h2 className="text-2xl font-bold mt-6 border-t border-gray-700 pt-4">Bids for this Job</h2>
                 {bids.length > 0 ? (
                     <ul className="mt-4 space-y-2">
-                        {bids.map(bid => (
+                        {bids.filter(bid => bid.status !== 'accepted').map(bid => ( // Exclude accepted bids
                             <li key={bid._id} className="bg-gray-700 p-4 rounded-md flex items-center justify-between">
                                 <div className="flex items-center">
                                     {bid.freelancer.info.profilePic ? (
@@ -144,15 +185,23 @@ const JobDetails = () => {
                                     <span className="bg-yellow-500 text-black rounded-full px-3 py-1 text-sm mr-2">
                                         ₹{bid.amount}
                                     </span>
-                                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${bid.status === 'pending' ? 'bg-yellow-600 text-black' : 'bg-green-500 text-white'}`}>
+                                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${bid.status === 'pending' ? 'bg-yellow-600 text-black' : 'bg-red-600 text-white'}`}>
                                         {bid.status.charAt(0).toUpperCase() + bid.status.slice(1)}
                                     </span>
+                                    {job.employer.username === username && bid.status === 'pending' && !job.bidAccepted && (
+                                        <button
+                                            onClick={() => handleAcceptBid(bid._id)}
+                                            className="bg-gray-600 text-white rounded-md px-3 py-1 ml-4 hover:bg-green-700 transition duration-200"
+                                        >
+                                            Accept
+                                        </button>
+                                    )}
                                 </div>
                             </li>
                         ))}
                     </ul>
                 ) : (
-                    <p>No bids yet.</p>
+                    <div className="mt-4">No bids placed for this job yet.</div>
                 )}
             </div>
         </div>

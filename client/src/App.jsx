@@ -19,7 +19,7 @@ function App() {
 
   return (
     <>
-      <div className='bg-dark text-light w-screen min-h-screen overflow-x-hidden'>
+      <div className='text-light w-screen min-h-screen overflow-x-hidden'>
         {!hideNavbarRoutes.includes(location.pathname) && <Navbar />}
 
         <Routes>

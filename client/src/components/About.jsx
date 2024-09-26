@@ -10,20 +10,20 @@ const About = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-purple-900 via-indigo-900 to-gray-900 text-white p-8">
+    <div className="min-h-screen bg-gradient-to-r  text-white p-8">
       {/* About Section */}
       <section className="mb-12 text-center">
         <h1 className="text-5xl font-extrabold text-blue-400 mb-6">
           About Our Freelancing Platform
         </h1>
         <p className="text-gray-300 mb-4 text-lg max-w-3xl mx-auto">
-          Welcome to our freelancing platform, where freelancers and enterprises connect seamlessly. 
-          Whether you're a freelancer looking for your next project, an enterprise needing expert talent, 
+          Welcome to our freelancing platform, where freelancers and enterprises connect seamlessly.
+          Whether you're a freelancer looking for your next project, an enterprise needing expert talent,
           or a hybrid user seeking the best of both worlds, our platform is designed to meet your needs.
         </p>
         <p className="text-gray-300 text-lg max-w-3xl mx-auto">
-          We offer a dynamic space where freelancers can showcase their skills, enterprises can find the right 
-          talent for their tasks, and hybrid users can enjoy the flexibility of both posting and completing tasks. 
+          We offer a dynamic space where freelancers can showcase their skills, enterprises can find the right
+          talent for their tasks, and hybrid users can enjoy the flexibility of both posting and completing tasks.
           With transparent commission rates and a user-friendly interface, we ensure a smooth experience for all users.
         </p>
       </section>

@@ -60,7 +60,7 @@ const JobDetails = () => {
     const acceptedBid = bids.find(bid => bid.status === 'accepted');
 
     return (
-        <div className="min-h-screen bg-gray-900 text-white p-8 flex flex-col items-center">
+        <div className="min-h-screen  text-white p-8 flex flex-col items-center">
             <div className="max-w-3xl w-full bg-gray-800 p-6 rounded-lg shadow-lg">
                 <h1 className="text-4xl font-bold mb-4 border-b border-gray-700 pb-2">{job.title}</h1>
                 <p className="text-lg mb-4">{job.description}</p>

@@ -31,7 +31,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-indigo-600 to-blue-500 flex justify-center items-center">
+    <div className="min-h-screen bg-gradient-to-r flex justify-center items-center">
       <div className="bg-gray-800 py-10 px-8 rounded-lg shadow-lg min-w-[325px] sm:min-w-[60%] lg:min-w-[35%] max-w-[90%]">
         <img src="/logo.png" className=' mx-auto w-20' alt="" />
         <h2 className="text-3xl text-white font-bold text-center mb-6">Welcome Back</h2>

@@ -51,7 +51,7 @@ const Marketplace = () => {
     return (
         <div className="relative min-h-screen text-white p-8 overflow-hidden">
             {/* Background Animation */}
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-purple-800 via-gray-900 to-black overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br overflow-hidden">
                 <div className="absolute -top-32 -left-32 w-96 h-96 bg-blue-500 opacity-30 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
                 <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-purple-700 opacity-30 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
                 <div className="absolute top-1/2 left-1/3 w-96 h-96 bg-pink-500 opacity-30 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>

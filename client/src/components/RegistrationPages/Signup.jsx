@@ -60,7 +60,7 @@ const SignupPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-indigo-600 to-blue-500 flex justify-center items-center">
+    <div className="min-h-screen bg-gradient-to-r flex justify-center items-center">
       <div className="bg-gray-800 p-10 rounded-lg shadow-lg text-center min-w-[325px] sm:min-w-[60%] lg:min-w-[35%] max-w-[90%] my-10">
         <img src="/logo.png" className='mx-auto w-20' alt="" />
         {errorMessage && <p className="text-red-500">{errorMessage}</p>}

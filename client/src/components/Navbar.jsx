@@ -66,7 +66,7 @@ const Navbar = () => {
                   <>
                     <Link to="/profile" className="px-3 py-2 mx-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">Settings</Link>
                     <button onClick={handleLogout} className="px-3 py-2 mx-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">Logout</button>
-                    <div className="relative">
+                    <Link to={`/user/${userProfile.username}`} className="relative">
                       <button
                         type="button"
                         className="flex items-center focus:outline-none"
@@ -84,7 +84,7 @@ const Navbar = () => {
                           )}
                         </div>
                       </button>
-                    </div>
+                    </Link>
                   </>
                 ) : (
                   <Link to="/login" className="px-3 py-2 mx-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">Login</Link>

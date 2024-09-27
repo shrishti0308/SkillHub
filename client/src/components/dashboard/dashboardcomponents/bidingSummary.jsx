@@ -46,7 +46,6 @@ const BiddingSummary = () => {
     // Function to get job title from the map
     const findJobTitle = (jobId) => {
         const recentJobs = jobs.jobs;
-        console.log(recentJobs);
         let ans = 'Unknown';
         Object.values(recentJobs).forEach(job => {
             if (job._id == jobId) {

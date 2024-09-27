@@ -116,7 +116,7 @@ const ProfileSettings = () => {
     };
 
     return (
-        <div className="max-w-5xl mx-auto p-6 bg-dark shadow-lg rounded-lg">
+        <div className=" my-10 max-w-5xl mx-auto p-6 bg-dark shadow-lg rounded-lg">
             <h1 className="text-4xl font-bold text-light pb-6 border-b-4 border-emerald">Profile Settings</h1>
             <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-6">
                 <ImageUpload profilePicPath={profilePicPath} setProfilePic={setProfilePic} />
@@ -270,7 +270,7 @@ const ProfileSettings = () => {
 
                 <button
                     type="submit"
-                    className="mt-6 bg-emerald text-light p-2 rounded-lg hover:bg-indigo-600 transition duration-200"
+                    className="mt-6 bg-white/20 text-light p-2 rounded-lg hover:bg-white/30 transition duration-200"
                 >
                     Update Profile
                 </button>

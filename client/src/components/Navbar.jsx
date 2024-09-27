@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserProfile, selectUserProfile } from '../redux/Features/user/ProfileSlice';
-import { selectAccessToken, logout } from '../redux/Features/user/authSlice'; // Add logout action
+import { selectAccessToken, logout, selectRole } from '../redux/Features/user/authSlice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 
@@ -11,6 +11,7 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const accessToken = useSelector(selectAccessToken);
   const userProfile = useSelector(selectUserProfile);
+  const userRole = useSelector(selectRole);
 
   useEffect(() => {
     if (accessToken) {
@@ -64,6 +65,7 @@ const Navbar = () => {
               <div className="flex items-center pr-4">
                 {accessToken ? (
                   <>
+                    {(userRole !== "freelancer") && (<Link to="/jobs/new" className="px-3 py-2 mx-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">New Job</Link>)}
                     <Link to="/profile" className="px-3 py-2 mx-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">Settings</Link>
                     <button onClick={handleLogout} className="px-3 py-2 mx-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">Logout</button>
                     <Link to={`/user/${userProfile.username}`} className="relative">

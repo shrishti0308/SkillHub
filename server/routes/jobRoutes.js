@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { createJob, getMarketplaceJobs, getJobById, updateJob ,getFilteredJobs, getJobByIdAuthCheck, createBid} = require('../controllers/jobController');
+const { createJob, getMarketplaceJobs, getJobById, updateJob, getFilteredJobs, getJobByIdAuthCheck, createBid } = require('../controllers/jobController');
 const { authenticateJWT } = require('../middlewares/authMiddleware');
 
 // Create a job (employer)
@@ -16,7 +16,7 @@ router.get('/:id', getJobById);
 router.put('/:id', updateJob);
 
 // Route to get filtered jobs
-router.get('/jobs', authenticateJWT, getFilteredJobs);
+router.get('/jobs/filtered', authenticateJWT, getFilteredJobs);
 
 // Route to get a specific job by ID
 router.get('/user/:id', authenticateJWT, getJobByIdAuthCheck);

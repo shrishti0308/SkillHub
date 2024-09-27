@@ -69,13 +69,13 @@ const updateJob = async (req, res) => {
 // Get recent jobs
 const getFilteredJobs = async (req, res) => {
     try {
-        const userId = req.user.id;  
-        const userRole = req.user.role; 
+        const userId = req.user.id;
+        const userRole = req.user.role;
 
-        let filter = { status: 'open' };  
+        let filter = { status: 'open' };
 
         if (userRole === 'freelancer' || userRole === 'hybrid') {
-            filter.employer = { $ne: userId };  
+            filter.employer = { $ne: userId };
         }
 
         const jobs = await Job.find(filter).sort({ createdAt: -1 });
@@ -107,33 +107,33 @@ const createBid = async (req, res) => {
     try {
         const { amount } = req.body;
         const { jobId } = req.params;
-        const freelancerId = req.user.id; 
-  
+        const freelancerId = req.user.id;
+
         const job = await Job.findById(jobId);
-  
+
         if (!job) {
             return res.status(404).json({ message: 'Job not found' });
         }
-  
+
         if (job.status !== 'open') {
             return res.status(400).json({ message: 'Job is not open for bids' });
         }
-  
+
         const newBid = new Bid({
             amount,
             job: jobId,
             freelancer: freelancerId,
         });
-  
+
         await newBid.save();
-  
+
         res.status(201).json({ message: 'Bid placed successfully', bid: newBid });
     } catch (err) {
         res.status(500).json({ message: 'Error placing bid', error: err.message });
     }
-  };
-  
-  module.exports = {
+};
+
+module.exports = {
     createJob,
     getMarketplaceJobs,
     getJobById,

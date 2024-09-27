@@ -34,7 +34,7 @@ function App() {
           <Route path="/freelancer-dashboard" element={<FreelancerDashboard />} />
           <Route path='/jobs' element={<Jobs />} />
           <Route path='/bidings' element={<Bids />} />
-          <Route path="/about" element={<About/>} />
+          <Route path="/about" element={<About />} />
 
         </Routes>
       </div>

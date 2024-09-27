@@ -15,12 +15,12 @@ const Bids = () => {
     const isSidebarMinimized = useSelector(selectIsSidebarMinimized);
 
 
-    const [bidsToDisplay,setBidsToDisplay] = useState([]);
+    const [bidsToDisplay, setBidsToDisplay] = useState([]);
 
     useEffect(() => {
         const fetchUserBids = async () => {
             try {
-                const response = await axiosInstance.get('/bid/recent-bids');
+                const response = await axiosInstance.get('/bids/recent');
                 dispatch(setBids(response.data.bids));
                 setBidsToDisplay(bids);
                 setStatus('succeeded');

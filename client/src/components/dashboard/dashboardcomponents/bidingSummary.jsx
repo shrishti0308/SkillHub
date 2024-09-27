@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import axiosInstance from '../../../api/axiosInstance';
 import { setBids, selectBidsForUser } from '../../../redux/reducers/dashboard/bidingSlice';
-import { selectRecentJobs } from '../../../redux/Features/dashboard/jobsSlice'; 
+import { selectRecentJobs } from '../../../redux/Features/dashboard/jobsSlice';
 
 const BiddingSummary = () => {
     const dispatch = useDispatch();
@@ -14,7 +14,7 @@ const BiddingSummary = () => {
     useEffect(() => {
         const fetchBids = async () => {
             try {
-                const response = await axiosInstance.get('/bid/recent-bids');
+                const response = await axiosInstance.get('/bids/recent-bids');
                 dispatch(setBids(response.data.recentBids));
                 setStatus('succeeded');
             } catch (error) {
@@ -48,7 +48,7 @@ const BiddingSummary = () => {
         const recentJobs = jobs.jobs;
         let ans = 'Unknown';
         Object.values(recentJobs).forEach(job => {
-            if(job._id == jobId){
+            if (job._id == jobId) {
                 ans = job.title;
             }
         });
@@ -65,10 +65,9 @@ const BiddingSummary = () => {
                             {findJobTitle(bid.job)}
                         </h3>
                         <p className="text-light mb-2">Bid Amount: <span className="font-medium text-light">${bid.amount}</span></p>
-                        <p className="text-light mb-4">Status: 
-                            <span className={`ml-2 inline-block px-3 py-2 border text-sm font-medium ${
-                                bid.status === 'accepted' ? 'text-emerald-100 border-emerald-600' : 'border-yellow-100 text-yellow-600'
-                            }`}>
+                        <p className="text-light mb-4">Status:
+                            <span className={`ml-2 inline-block px-3 py-2 border text-sm font-medium ${bid.status === 'accepted' ? 'text-emerald-100 border-emerald-600' : 'border-yellow-100 text-yellow-600'
+                                }`}>
                                 {bid.status}
                             </span>
                         </p>

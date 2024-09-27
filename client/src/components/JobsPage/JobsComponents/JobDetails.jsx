@@ -14,7 +14,7 @@ const JobDetails = () => {
     useEffect(() => {
         const fetchJobDetails = async () => {
             try {
-                const response = await axiosInstance.get(`/job/user/${jobId}`);
+                const response = await axiosInstance.get(`/jobs/user/${jobId}`);
                 dispatch(setJobById(response.data.job));  // Set job in Redux state
             } catch (error) {
                 console.error('Error fetching job details:', error);
@@ -32,7 +32,7 @@ const JobDetails = () => {
     const handleBidSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axiosInstance.post(`/job/${jobId}/bid`, { amount: parseFloat(amount) });  // Send bid amount to backend
+            await axiosInstance.post(`/jobs/${jobId}/bid`, { amount: parseFloat(amount) });  // Send bid amount to backend
             dispatch(setBidSuccess(true));  // Set success state in Redux
         } catch (error) {
             console.error('Error submitting bid:', error);
@@ -47,7 +47,7 @@ const JobDetails = () => {
         <div className='p-6'>
             <h1 className="text-2xl font-bold text-white">{job.title}</h1>
             <p className="text-white">{job.description}</p>
-            <p className="text-white">Budget: ${job.budget}</p>
+            <p className="text-white">Budget: {job.budget.min} - {job.budget.max}</p>
 
             {bidSuccess ? (
                 <p className="text-green-500">Your bid has been placed successfully!</p>

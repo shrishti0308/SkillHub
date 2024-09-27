@@ -14,7 +14,7 @@ router.put('/accept/:bidId', authenticateJWT, acceptBid);
 
 const bidController = require('../controllers/bidController');
 
-router.get('/recent-bids', authenticateJWT, bidController.getRecentBids);
+router.get('/recent', authenticateJWT, bidController.getRecentBids);
 
 // Route to get details of a specific bid (including all bids for the job)
 router.get('/:bidId/details', authenticateJWT, bidController.getBidDetails);

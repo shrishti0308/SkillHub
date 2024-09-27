@@ -5,13 +5,13 @@ import axiosInstance from '../../../api/axiosInstance';
 
 const BidDetails = ({ bid }) => {
     const dispatch = useDispatch();
-    const bidDetails = useSelector(selectBidDetails); 
+    const bidDetails = useSelector(selectBidDetails);
 
     useEffect(() => {
         const fetchBidDetails = async () => {
             try {
-                const response = await axiosInstance.get(`/bid/${bid.job._id}/bids`);
-                dispatch(setBidDetails(response.data)); 
+                const response = await axiosInstance.get(`/bids/${bid.job._id}/bids`);
+                dispatch(setBidDetails(response.data));
             } catch (error) {
                 console.error('Error fetching bid details:', error);
             }

@@ -43,29 +43,32 @@ const Bids = () => {
     }
 
     return (
-        <div className={`flex flex-col flex-grow p-5 fixed top-16 ${isSidebarMinimized ? 'left-16' : 'left-56'} transition-all duration-300 overflow-auto h-screen`}>
+        <div className={`flex  flex-grow p-5 top-16 ${isSidebarMinimized ? 'left-16' : 'left-56'} transition-all duration-300 `}>
             <Sidebar />
-            <h2>User Bids</h2>
-            <table className="table-auto w-full text-left">
-                <thead>
-                    <tr>
-                        <th>Job</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {bidsToDisplay.map((bid) => (
-                        <tr key={bid._id} onClick={() => setSelectedBid(bid)}>
-                            <td>{bid.job.title}</td>
-                            <td>${bid.amount}</td>
-                            <td>{bid.status}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            <div className="a">
 
-            {selectedBid && <BidDetails bid={selectedBid} />}
+                <h2>User Bids</h2>
+                <table className="table-auto text-left">
+                    <thead>
+                        <tr>
+                            <th>Job</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {bidsToDisplay.map((bid) => (
+                            <tr key={bid._id} onClick={() => setSelectedBid(bid)}>
+                                <td>{bid.job.title}</td>
+                                <td>${bid.amount}</td>
+                                <td>{bid.status}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+
+                {selectedBid && <BidDetails bid={selectedBid} />}
+            </div>
         </div>
     );
 };

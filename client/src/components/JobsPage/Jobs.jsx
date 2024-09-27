@@ -9,7 +9,7 @@ import { selectIsSidebarMinimized } from '../../redux/Features/dashboard/sidebar
 const Jobs = () => {
     const isSidebarMinimized = useSelector(selectIsSidebarMinimized);
     return (
-        <div className={`p-6 fixed top-16 ${isSidebarMinimized ? 'left-16' : 'left-56'}`}>
+        <div className={`p-6 flex ${isSidebarMinimized ? 'left-16' : 'left-56'}`}>
             <Sidebar />
             <Routes>
                 <Route path="/" element={<JobsList />} />

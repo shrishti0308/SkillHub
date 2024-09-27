@@ -13,6 +13,9 @@ const bidRoutes = require('./routes/bidRoutes');
 const projectRoutes = require('./routes/projectRoutes');
 const walletRoutes = require('./routes/walletRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
+const { default: mongoose } = require('mongoose');
+const bid = require('./models/bid');
+const { authenticateJWT } = require('./middlewares/authMiddleware');
 
 
 connectDB();
@@ -41,6 +44,19 @@ app.use('/review', reviewRoutes);
 app.use('/project', projectRoutes);
 app.use('/wallet', walletRoutes);
 app.use('/transaction', transactionRoutes);
+
+app.get('/recent-bids', authenticateJWT, async (req, res) => {
+  try {
+    const freelancerId = req.user.id;
+    const freelancerObjectId = new mongoose.Types.ObjectId(freelancerId);
+
+    const recentBids = await bid.find({ freelancer: freelancerObjectId });
+
+    res.status(200).json({ recentBids });
+  } catch (error) {
+    res.status(500).json({ message: 'Error retrieving recent bids', error: error.message });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

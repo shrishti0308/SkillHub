@@ -14,7 +14,7 @@ const BiddingSummary = () => {
     useEffect(() => {
         const fetchBids = async () => {
             try {
-                const response = await axiosInstance.get('/bids/recent-bids');
+                const response = await axiosInstance.get('/recent-bids');
                 dispatch(setBids(response.data.recentBids));
                 setStatus('succeeded');
             } catch (error) {

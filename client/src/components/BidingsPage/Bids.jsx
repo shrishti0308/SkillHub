@@ -20,7 +20,7 @@ const Bids = () => {
     useEffect(() => {
         const fetchUserBids = async () => {
             try {
-                const response = await axiosInstance.get('/bids/recent');
+                const response = await axiosInstance.get('/recent-bids');
                 dispatch(setBids(response.data.bids));
                 setBidsToDisplay(bids);
                 setStatus('succeeded');

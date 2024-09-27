@@ -66,6 +66,7 @@ const Navbar = () => {
                 {accessToken ? (
                   <>
                     {(userRole !== "freelancer") && (<Link to="/jobs/new" className="px-3 py-2 mx-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">New Job</Link>)}
+                    <Link to="/freelancer-dashboard" className="px-3 py-2 mx-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">Dashboard</Link>
                     <Link to="/profile" className="px-3 py-2 mx-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">Settings</Link>
                     <button onClick={handleLogout} className="px-3 py-2 mx-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">Logout</button>
                     <Link to={`/user/${userProfile.username}`} className="relative">

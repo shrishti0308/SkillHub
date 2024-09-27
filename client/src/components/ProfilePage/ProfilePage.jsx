@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux'; // Import useSelector to access auth state
 import axiosInstance from '../../api/axiosInstance';
 import ReactStars from 'react-stars';
-import ReviewModal from './ProfileComponents/ReviewModal';
-import { selectUsername } from '../../redux/Features/user/authSlice'; // Import the username selector
+import ReviewModal from './ProfileComponents/ReviewModal'; // Assuming you have a separate modal component
+import { selectUsername } from '../../redux/Features/user/authSlice';
 
 const ProfilePage = () => {
     const { username } = useParams();
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [reviews, setReviews] = useState([]); // State to store reviews
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
@@ -21,6 +22,10 @@ const ProfilePage = () => {
             try {
                 const response = await axiosInstance.get(`/user/${username}`);
                 setUser(response.data);
+
+                // Fetch reviews for this user
+                const reviewsResponse = await axiosInstance.get(`/review/user/${response.data._id}`);
+                setReviews(reviewsResponse.data.reviews);  // Store the reviews
             } catch (error) {
                 console.error('Error fetching user profile:', error);
             } finally {
@@ -70,7 +75,7 @@ const ProfilePage = () => {
                     <p className="text-lg font-semibold">Joined {joinedTime}</p>
                 </div>
 
-                {/* Check if the current user is viewing their own profile */}
+                {/* Add Review button if not viewing own profile */}
                 {currentUsername !== user.username && (
                     <button
                         onClick={() => setIsModalOpen(true)}
@@ -86,6 +91,36 @@ const ProfilePage = () => {
                 <UserDetailsSection title="Skills" items={user.info.skills} />
                 <UserDetailsSection title="Experience" items={user.info.experience} />
                 <PreviousWorksSection works={user.previousWorks} />
+
+                {/* Reviews Section */}
+                <section className="w-full mt-8">
+                    <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200">Reviews</h2>
+                    <div className="space-y-4 mt-4">
+                        {reviews.length > 0 ? (
+                            reviews.map((review, index) => (
+                                <div key={index} className="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-lg w-fit">
+                                    <Link to={`/user/${review.reviewer.username}`}>
+                                        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex flex-col items-center">
+                                            {review.reviewer.name}
+                                        </h3>
+                                    </Link>
+                                    <div>
+                                        <ReactStars
+                                            count={5}
+                                            value={review.rating}
+                                            size={24}
+                                            color2={'#ffd700'}
+                                            edit={false}
+                                        />
+                                    </div>
+                                    <p className="text-gray-600 dark:text-gray-300 mt-2 inline-block mx-auto">{review.comment}</p>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="text-gray-600 dark:text-gray-300">No reviews available.</p>
+                        )}
+                    </div>
+                </section>
             </main>
 
             {/* Review Modal */}

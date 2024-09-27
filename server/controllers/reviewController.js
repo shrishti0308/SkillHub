@@ -68,7 +68,7 @@ exports.getAllReviewsForUser = async (req, res) => {
     const { userId } = req.params;
 
     try {
-        const reviews = await Review.find({ reviewedUser: userId }).populate('reviewer', 'name');
+        const reviews = await Review.find({ reviewedUser: userId }).populate('reviewer', 'name username');
         res.status(200).json({ success: true, reviews });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error fetching reviews', error });

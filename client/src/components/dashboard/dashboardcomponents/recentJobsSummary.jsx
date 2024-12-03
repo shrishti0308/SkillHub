@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom'; 
 import { useDispatch, useSelector } from 'react-redux';
 import axiosInstance from '../../../api/axiosInstance';
 import { selectRecentJobs, setRecentJobs } from '../../../redux/Features/dashboard/jobsSlice';
@@ -49,7 +50,12 @@ const RecentJobsSummary = () => {
             {/* Map through jobsToDisplay and display entries */}
             {jobsToDisplay.map((job) => (
                 <div key={job._id} className="grid grid-cols-4 text-left bg-grey text-white border-b border-gray-700 my-2">
-                    <div className="p-3">{job.title}</div>
+                    {/* <div className="p-3">{job.title}</div> */}
+                    <Link className='p-3' to={`/jobs/${job._id}`}>
+                            <span className="text-cyan-blue hover:underline cursor-pointer">
+                                {job.title}
+                            </span>
+                    </Link>
                     <div className="p-3">{job.description}</div>
                     <div className="p-3">{job.budget.min} - {job.budget.max}</div>
                     <div className="p-3">

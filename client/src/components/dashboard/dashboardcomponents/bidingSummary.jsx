@@ -46,6 +46,8 @@ const BiddingSummary = () => {
     // Function to get job title from the map
     const findJobTitle = (jobId) => {
         const recentJobs = jobs.jobs;
+        console.log("finding for job title");
+        console.log(recentJobs);
         let ans = 'Unknown';
         Object.values(recentJobs).forEach(job => {
             if (job._id == jobId) {
@@ -63,6 +65,7 @@ const BiddingSummary = () => {
                     <div key={bid._id} className="bg-gray p-5 rounded-xl shadow-lg transform transition-all hover:scale-105 hover:shadow-2xl">
                         <h3 className="text-xl font-semibold text-cyan-blue mb-3">
                             {findJobTitle(bid.job)}
+                            {/* {bid.job} */}
                         </h3>
                         <p className="text-light mb-2">Bid Amount: <span className="font-medium text-light">${bid.amount}</span></p>
                         <p className="text-light mb-4">Status:

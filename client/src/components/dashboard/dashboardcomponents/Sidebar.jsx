@@ -25,7 +25,10 @@ function Sidebar() {
                 <div className="flex justify-between my-5 w-full pl-5 pr-5">
                     <div className={`text-md flex items-start font-bold ${isSidebarMinimized ? 'hidden' : 'block'}`}>
                         <TiHomeOutline className='mr-2 mt-1.5 text-lg' />
-                        <span className='text-base font-normal p-0 m-1'>Dashboard</span>
+                        {/* <span className='text-base font-normal p-0 m-1'>Dashboard</span>
+                         */}
+                        <Link to="/freelancer-dashboard" className='text-base font-normal p-0 m-1'>Dashboard</Link>
+
                     </div>
                     <button className="text-light px-2 py-1 rounded" onClick={() => dispatch(toggleSidebar())}> {/* Dispatch the toggle action */}
                         {isSidebarMinimized ? <FaAngleLeft className='font-light' /> : <FaAngleRight className='font-light' />}

@@ -57,13 +57,13 @@ const Bids = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {bidsToDisplay.map((bid) => (
+                        {bidsToDisplay && bidsToDisplay.length !== 0 ? bidsToDisplay.map((bid) => (
                             <tr key={bid._id} onClick={() => setSelectedBid(bid)}>
                                 <td>{bid.job.title}</td>
                                 <td>${bid.amount}</td>
                                 <td>{bid.status}</td>
                             </tr>
-                        ))}
+                        )) : <tr><td colSpan="3">No bids found</td></tr>}
                     </tbody>
                 </table>
 

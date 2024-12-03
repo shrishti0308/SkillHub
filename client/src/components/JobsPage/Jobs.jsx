@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Routes, Route } from 'react-router-dom';
 import JobsList from './JobsComponents/JobsList';
-import JobDetails from './JobsComponents/jobDetails';
-import Sidebar from '../Dashboard/Dashboardcomponents/Sidebar';
+import JobDetails from './JobsComponents/JobDetails';
+import Sidebar from '../dashboard/dashboardcomponents/Sidebar';
 import { selectIsSidebarMinimized } from '../../redux/Features/dashboard/sidebarSlice';
 
 const Jobs = () => {

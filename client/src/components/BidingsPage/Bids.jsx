@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectBidsForUser, setBids } from '../../redux/reducers/dashboard/bidingSlice';
 import axiosInstance from '../../api/axiosInstance';
 import BidDetails from './BidingComponents/BidDetails';
-import Sidebar from '../Dashboard/Dashboardcomponents/Sidebar';
+import Sidebar from '../dashboard/dashboardcomponents/Sidebar';
 import { selectIsSidebarMinimized } from '../../redux/reducers/dashboard/sidebarSlice';
 
 const Bids = () => {

@@ -1,12 +1,12 @@
-import React from 'react';
-import Sidebar from '../Dashboard/Dashboardcomponents/Sidebar';
-import { selectIsSidebarMinimized } from '../../redux/reducers/dashboard/sidebarSlice';
-import EarningsSummary from './Dashboardcomponents/EarningsSummary';
-import BiddingSummary from './Dashboardcomponents/BidingSummary';
-import ProjectsSummary from './Dashboardcomponents/ProjectsSummary';
-import RecentJobsSummary from './Dashboardcomponents/RecentJobsSummary';
-import { useSelector } from 'react-redux';
-import { selectUsername } from '../../redux/Features/user/authSlice';
+import React from "react";
+import Sidebar from "../dashboard/dashboardcomponents/Sidebar";
+import { selectIsSidebarMinimized } from "../../redux/reducers/dashboard/sidebarSlice";
+import EarningsSummary from "./dashboardcomponents/earningsSummary";
+import BiddingSummary from "./dashboardcomponents/bidingSummary";
+import ProjectsSummary from "./dashboardcomponents/projectsSummary";
+import RecentJobsSummary from "./dashboardcomponents/recentJobsSummary";
+import { useSelector } from "react-redux";
+import { selectUsername } from "../../redux/Features/user/authSlice";
 
 const FreelancerDashboard = () => {
   const isSidebarMinimized = useSelector(selectIsSidebarMinimized);

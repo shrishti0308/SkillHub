@@ -1,17 +1,17 @@
 import { Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom';
-import Navbar from './components/navbar';
-import LoginPage from './components/RegistrationPages/Login';
-import SignupPage from './components/RegistrationPages/Signup';
-import ProfileSettings from './components/ProfilePage/ProfileSettings';
-import ProfilePage from './components/ProfilePage/ProfilePage';
-import Marketplace from './components/Marketplace/MarketPlace';
+import About from './components/About';
+import Bids from './components/BidingsPage/Bids';
 import FreelancerDashboard from './components/dashboard/FreelancerDashboard';
 import JobDetails from './components/Jobs/JobDetails';
 import PostJob from './components/Jobs/PostJob';
-import LandingPage from './components/LandingPage/LandingPage';
 import Jobs from './components/JobsPage/Jobs';
-import Bids from './components/BidingsPage/Bids';
-import About from './components/About';
+import LandingPage from './components/LandingPage/LandingPage';
+import Marketplace from './components/MarketPlace/MarketPlace';
+import Navbar from './components/Navbar';
+import ProfilePage from './components/ProfilePage/ProfilePage';
+import ProfileSettings from './components/ProfilePage/ProfileSettings';
+import LoginPage from './components/RegistrationPages/Login';
+import SignupPage from './components/RegistrationPages/Signup';
 function App() {
   const location = useLocation();
 

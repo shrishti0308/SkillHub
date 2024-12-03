@@ -16,6 +16,9 @@ import SignupPage from './components/RegistrationPages/Signup';
 import AdminLogin from './components/admin/AdminLogin';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './components/admin/AdminDashboard';
+import AdminUsers from './components/admin/AdminUsers';
+import AdminJobs from './components/admin/AdminJobs';
+import AdminReports from './components/admin/AdminReports';
 import { useSelector } from 'react-redux';
 
 // Protected Route component for admin routes
@@ -34,7 +37,7 @@ import NotificationsPage from './components/Notifications/NotificationsPage';
 
 function App() {
   const location = useLocation();
-  const hideNavbarRoutes = ['/login', '/signup', '/admin', '/admin/login', '/admin/dashboard'];
+  const hideNavbarRoutes = ['/login', '/signup', '/admin', '/admin/login', '/admin/dashboard', '/admin/users', '/admin/jobs', '/admin/reports'];
 
   return (
     <>
@@ -71,7 +74,9 @@ function App() {
             }
           >
             <Route path="dashboard" element={<AdminDashboard />} />
-            {/* Add more admin routes here as needed */}
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="jobs" element={<AdminJobs />} />
+            <Route path="reports" element={<AdminReports />} />
           </Route>
 
           <Route path="/features" element={<Features />} />

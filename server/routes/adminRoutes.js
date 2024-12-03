@@ -13,6 +13,21 @@ router.use(adminAuth); // Apply admin authentication middleware to all routes be
 // Get current admin
 router.get('/current', adminController.getCurrentAdmin);
 
+// User Management Routes
+router.get('/users', hasPermission('manageUsers'), adminController.getAllUsers);
+router.put('/users/:id', hasPermission('manageUsers'), adminController.updateUser);
+router.delete('/users/:id', hasPermission('manageUsers'), adminController.deleteUser);
+
+// Job Management Routes
+router.get('/jobs', hasPermission('manageJobs'), adminController.getAllJobs);
+router.delete('/jobs/:id', hasPermission('manageJobs'), adminController.deleteJob);
+router.put('/jobs/:id', hasPermission('manageJobs'), adminController.updateJob);
+
+// Reports and Analytics Routes
+router.get('/reports', hasPermission('viewReports'), adminController.getReports);
+router.get('/reports/statistics', hasPermission('viewReports'), adminController.getStatistics);
+router.get('/reports/activities', hasPermission('viewReports'), adminController.getRecentActivities);
+
 // Superuser only routes
 router.post('/create', hasPermission('manageAdmins'), adminController.createAdmin);
 router.get('/all', hasPermission('manageAdmins'), adminController.getAllAdmins);

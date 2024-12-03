@@ -4,6 +4,7 @@ const userController = require("../controllers/userController");
 const { upload } = require("../middlewares/uploadMiddleware");
 const { authenticateJWT } = require("../middlewares/authMiddleware");
 const { validateUserInput } = require("../middlewares/validationMiddleware");
+const adminAuth = require("../middleware/adminAuth");
 
 router.use(express.urlencoded({ extended: true }));
 
@@ -31,9 +32,9 @@ router.post(
 );
 
 // Route for getting all users (Admin only)
-router.get("/all", authenticateJWT, userController.getAllUsers);
+router.get("/all", adminAuth, userController.getAllUsers);
 
 // Route for deleting a user by admin
-router.delete("/:id", authenticateJWT, userController.deleteUser);
+router.delete("/:id", adminAuth, userController.deleteUser);
 
 module.exports = router;

@@ -1,4 +1,6 @@
 const Admin = require('../models/admin');
+const User = require('../models/user');
+const Job = require('../models/job');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -200,3 +202,269 @@ exports.getCurrentAdmin = async (req, res) => {
         res.status(500).json({ message: 'Error fetching admin data', error: error.message });
     }
 };
+
+// User Management
+exports.getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find().select('-password');
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching users', error: error.message });
+    }
+};
+
+exports.updateUser = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const updates = req.body;
+        
+        // Fields that are allowed to be updated by admin
+        const allowedUpdates = ['name', 'username', 'email', 'role', 'commissionRate', 'bio', 'info'];
+        const updateData = {};
+        
+        Object.keys(updates).forEach(key => {
+            if (allowedUpdates.includes(key)) {
+                updateData[key] = updates[key];
+            }
+        });
+
+        const user = await User.findByIdAndUpdate(
+            userId,
+            updateData,
+            { new: true, runValidators: true }
+        ).select('-password');
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating user', error: error.message });
+    }
+};
+
+exports.deleteUser = async (req, res) => {
+    try {
+        const user = await User.findByIdAndDelete(req.params.id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.json({ message: 'User deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error deleting user', error: error.message });
+    }
+};
+
+// Job Management
+exports.getAllJobs = async (req, res) => {
+    try {
+        const jobs = await Job.find().populate('employer', 'name email');
+        res.json(jobs);
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: 'Error fetching jobs', error: error.message });
+    }
+};
+
+exports.deleteJob = async (req, res) => {
+    try {
+        const job = await Job.findByIdAndDelete(req.params.id);
+        if (!job) {
+            return res.status(404).json({ message: 'Job not found' });
+        }
+        res.json({ message: 'Job deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error deleting job', error: error.message });
+    }
+};
+
+exports.updateJob = async (req, res) => {
+    try {
+        const jobId = req.params.id;
+        const updates = req.body;
+        
+        // Fields that are allowed to be updated
+        const allowedUpdates = ['title', 'description', 'budget', 'status', 'categories', 'skillsRequired'];
+        const updateData = {};
+        
+        Object.keys(updates).forEach(key => {
+            if (allowedUpdates.includes(key)) {
+                updateData[key] = updates[key];
+            }
+        });
+
+        const job = await Job.findByIdAndUpdate(
+            jobId,
+            updateData,
+            { new: true, runValidators: true }
+        ).populate('employer', 'name email');
+
+        if (!job) {
+            return res.status(404).json({ message: 'Job not found' });
+        }
+
+        res.json(job);
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating job', error: error.message });
+    }
+};
+
+// Reports and Analytics
+exports.getReports = async (req, res) => {
+    try {
+        const [users, jobs, completedJobs] = await Promise.all([
+            User.countDocuments(),
+            Job.countDocuments(),
+            Job.countDocuments({ status: 'completed' })
+        ]);
+
+        // Calculate monthly data (last 6 months)
+        const monthlyData = await getMonthlyData();
+
+        // Get recent activities
+        const recentActivities = await getRecentActivities();
+
+        res.json({
+            statistics: {
+                totalUsers: users,
+                activeJobs: jobs,
+                completedJobs,
+                totalRevenue: await calculateTotalRevenue(),
+                monthlyData
+            },
+            recentActivities
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching reports', error: error.message });
+    }
+};
+
+exports.getStatistics = async (req, res) => {
+    try {
+        const stats = {
+            users: await User.countDocuments(),
+            jobs: await Job.countDocuments(),
+            completedJobs: await Job.countDocuments({ status: 'completed' }),
+            totalRevenue: await calculateTotalRevenue()
+        };
+        res.json(stats);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching statistics', error: error.message });
+    }
+};
+
+exports.getRecentActivities = async (req, res) => {
+    try {
+        const activities = await getRecentActivities();
+        res.json(activities);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching activities', error: error.message });
+    }
+};
+
+// Helper functions
+async function getMonthlyData() {
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+    const monthlyUsers = await User.aggregate([
+        {
+            $match: {
+                createdAt: { $gte: sixMonthsAgo }
+            }
+        },
+        {
+            $group: {
+                _id: {
+                    month: { $month: '$createdAt' },
+                    year: { $year: '$createdAt' }
+                },
+                count: { $sum: 1 }
+            }
+        }
+    ]);
+
+    const monthlyJobs = await Job.aggregate([
+        {
+            $match: {
+                createdAt: { $gte: sixMonthsAgo }
+            }
+        },
+        {
+            $group: {
+                _id: {
+                    month: { $month: '$createdAt' },
+                    year: { $year: '$createdAt' }
+                },
+                count: { $sum: 1 }
+            }
+        }
+    ]);
+
+    // Format data for the last 6 months
+    const months = [];
+    for (let i = 0; i < 6; i++) {
+        const date = new Date();
+        date.setMonth(date.getMonth() - i);
+        months.unshift({
+            month: date.toLocaleString('default', { month: 'short' }),
+            users: 0,
+            jobs: 0
+        });
+    }
+
+    // Fill in the actual data
+    monthlyUsers.forEach(item => {
+        const monthIndex = months.findIndex(m => 
+            m.month === new Date(0, item._id.month - 1).toLocaleString('default', { month: 'short' })
+        );
+        if (monthIndex !== -1) {
+            months[monthIndex].users = item.count;
+        }
+    });
+
+    monthlyJobs.forEach(item => {
+        const monthIndex = months.findIndex(m => 
+            m.month === new Date(0, item._id.month - 1).toLocaleString('default', { month: 'short' })
+        );
+        if (monthIndex !== -1) {
+            months[monthIndex].jobs = item.count;
+        }
+    });
+
+    return months;
+}
+
+async function calculateTotalRevenue() {
+    const completedJobs = await Job.find({ status: 'completed' });
+    return completedJobs.reduce((total, job) => total + (job.budget || 0), 0);
+}
+
+async function getRecentActivities() {
+    const recentUsers = await User.find()
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .select('name createdAt');
+
+    const recentJobs = await Job.find()
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .populate('employer', 'name')
+        .select('title createdAt employer');
+
+    const activities = [
+        ...recentUsers.map(user => ({
+            description: `New user registered: ${user.name}`,
+            timestamp: user.createdAt,
+            type: 'user'
+        })),
+        ...recentJobs.map(job => ({
+            description: `New job posted: ${job.title} by ${job.employer.name}`,
+            timestamp: job.createdAt,
+            type: 'job'
+        }))
+    ];
+
+    return activities.sort((a, b) => b.timestamp - a.timestamp).slice(0, 10);
+}

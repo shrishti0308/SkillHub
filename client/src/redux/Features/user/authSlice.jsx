@@ -78,13 +78,13 @@ export const login = (usernameOrEmail, password) => async (dispatch) => {
 };
 
 // Selector to get accessToken from state
-export const selectAccessToken = (state) => state.auth.accessToken;
+export const selectAccessToken = (state) => state.auth?.accessToken;
 
 // Selector to get role from state
-export const selectRole = (state) => state.auth.role;
+export const selectRole = (state) => state.auth?.role;
 
 // Selector to get username from state
-export const selectUsername = (state) => state.auth.username;
+export const selectUsername = (state) => state.auth?.username;
 
 // Export the actions created automatically by the slice
 export const { setAccessToken, setRole, setUsername, logout } =

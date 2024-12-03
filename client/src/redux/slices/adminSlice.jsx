@@ -1,7 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-const API_URL = 'http://localhost:3000/admin';
+import axiosInstance from '../../api/axiosInstance';
 
 // Get stored admin data
 const getStoredAdminData = () => {
@@ -35,111 +33,90 @@ export const loginAdmin = createAsyncThunk(
     'admin/login',
     async (credentials, { rejectWithValue }) => {
         try {
-            const response = await axios.post(`${API_URL}/login`, credentials);
-            localStorage.setItem('adminToken', response.data.token);
-            localStorage.setItem('adminData', JSON.stringify(response.data.admin));
-            return response.data;
+            const response = await axiosInstance.post('/admin/login', credentials);
+            const { token, admin } = response.data;
+            
+            localStorage.setItem('adminToken', token);
+            localStorage.setItem('adminData', JSON.stringify(admin));
+            
+            return { token, admin };
         } catch (error) {
-            return rejectWithValue(error.response?.data || { message: 'Login failed' });
-        }
-    }
-);
-
-export const fetchAllAdmins = createAsyncThunk(
-    'admin/fetchAll',
-    async (_, { rejectWithValue, getState }) => {
-        try {
-            const { token } = getState().admin;
-            const response = await axios.get(`${API_URL}/all`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error.response?.data || { message: 'Failed to fetch admins' });
-        }
-    }
-);
-
-export const createAdmin = createAsyncThunk(
-    'admin/create',
-    async (adminData, { rejectWithValue, getState }) => {
-        try {
-            const { token } = getState().admin;
-            const response = await axios.post(`${API_URL}/create`, adminData, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error.response?.data || { message: 'Failed to create admin' });
-        }
-    }
-);
-
-export const updateAdmin = createAsyncThunk(
-    'admin/update',
-    async ({ id, data }, { rejectWithValue, getState }) => {
-        try {
-            const { token } = getState().admin;
-            const response = await axios.patch(`${API_URL}/${id}`, data, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error.response?.data || { message: 'Failed to update admin' });
-        }
-    }
-);
-
-export const deleteAdmin = createAsyncThunk(
-    'admin/delete',
-    async (adminId, { rejectWithValue, getState }) => {
-        try {
-            const { token } = getState().admin;
-            await axios.delete(`${API_URL}/${adminId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            return adminId;
-        } catch (error) {
-            return rejectWithValue(error.response?.data || { message: 'Failed to delete admin' });
+            return rejectWithValue(error.response?.data?.message || 'Login failed');
         }
     }
 );
 
 export const getCurrentAdmin = createAsyncThunk(
     'admin/getCurrent',
-    async (_, { rejectWithValue, getState }) => {
+    async (_, { rejectWithValue }) => {
         try {
-            const { token } = getState().admin;
-            if (!token) return null;
-            
-            const response = await axios.get(`${API_URL}/current`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const response = await axiosInstance.get('/admin/current');
             localStorage.setItem('adminData', JSON.stringify(response.data));
             return response.data;
         } catch (error) {
             localStorage.removeItem('adminToken');
             localStorage.removeItem('adminData');
-            return rejectWithValue(error.response?.data || { message: 'Failed to get current admin' });
+            return rejectWithValue(error.response?.data?.message || 'Failed to get current admin');
+        }
+    }
+);
+
+export const fetchAllAdmins = createAsyncThunk(
+    'admin/fetchAll',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.get('/admin/all');
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch admins');
+        }
+    }
+);
+
+export const createAdmin = createAsyncThunk(
+    'admin/create',
+    async (adminData, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.post('/admin/create', adminData);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to create admin');
+        }
+    }
+);
+
+export const updateAdmin = createAsyncThunk(
+    'admin/update',
+    async ({ id, data }, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.patch(`/admin/${id}`, data);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to update admin');
+        }
+    }
+);
+
+export const deleteAdmin = createAsyncThunk(
+    'admin/delete',
+    async (adminId, { rejectWithValue }) => {
+        try {
+            await axiosInstance.delete(`/admin/${adminId}`);
+            return adminId;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to delete admin');
         }
     }
 );
 
 export const updatePermissions = createAsyncThunk(
     'admin/updatePermissions',
-    async ({ adminId, permissions }, { rejectWithValue, getState }) => {
+    async ({ id, permissions }, { rejectWithValue }) => {
         try {
-            const { token } = getState().admin;
-            const response = await axios.patch(
-                `${API_URL}/${adminId}/permissions`,
-                { permissions },
-                {
-                    headers: { Authorization: `Bearer ${token}` }
-                }
-            );
+            const response = await axiosInstance.patch(`/admin/${id}/permissions`, { permissions });
             return response.data;
         } catch (error) {
-            return rejectWithValue(error.response?.data || { message: 'Failed to update permissions' });
+            return rejectWithValue(error.response?.data?.message || 'Failed to update permissions');
         }
     }
 );
@@ -149,9 +126,8 @@ const adminSlice = createSlice({
     initialState,
     reducers: {
         logout: (state) => {
-            state.currentAdmin = null;
             state.token = null;
-            state.admins = [];
+            state.currentAdmin = null;
             localStorage.removeItem('adminToken');
             localStorage.removeItem('adminData');
         },
@@ -174,15 +150,30 @@ const adminSlice = createSlice({
             })
             .addCase(loginAdmin.fulfilled, (state, action) => {
                 state.loading = false;
-                state.currentAdmin = action.payload.admin;
                 state.token = action.payload.token;
+                state.currentAdmin = action.payload.admin;
                 state.error = null;
             })
             .addCase(loginAdmin.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload?.message || 'Login failed';
+                state.error = action.payload;
             })
-            // Fetch All
+            // Get Current Admin
+            .addCase(getCurrentAdmin.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getCurrentAdmin.fulfilled, (state, action) => {
+                state.loading = false;
+                state.currentAdmin = action.payload;
+            })
+            .addCase(getCurrentAdmin.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+                state.currentAdmin = null;
+                state.token = null;
+            })
+            // Fetch All Admins
             .addCase(fetchAllAdmins.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -193,7 +184,7 @@ const adminSlice = createSlice({
             })
             .addCase(fetchAllAdmins.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload?.message || 'Failed to fetch admins';
+                state.error = action.payload;
             })
             // Create Admin
             .addCase(createAdmin.pending, (state) => {
@@ -203,11 +194,11 @@ const adminSlice = createSlice({
             .addCase(createAdmin.fulfilled, (state, action) => {
                 state.loading = false;
                 state.admins.push(action.payload);
-                state.success = true;
+                state.success = 'Admin created successfully';
             })
             .addCase(createAdmin.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload?.message || 'Failed to create admin';
+                state.error = action.payload;
             })
             // Update Admin
             .addCase(updateAdmin.pending, (state) => {
@@ -216,14 +207,31 @@ const adminSlice = createSlice({
             })
             .addCase(updateAdmin.fulfilled, (state, action) => {
                 state.loading = false;
-                state.admins = state.admins.map(admin => 
-                    admin._id === action.payload._id ? action.payload : admin
-                );
+                const index = state.admins.findIndex(admin => admin._id === action.payload._id);
+                if (index !== -1) {
+                    state.admins[index] = action.payload;
+                }
                 state.success = 'Admin updated successfully';
             })
             .addCase(updateAdmin.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload?.message || 'Failed to update admin';
+                state.error = action.payload;
+            })
+            // Update Permissions
+            .addCase(updatePermissions.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(updatePermissions.fulfilled, (state, action) => {
+                state.loading = false;
+                state.success = 'Permissions updated successfully';
+                state.admins = state.admins.map(admin =>
+                    admin._id === action.payload._id ? action.payload : admin
+                );
+            })
+            .addCase(updatePermissions.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
             })
             // Delete Admin
             .addCase(deleteAdmin.pending, (state) => {
@@ -237,37 +245,7 @@ const adminSlice = createSlice({
             })
             .addCase(deleteAdmin.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload?.message || 'Failed to delete admin';
-            })
-            // Get Current Admin
-            .addCase(getCurrentAdmin.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(getCurrentAdmin.fulfilled, (state, action) => {
-                state.loading = false;
-                state.currentAdmin = action.payload;
-            })
-            .addCase(getCurrentAdmin.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload?.message || 'Failed to get current admin';
-            })
-            // Update Permissions
-            .addCase(updatePermissions.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-                state.success = null;
-            })
-            .addCase(updatePermissions.fulfilled, (state, action) => {
-                state.loading = false;
-                state.success = 'Permissions updated successfully';
-                state.admins = state.admins.map(admin =>
-                    admin._id === action.payload.admin._id ? action.payload.admin : admin
-                );
-            })
-            .addCase(updatePermissions.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload?.message || 'Failed to update permissions';
+                state.error = action.payload;
             });
     }
 });

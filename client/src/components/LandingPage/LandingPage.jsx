@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const LandingPage = () => {
   return (
@@ -17,12 +18,8 @@ const LandingPage = () => {
           </p>
           {/* Centering the button */}
           <div className="flex justify-center">
-            <a
-              href="#features"
-              className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105"
-            >
-              Get Started
-            </a>
+            <Link to="/features" className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105"
+            >Get Started</Link>
           </div>
         </div>
       </section>

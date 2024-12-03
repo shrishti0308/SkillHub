@@ -12,6 +12,8 @@ import ProfilePage from './components/ProfilePage/ProfilePage';
 import ProfileSettings from './components/ProfilePage/ProfileSettings';
 import LoginPage from './components/RegistrationPages/Login';
 import SignupPage from './components/RegistrationPages/Signup';
+import Features from './components/Features/FeaturesPage';
+
 function App() {
   const location = useLocation();
 
@@ -35,6 +37,7 @@ function App() {
           <Route path='/jobs' element={<Jobs />} />
           <Route path='/bidings' element={<Bids />} />
           <Route path="/about" element={<About />} />
+          <Route path="/features" element={<Features />} />
 
         </Routes>
       </div>

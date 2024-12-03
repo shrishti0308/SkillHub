@@ -14,9 +14,11 @@ const SignupPage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showRoleSelection, setShowRoleSelection] = useState(false);
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [role, setRole] = useState('');
   const [formErrors, setFormErrors] = useState({});
   const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [userInfo, setUserInfo] = useState({
     name: '',
     username: '',
@@ -31,14 +33,46 @@ const SignupPage = () => {
     setUserInfo((prev) => ({ ...prev, [name]: value }));
   };
 
+  const validatePassword = (password) => {
+    const requirements = {
+      length: password.length >= 8,
+      number: /[0-9]/.test(password),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+    };
+    return requirements;
+  };
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleSignup = async (e) => {
     e.preventDefault();
     const errors = {};
 
-    if (!userInfo.name) errors['name'] = true;
-    if (!userInfo.username) errors['username'] = true;
-    if (!userInfo.email) errors['email'] = true;
-    if (!password) errors['password'] = true;
+    // Basic field validation
+    if (!userInfo.name.trim()) errors.name = 'Name is required';
+    if (!userInfo.username.trim()) errors.username = 'Username is required';
+    if (!userInfo.email.trim()) errors.email = 'Email is required';
+    else if (!validateEmail(userInfo.email)) errors.email = 'Invalid email format';
+    
+    // Password validation
+    if (!password) {
+      errors.password = 'Password is required';
+    } else {
+      const passwordRequirements = validatePassword(password);
+      if (!passwordRequirements.length) errors.password = 'Password must be at least 8 characters';
+      if (!passwordRequirements.number) errors.password = 'Password must contain at least one number';
+      if (!passwordRequirements.special) errors.password = 'Password must contain at least one special character';
+    }
+
+    // Confirm password validation
+    if (!confirmPassword) {
+      errors.confirmPassword = 'Please confirm your password';
+    } else if (password !== confirmPassword) {
+      errors.confirmPassword = 'Passwords do not match';
+    }
 
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
@@ -50,12 +84,20 @@ const SignupPage = () => {
   };
 
   const handleRoleSelectionSubmit = async () => {
+    if (!role) {
+      setErrorMessage('Please select a role to continue');
+      return;
+    }
+
+    setIsLoading(true);
     try {
-      await dispatch(signup(userInfo, password, role)); // Dispatch the signup action
+      await dispatch(signup(userInfo, password, role));
       console.log('User registered successfully');
-      navigate('/'); // Redirect to home page
+      navigate('/');
     } catch (error) {
-      setErrorMessage(error.message);
+      setErrorMessage(error.message || 'Registration failed. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -93,6 +135,9 @@ const SignupPage = () => {
                     placeholder={field.replace('-', ' ').replace(/\b\w/g, char => char.toUpperCase())}
                     className={`w-full p-3 border ${formErrors[field] ? 'border-red-600' : 'border-gray-600'} bg-gray-700 text-white rounded-lg text-lg placeholder-gray-400 transition focus:outline-none focus:ring focus:ring-blue-500`}
                   />
+                  {formErrors[field] && (
+                    <p className="text-red-500 text-sm mt-1">{formErrors[field]}</p>
+                  )}
                 </div>
               ))}
 
@@ -102,35 +147,42 @@ const SignupPage = () => {
                   id="password"
                   name="password"
                   placeholder="Password"
-                  className={`w-full p-3 border ${formErrors['password'] ? 'border-red-600' : 'border-gray-600'} bg-gray-700 text-white rounded-lg text-lg placeholder-gray-400 transition focus:outline-none focus:ring focus:ring-blue-500`}
+                  className={`w-full p-3 border ${formErrors.password ? 'border-red-600' : 'border-gray-600'} bg-gray-700 text-white rounded-lg text-lg placeholder-gray-400 transition focus:outline-none focus:ring focus:ring-blue-500`}
                   onChange={(e) => setPassword(e.target.value)}
                 />
                 <span className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-lg text-gray-400" onClick={togglePasswordVisibility}>
                   <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                 </span>
+                {formErrors.password && (
+                  <p className="text-red-500 text-sm mt-1">{formErrors.password}</p>
+                )}
               </div>
 
-              {password.length >= 6 && (
-                <div className="relative mb-5">
-                  <input
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    id="confirm-password"
-                    name="confirm_password"
-                    placeholder="Confirm Password"
-                    className="w-full p-3 border border-gray-600 bg-gray-700 text-white rounded-lg text-lg placeholder-gray-400 transition focus:outline-none focus:ring focus:ring-blue-500"
-                  />
-                  <span className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-lg text-gray-400" onClick={toggleConfirmPasswordVisibility}>
-                    <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
-                  </span>
-                </div>
-              )}
+              <div className="relative mb-5">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  id="confirm-password"
+                  name="confirm_password"
+                  placeholder="Confirm Password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className={`w-full p-3 border ${formErrors.confirmPassword ? 'border-red-600' : 'border-gray-600'} bg-gray-700 text-white rounded-lg text-lg placeholder-gray-400 transition focus:outline-none focus:ring focus:ring-blue-500`}
+                />
+                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-lg text-gray-400" onClick={toggleConfirmPasswordVisibility}>
+                  <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
+                </span>
+                {formErrors.confirmPassword && (
+                  <p className="text-red-500 text-sm mt-1">{formErrors.confirmPassword}</p>
+                )}
+              </div>
 
               <button
                 type="submit"
+                disabled={isLoading}
                 style={{ backgroundColor: 'rgb(37, 99, 235)', color: 'white', border: '2px solid rgb(37, 99, 235)' }}
-                className="w-full py-3 rounded-md font-semibold hover:bg-blue-700 transition duration-200 text-xl"
+                className={`w-full py-3 rounded-md font-semibold transition duration-200 text-xl ${isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700'}`}
               >
-                Get Started Now
+                {isLoading ? 'Creating Account...' : 'Get Started Now'}
               </button>
 
               <p className="mt-5 text-sm text-gray-400">
@@ -172,11 +224,12 @@ const SignupPage = () => {
 
             <button
               type="button"
+              disabled={isLoading}
               style={{ backgroundColor: 'rgb(37, 99, 235)', color: 'white', border: '2px solid rgb(37, 99, 235)' }}
-              className="w-full py-3 rounded-md font-semibold hover:bg-blue-700 transition duration-200 text-xl mt-5"
+              className={`w-full py-3 rounded-md font-semibold transition duration-200 text-xl mt-5 ${isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700'}`}
               onClick={handleRoleSelectionSubmit}
             >
-              Start your Journey
+              {isLoading ? 'Setting up your account...' : 'Start your Journey'}
             </button>
           </div>
         )}

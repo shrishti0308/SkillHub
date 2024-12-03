@@ -4,6 +4,7 @@ import Bids from './components/BidingsPage/Bids';
 import FreelancerDashboard from './components/dashboard/FreelancerDashboard';
 import JobDetails from './components/Jobs/JobDetails';
 import PostJob from './components/Jobs/PostJob';
+import Features from './components/Features/FeaturesPage';
 import Jobs from './components/JobsPage/Jobs';
 import LandingPage from './components/LandingPage/LandingPage';
 import Marketplace from './components/MarketPlace/MarketPlace';

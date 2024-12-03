@@ -28,6 +28,8 @@ const AdminProtectedRoute = ({ children }) => {
 
   return children;
 };
+import Footer from './components/Footer';
+import NotificationsPage from './components/Notifications/NotificationsPage';
 
 function App() {
   const location = useLocation();
@@ -47,6 +49,7 @@ function App() {
           <Route path="/user/:username" element={<ProfilePage />} />
           <Route path="/jobs/:id" element={<JobDetails />} />
           <Route path="/jobs/new" element={<PostJob />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
           <Route
             path="/freelancer-dashboard"
             element={<FreelancerDashboard />}
@@ -72,6 +75,7 @@ function App() {
 
           <Route path="/features" element={<Features />} />
         </Routes>
+        {!hideNavbarRoutes.includes(location.pathname) && <Footer />}
       </div>
     </>
   );

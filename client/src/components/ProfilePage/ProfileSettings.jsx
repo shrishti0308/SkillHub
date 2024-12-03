@@ -2,19 +2,19 @@ import React, { useEffect, useState } from "react";
 import { FaPlus, FaTimes } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  fetchUserProfile,
-  updateUserProfileThunk,
-  selectUserProfile,
-  addSkill,
-  removeSkill,
-  addExperience,
-  removeExperience,
-  addPreviousWork,
-  removePreviousWork,
-  updatePreviousWork,
-} from "../../redux/Features/user/ProfileSlice";
-import ImageUpload from "./ProfileComponents/ImageUpload";
-import axiosInstance from "../../api/axiosInstance";
+    fetchUserProfile,
+    updateUserProfileThunk,
+    selectUserProfile,
+    addSkill,
+    removeSkill,
+    addExperience,
+    removeExperience,
+    addPreviousWork,
+    removePreviousWork,
+    updatePreviousWork
+} from '../../redux/Features/user/ProfileSlice';
+import ImageUpload from './ProfileComponents/ImageUpload';
+import axiosInstance from '../../api/axiosInstance';
 
 const ProfileSettings = () => {
   const dispatch = useDispatch();

@@ -5,14 +5,17 @@ import profileReducer from './user/ProfileSlice';
 import bidingReducer from '../reducers/dashboard/bidingSlice';
 import jobsReducer from './dashboard/jobsSlice';
 import adminReducer from '../slices/adminSlice';
+import notificationReducer from './notificationSlice';
+
 
 const rootReducer = combineReducers({
     auth: authReducer,
     sidebar: sidebarReducer,
     profile: profileReducer,
-    bids: bidingReducer,
+    bids : bidingReducer,
     jobs: jobsReducer,
-    admin: adminReducer
+    admin: adminReducer,
+    notifications: notificationReducer
 });
 
 export default rootReducer;

@@ -6,6 +6,7 @@ const path = require('path');  // Add this to manage file paths
 const app = express();
 const PORT = 3000;
 
+const adminRoutes = require('./routes/adminRoutes');
 const userRoutes = require('./routes/userRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const jobRoutes = require('./routes/jobRoutes');
@@ -37,6 +38,7 @@ app.get('/', (req, res) => {
   res.send('Hello, My lord!');
 });
 
+app.use('/admin', adminRoutes);
 app.use('/user', userRoutes);
 app.use('/jobs', jobRoutes);
 app.use('/bids', bidRoutes);

@@ -1,4 +1,4 @@
-import { Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom';
+import { Route, BrowserRouter as Router, Routes, useLocation, Navigate } from 'react-router-dom';
 import About from './components/About';
 import Bids from './components/BidingsPage/Bids';
 import FreelancerDashboard from './components/dashboard/FreelancerDashboard';
@@ -12,10 +12,26 @@ import ProfilePage from './components/ProfilePage/ProfilePage';
 import ProfileSettings from './components/ProfilePage/ProfileSettings';
 import LoginPage from './components/RegistrationPages/Login';
 import SignupPage from './components/RegistrationPages/Signup';
+import AdminLogin from './components/admin/AdminLogin';
+import AdminLayout from './components/admin/AdminLayout';
+import AdminDashboard from './components/admin/AdminDashboard';
+import { useSelector } from 'react-redux';
+
+// Protected Route component for admin routes
+const AdminProtectedRoute = ({ children }) => {
+  const { token } = useSelector((state) => state.admin);
+  const location = useLocation();
+  
+  if (!token) {
+    return <Navigate to="/admin/login" state={{ from: location }} replace />;
+  }
+
+  return children;
+};
+
 function App() {
   const location = useLocation();
-
-  const hideNavbarRoutes = ['/login', '/signup'];
+  const hideNavbarRoutes = ['/login', '/signup', '/admin', '/admin/login', '/admin/dashboard'];
 
   return (
     <>
@@ -35,6 +51,21 @@ function App() {
           <Route path='/jobs' element={<Jobs />} />
           <Route path='/bidings' element={<Bids />} />
           <Route path="/about" element={<About />} />
+
+          {/* Admin Routes */}
+          <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route
+            path="/admin"
+            element={
+              <AdminProtectedRoute>
+                <AdminLayout />
+              </AdminProtectedRoute>
+            }
+          >
+            <Route path="dashboard" element={<AdminDashboard />} />
+            {/* Add more admin routes here as needed */}
+          </Route>
 
         </Routes>
       </div>

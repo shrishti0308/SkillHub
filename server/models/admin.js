@@ -106,4 +106,4 @@ adminSchema.statics.findActive = function() {
     return this.find({ status: 'active' });
 };
 
-module.exports = mongoose.model('Admin', adminSchema);
+module.exports = mongoose.model("Admin", adminSchema);

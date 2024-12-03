@@ -1,7 +1,7 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 export const sidebarSlice = createSlice({
-  name: 'sidebar',
+  name: "sidebar",
   initialState: {
     isSidebarMinimized: false,
   },
@@ -14,12 +14,14 @@ export const sidebarSlice = createSlice({
     },
     openSidebar: (state) => {
       state.isSidebarMinimized = true;
-    }
-  }
+    },
+  },
 });
 
-export const { toggleSidebar, closeSidebar, openSidebar } = sidebarSlice.actions;
+export const { toggleSidebar, closeSidebar, openSidebar } =
+  sidebarSlice.actions;
 
-export const selectIsSidebarMinimized = (state) => state.sidebar.isSidebarMinimized;
+export const selectIsSidebarMinimized = (state) =>
+  state.sidebar.isSidebarMinimized;
 
 export default sidebarSlice.reducer;

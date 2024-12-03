@@ -1,7 +1,7 @@
-const express = require('express');
-const cors = require('cors');
-const connectDB = require('./config/db');
-const path = require('path');  // Add this to manage file paths
+const express = require("express");
+const cors = require("cors");
+const connectDB = require("./config/db");
+const path = require("path"); // Add this to manage file paths
 
 const app = express();
 const PORT = 3000;
@@ -23,7 +23,7 @@ connectDB();
 
 // Define the allowed origin (update with your frontend URL)
 const corsOptions = {
-  origin: 'http://localhost:5173', // Allow your frontend
+  origin: "http://localhost:5173", // Allow your frontend
   credentials: true, // Allow credentials
 };
 
@@ -31,11 +31,11 @@ app.use(cors(corsOptions)); // Use CORS with options
 app.use(express.json());
 
 // Host the public folder statically
-app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use("/public", express.static(path.join(__dirname, "public")));
 
 // Root endpoint
-app.get('/', (req, res) => {
-  res.send('Hello, My lord!');
+app.get("/", (req, res) => {
+  res.send("Hello, My lord!");
 });
 
 app.use('/admin', adminRoutes);
@@ -47,7 +47,7 @@ app.use('/project', projectRoutes);
 app.use('/wallet', walletRoutes);
 app.use('/transaction', transactionRoutes);
 
-app.get('/recent-bids', authenticateJWT, async (req, res) => {
+app.get("/recent-bids", authenticateJWT, async (req, res) => {
   try {
     const freelancerId = req.user.id;
     const freelancerObjectId = new mongoose.Types.ObjectId(freelancerId);
@@ -56,7 +56,9 @@ app.get('/recent-bids', authenticateJWT, async (req, res) => {
 
     res.status(200).json({ recentBids });
   } catch (error) {
-    res.status(500).json({ message: 'Error retrieving recent bids', error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error retrieving recent bids", error: error.message });
   }
 });
 

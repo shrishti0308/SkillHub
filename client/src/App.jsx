@@ -35,7 +35,7 @@ function App() {
 
   return (
     <>
-      <div className='text-light w-screen min-h-screen overflow-x-hidden'>
+      <div className="text-light w-screen min-h-screen overflow-x-hidden">
         {!hideNavbarRoutes.includes(location.pathname) && <Navbar />}
 
         <Routes>
@@ -47,9 +47,12 @@ function App() {
           <Route path="/user/:username" element={<ProfilePage />} />
           <Route path="/jobs/:id" element={<JobDetails />} />
           <Route path="/jobs/new" element={<PostJob />} />
-          <Route path="/freelancer-dashboard" element={<FreelancerDashboard />} />
-          <Route path='/jobs' element={<Jobs />} />
-          <Route path='/bidings' element={<Bids />} />
+          <Route
+            path="/freelancer-dashboard"
+            element={<FreelancerDashboard />}
+          />
+          <Route path="/jobs" element={<Jobs />} />
+          <Route path="/bidings" element={<Bids />} />
           <Route path="/about" element={<About />} />
 
           {/* Admin Routes */}
@@ -67,6 +70,7 @@ function App() {
             {/* Add more admin routes here as needed */}
           </Route>
 
+          <Route path="/features" element={<Features />} />
         </Routes>
       </div>
     </>

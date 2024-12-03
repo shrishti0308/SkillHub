@@ -1,58 +1,63 @@
-const mongoose = require('mongoose');
-const fs = require('fs');
+const mongoose = require("mongoose");
+const fs = require("fs");
 
-const userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema(
+  {
     name: { type: String, required: true },
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: {
-        type: String,
-        enum: ['freelancer', 'enterprise', 'hybrid'],
-        default: 'freelancer'
+      type: String,
+      enum: ["freelancer", "enterprise", "hybrid"],
+      default: "freelancer",
     },
     wallet: {
-        type: Number,
-        default: 0
+      type: Number,
+      default: 0,
     },
     commissionRate: {
-        type: Number
+      type: Number,
     },
     bio: {
-        type: String,
-        maxlength: 500
+      type: String,
+      maxlength: 500,
     },
     info: {
-        skills: [{ type: String }],
-        portfolio: { type: String },
-        experience: [{ type: String }],
-        profilePic: { type: String }
+      skills: [{ type: String }],
+      portfolio: { type: String },
+      experience: [{ type: String }],
+      profilePic: { type: String },
     },
-    previousWorks: [{
+    previousWorks: [
+      {
         title: { type: String, required: true },
         description: { type: String },
-        link: { type: String }
-    }],
-}, { timestamps: true });
+        link: { type: String },
+      },
+    ],
+  },
+  { timestamps: true }
+);
 
 // Middleware to set commission rate based on role
-userSchema.pre('save', function (next) {
-    if (this.isNew) {
-        switch (this.role) {
-            case 'freelancer':
-                this.commissionRate = 0.5;
-                break;
-            case 'enterprise':
-                this.commissionRate = 1;
-                break;
-            case 'hybrid':
-                this.commissionRate = 1.5;
-                break;
-            default:
-                this.commissionRate = 1;
-        }
+userSchema.pre("save", function (next) {
+  if (this.isNew) {
+    switch (this.role) {
+      case "freelancer":
+        this.commissionRate = 0.5;
+        break;
+      case "enterprise":
+        this.commissionRate = 1;
+        break;
+      case "hybrid":
+        this.commissionRate = 1.5;
+        break;
+      default:
+        this.commissionRate = 1;
     }
-    next();
+  }
+  next();
 });
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model("User", userSchema);

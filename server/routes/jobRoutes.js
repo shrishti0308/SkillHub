@@ -1,27 +1,35 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { createJob, getMarketplaceJobs, getJobById, updateJob, getFilteredJobs, getJobByIdAuthCheck, createBid } = require('../controllers/jobController');
-const { authenticateJWT } = require('../middlewares/authMiddleware');
+const {
+  createJob,
+  getMarketplaceJobs,
+  getJobById,
+  updateJob,
+  getFilteredJobs,
+  getJobByIdAuthCheck,
+  createBid,
+} = require("../controllers/jobController");
+const { authenticateJWT } = require("../middlewares/authMiddleware");
 
 // Create a job (employer)
-router.post('/create', authenticateJWT, createJob);
+router.post("/create", authenticateJWT, createJob);
 
 // Get all jobs for marketplace
-router.get('/marketplace', getMarketplaceJobs);
+router.get("/marketplace", getMarketplaceJobs);
 
 // Get a specific job by ID
-router.get('/:id', getJobById);
+router.get("/:id", getJobById);
 
 // Update job status (e.g., when the job is completed)
-router.put('/:id', updateJob);
+router.put("/:id", updateJob);
 
 // Route to get filtered jobs
-router.get('/jobs/filtered', authenticateJWT, getFilteredJobs);
+router.get("/jobs/filtered", authenticateJWT, getFilteredJobs);
 
 // Route to get a specific job by ID
-router.get('/user/:id', authenticateJWT, getJobByIdAuthCheck);
+router.get("/user/:id", authenticateJWT, getJobByIdAuthCheck);
 
 // Route to place a bid on a job
-router.post('/:jobId/bid', authenticateJWT, createBid);
+router.post("/:jobId/bid", authenticateJWT, createBid);
 
 module.exports = router;

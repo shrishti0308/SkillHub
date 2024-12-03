@@ -1,22 +1,25 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const bidSchema = new mongoose.Schema({
+const bidSchema = new mongoose.Schema(
+  {
     amount: { type: Number, required: true },
     job: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Job',
-        required: true
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Job",
+      required: true,
     },
     freelancer: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
     status: {
-        type: String,
-        enum: ['pending', 'accepted', 'rejected'],
-        default: 'pending'
+      type: String,
+      enum: ["pending", "accepted", "rejected"],
+      default: "pending",
     },
-}, { timestamps: true });
+  },
+  { timestamps: true }
+);
 
-module.exports = mongoose.model('Bid', bidSchema);
+module.exports = mongoose.model("Bid", bidSchema);

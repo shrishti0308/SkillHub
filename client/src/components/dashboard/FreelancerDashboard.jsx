@@ -16,7 +16,11 @@ const FreelancerDashboard = () => {
       {/* Sidebar */}
       <Sidebar />
 
-      <div className={`flex flex-col flex-grow p-5 absolute ${isSidebarMinimized ? 'left-16' : 'left-56'} transition-all duration-300 mt-[70px]`}>
+      <div
+        className={`flex flex-col flex-grow p-5 absolute ${
+          isSidebarMinimized ? "left-16" : "left-56"
+        } transition-all duration-300 mt-[70px]`}
+      >
         <div className="flex justify-between items-center bg-dark p-4 mb-2">
           <span className="text-xl font-semibold">Welcome {userName}!</span>
         </div>
@@ -26,7 +30,7 @@ const FreelancerDashboard = () => {
           <BiddingSummary />
           <ProjectsSummary />
           <EarningsSummary />
-          <div className='mt-4'>fooooooter</div>
+          <div className="mt-4">fooooooter</div>
         </div>
       </div>
     </div>

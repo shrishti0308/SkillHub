@@ -1,21 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { FaPen } from 'react-icons/fa';
+import React, { useEffect, useState } from "react";
+import { FaPen } from "react-icons/fa";
 
 const ImageUpload = ({ profilePicPath, setProfilePic }) => {
-  const [imagePreview, setImagePreview] = useState(`http://localhost:3000/public${profilePicPath}`);
+  const [imagePreview, setImagePreview] = useState(
+    `http://localhost:3000/public${profilePicPath}`
+  );
   const [error, setError] = useState("");
 
   useEffect(() => {
-    setImagePreview(`http://localhost:3000/public${profilePicPath}`)
-  }, [profilePicPath])
-
+    setImagePreview(`http://localhost:3000/public${profilePicPath}`);
+  }, [profilePicPath]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+      const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
       if (!allowedTypes.includes(file.type)) {
-        setError('Only JPG, JPEG, and PNG files are allowed');
+        setError("Only JPG, JPEG, and PNG files are allowed");
         return;
       }
       setError("");
@@ -58,7 +59,8 @@ const ImageUpload = ({ profilePicPath, setProfilePic }) => {
               />
             </svg>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              <span className="font-semibold">Click to upload</span> or drag and drop
+              <span className="font-semibold">Click to upload</span> or drag and
+              drop
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               {"(PNG, JPG, JPEG only)"}
@@ -72,7 +74,7 @@ const ImageUpload = ({ profilePicPath, setProfilePic }) => {
           accept="image/jpeg, image/jpg, image/png"
           onChange={handleImageUpload}
         />
-        <div className=' p-2 border border-white rounded-full bg-grey absolute bottom-0 right-1'>
+        <div className=" p-2 border border-white rounded-full bg-grey absolute bottom-0 right-1">
           <FaPen />
         </div>
       </label>

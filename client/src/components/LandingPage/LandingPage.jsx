@@ -1,35 +1,40 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
 
 const LandingPage = () => {
   return (
-    <div className="text-white" style={{ backgroundColor: '#B0E0E6' }}>
+    <div className="text-white" style={{ backgroundColor: "#B0E0E6" }}>
       {/* Hero Section */}
       <section
         className="h-screen flex flex-col justify-center items-center bg-cover bg-center bg-no-repeat relative"
-        style={{ backgroundImage: 'url(freelance.png)' }}
+        style={{ backgroundImage: "url(freelance.png)" }}
       >
         <div className="bg-black bg-opacity-60 p-8 rounded-lg shadow-2xl">
           <h1 className="text-5xl font-bold mb-4 text-center text-yellow-300 drop-shadow-lg">
             Welcome to Skill Hub
           </h1>
           <p className="text-lg text-center mb-6 text-gray-300">
-            Connect with top talent, find freelance jobs, and grow your business.
+            Connect with top talent, find freelance jobs, and grow your
+            business.
           </p>
           {/* Centering the button */}
           <div className="flex justify-center">
-            <Link to="/features" className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105"
-            >Get Started</Link>
+            <Link
+              to="/features"
+              className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-3 px-6 rounded-full shadow-lg transition-transform transform hover:scale-105"
+            >
+              Get Started
+            </Link>
           </div>
         </div>
       </section>
-
 
       {/* Get Work Done in 150+ Categories Section */}
       <section className="py-24 bg-gray-900 text-white">
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold mb-6">
-            Get work done in <span className="text-pink-500">over 150+</span> different categories
+            Get work done in <span className="text-pink-500">over 150+</span>{" "}
+            different categories
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Categories Columns */}
@@ -88,7 +93,9 @@ const LandingPage = () => {
             <div className="bg-gray-800 p-8 rounded-lg shadow-lg">
               <h3 className="text-3xl font-bold mb-4">Freelancer</h3>
               <p className="text-gray-300 mb-6">
-                Ideal for individual freelancers looking to showcase their skills and connect with clients for freelance jobs. We just take 0.5% commission in this service.
+                Ideal for individual freelancers looking to showcase their
+                skills and connect with clients for freelance jobs. We just take
+                0.5% commission in this service.
               </p>
               <a
                 href="#"
@@ -101,7 +108,9 @@ const LandingPage = () => {
             <div className="bg-gray-800 p-8 rounded-lg shadow-lg">
               <h3 className="text-3xl font-bold mb-4">Enterprise</h3>
               <p className="text-gray-300 mb-6">
-                Designed for businesses and large enterprises seeking to hire top talent for long-term projects and specialized tasks. We just take 1% commission in this service.
+                Designed for businesses and large enterprises seeking to hire
+                top talent for long-term projects and specialized tasks. We just
+                take 1% commission in this service.
               </p>
               <a
                 href="#"
@@ -114,7 +123,9 @@ const LandingPage = () => {
             <div className="bg-gray-800 p-8 rounded-lg shadow-lg">
               <h3 className="text-3xl font-bold mb-4">Hybrid</h3>
               <p className="text-gray-300 mb-6">
-                A flexible service combining both freelance and enterprise features to cater to diverse project needs. We just take 1.5% commission in this service.
+                A flexible service combining both freelance and enterprise
+                features to cater to diverse project needs. We just take 1.5%
+                commission in this service.
               </p>
               <a
                 href="#"
@@ -130,12 +141,17 @@ const LandingPage = () => {
       {/* Make it Real with Freelancer Section */}
       <section
         className="h-[70vh] py-32 bg-gray-100 text-gray-200 bg-cover bg-center"
-        style={{ backgroundImage: 'url(freelance1.png)' }}
+        style={{ backgroundImage: "url(freelance1.png)" }}
       >
         <div className="container mx-auto px-6">
-          <h2 className="text-4xl font-bold text-center mb-8 text-white">Make it Real with Freelancer</h2>
+          <h2 className="text-4xl font-bold text-center mb-8 text-white">
+            Make it Real with Freelancer
+          </h2>
           <p className="text-lg font-bold text-center mb-12 max-w-5xl mx-auto text-white">
-            Skill Hub is a thriving community where creativity and opportunity converge. With our user-friendly interface, freelancers can create impactful profiles, and businesses can find talent with ease. Join us and turn your ideas into reality!
+            Skill Hub is a thriving community where creativity and opportunity
+            converge. With our user-friendly interface, freelancers can create
+            impactful profiles, and businesses can find talent with ease. Join
+            us and turn your ideas into reality!
           </p>
         </div>
       </section>
@@ -143,14 +159,19 @@ const LandingPage = () => {
       {/* Tap into a Global Talent Network Section */}
       <section
         className="h-[70vh] py-32 bg-gray-800 text-white bg-cover bg-center"
-        style={{ backgroundImage: 'url(global-background.jpg)' }} // Replace with the correct image path
+        style={{ backgroundImage: "url(global-background.jpg)" }} // Replace with the correct image path
       >
         <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
           <div>
-            <h2 className="text-4xl font-bold mb-8">Tap into a Global Talent Network</h2>
+            <h2 className="text-4xl font-bold mb-8">
+              Tap into a Global Talent Network
+            </h2>
             <p className="text-lg mb-12 max-w-3xl">
-              Connect with top talent from around the world. Leverage our global network to find the perfect professionals for your projects, regardless of scale or complexity. Explore limitless possibilities and take your business to the next level.
+              Connect with top talent from around the world. Leverage our global
+              network to find the perfect professionals for your projects,
+              regardless of scale or complexity. Explore limitless possibilities
+              and take your business to the next level.
             </p>
           </div>
 
@@ -179,9 +200,11 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-8" style={{ backgroundColor: '#B0E0E6' }}>
+      <footer className="py-8" style={{ backgroundColor: "#B0E0E6" }}>
         <div className="container mx-auto text-center">
-          <p className="text-gray-500">© 2024 Skill Hub. All rights reserved.</p>
+          <p className="text-gray-500">
+            © 2024 Skill Hub. All rights reserved.
+          </p>
         </div>
       </footer>
     </div>
@@ -189,4 +212,3 @@ const LandingPage = () => {
 };
 
 export default LandingPage;
-

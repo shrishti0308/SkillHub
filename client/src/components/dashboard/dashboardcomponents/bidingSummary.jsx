@@ -12,7 +12,7 @@ const BiddingSummary = () => {
   useEffect(() => {
     const fetchBids = async () => {
       try {
-        const response = await axiosInstance.get("bids/recent/bid");
+        const response = await axiosInstance.get("/bids/recent/bid");
         dispatch(setBids(response.data.recentBids));
         setStatus("succeeded");
       } catch (error) {

@@ -17,33 +17,33 @@ const UnifiedDashboard = () => {
     switch (userRole) {
       case "freelancer":
         return (
-          <>
-            <RecentJobsSummary />
+          <div className="space-y-6">
             <BiddingSummary />
+            <RecentJobsSummary />
             <ProjectsSummary />
             <EarningsSummary />
-          </>
+          </div>
         );
       case "enterprise":
         return (
-          <>
-            <ProjectsSummary />
+          <div className="space-y-6">
             <BiddingSummary />
+            <ProjectsSummary />
             <EarningsSummary />
-          </>
+          </div>
         );
       case "hybrid":
         return (
-          <>
+          <div className="space-y-6">
+            <BiddingSummary />
             <RecentJobsSummary />
             <ProjectsSummary />
-            <BiddingSummary />
             <EarningsSummary />
-          </>
+          </div>
         );
       default:
         return (
-          <div className="text-center text-gray-600">
+          <div className="text-center text-gray-400">
             Loading dashboard components...
           </div>
         );
@@ -51,21 +51,32 @@ const UnifiedDashboard = () => {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex min-h-screen bg-gray-900">
       <Sidebar />
-
       <div
-        className={`flex flex-col flex-grow p-5 absolute ${
-          isSidebarMinimized ? "left-16" : "left-56"
-        } transition-all duration-300 mt-[70px]`}
+        className={`flex-1 transition-all duration-300 ${
+          isSidebarMinimized ? "ml-16" : ""
+        }`}
       >
-        <div className="flex justify-between items-center bg-dark p-4 mb-2">
-          <span className="text-xl font-semibold">Welcome {userName}!</span>
-          <span className="text-sm capitalize">{userRole} Dashboard</span>
-        </div>
+        <div className="flex flex-col p-6 min-h-screen">
+          <div className="flex justify-between items-center bg-gray-800 p-6 mb-6 rounded-xl shadow-lg border border-gray-700">
+            <div className="flex flex-col">
+              <span className="text-2xl font-bold text-white mb-1">Welcome back, {userName}!</span>
+              <span className="text-sm text-gray-400 capitalize">{userRole} Dashboard</span>
+            </div>
+            <div className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition-colors">
+              {new Date().toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              })}
+            </div>
+          </div>
 
-        <div className="flex flex-col space-y-4">
-          {renderDashboardComponents()}
+          <div className="flex-1">
+            {renderDashboardComponents()}
+          </div>
         </div>
       </div>
     </div>

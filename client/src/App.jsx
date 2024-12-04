@@ -28,6 +28,8 @@ import AdminJobs from "./components/admin/AdminJobs";
 import AdminReports from "./components/admin/AdminReports";
 import TransactionPage from "./components/TransactionPage/TransactionPage";
 import { useSelector } from "react-redux";
+import Footer from "./components/Footer";
+import NotificationsPage from "./components/Notifications/NotificationsPage";
 
 // Protected Route component for admin routes
 const AdminProtectedRoute = ({ children }) => {
@@ -40,8 +42,6 @@ const AdminProtectedRoute = ({ children }) => {
 
   return children;
 };
-import Footer from "./components/Footer";
-import NotificationsPage from "./components/Notifications/NotificationsPage";
 
 function App() {
   const location = useLocation();
@@ -56,11 +56,13 @@ function App() {
     "/admin/reports",
   ];
 
-  return (
-    <>
-      <div className="text-light w-screen min-h-screen overflow-x-hidden">
-        {!hideNavbarRoutes.includes(location.pathname) && <Navbar />}
+  const isDashboardRoute = location.pathname.startsWith("/dashboard");
 
+  return (
+    <div className="flex flex-col min-h-screen bg-gray-900">
+      {!hideNavbarRoutes.includes(location.pathname) && <Navbar />}
+      
+      <main className={`w-full${isDashboardRoute ? 'flex' : ''}`}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
@@ -76,16 +78,10 @@ function App() {
           <Route path="/dashboard/bids" element={<Bids />} />
           <Route path="dashboard/projects" element={<Projects />} />
           <Route path="/about" element={<About />} />
-          <Route
-            path="dashboard/transactions/*"
-            element={<TransactionPage />}
-          />
+          <Route path="dashboard/transactions/*" element={<TransactionPage />} />
 
           {/* Admin Routes */}
-          <Route
-            path="/admin"
-            element={<Navigate to="/admin/login" replace />}
-          />
+          <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route
             path="/admin"
@@ -103,9 +99,14 @@ function App() {
 
           <Route path="/features" element={<Features />} />
         </Routes>
-        {!hideNavbarRoutes.includes(location.pathname) && <Footer />}
-      </div>
-    </>
+      </main>
+
+      {!hideNavbarRoutes.includes(location.pathname) && (
+        <footer className={isDashboardRoute ? 'ml-64' : ''}>
+          <Footer />
+        </footer>
+      )}
+    </div>
   );
 }
 

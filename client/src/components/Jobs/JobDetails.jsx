@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import axiosInstance from "../../api/axiosInstance";
 import {
@@ -176,12 +176,12 @@ const JobDetails = () => {
                   />
                 )}
                 <div>
-                  <a
-                    href={`/user/${job.employer.username}`}
+                  <Link
+                    to={`/user/${job.employer.username}`}
                     className="text-blue-400 hover:text-blue-300 transition-colors font-medium"
                   >
                     {job.employer.name}
-                  </a>
+                  </Link>
                   <p className="text-sm text-gray-400">Employer</p>
                 </div>
               </div>
@@ -257,12 +257,12 @@ const JobDetails = () => {
                   />
                 )}
                 <div>
-                  <a
-                    href={`/user/${acceptedBid.freelancer.username}`}
+                  <Link
+                    to={`/user/${acceptedBid.freelancer.username}`}
                     className="text-blue-400 hover:text-blue-300 transition-colors font-medium"
                   >
                     {acceptedBid.freelancer.name}
-                  </a>
+                  </Link>
                   <p className="text-sm text-gray-400">Freelancer</p>
                 </div>
               </div>
@@ -369,12 +369,12 @@ const JobDetails = () => {
                         />
                       )}
                       <div>
-                        <a
-                          href={`/user/${bid.freelancer.username}`}
+                        <Link
+                          to={`/user/${bid.freelancer.username}`}
                           className="text-blue-400 hover:text-blue-300 transition-colors font-medium"
                         >
                           {bid.freelancer.name}
-                        </a>
+                        </Link>
                         <p className="text-sm text-gray-400">Freelancer</p>
                       </div>
                     </div>

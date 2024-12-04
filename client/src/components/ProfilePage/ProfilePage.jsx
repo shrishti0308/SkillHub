@@ -186,17 +186,23 @@ const ProfilePage = () => {
                   className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700/50 hover:bg-gray-800 transition-all duration-200"
                 >
                   <div className="flex items-start">
-                    <img
-                      className="h-10 w-10 rounded-full border border-gray-700"
-                      src={`http://localhost:3000/public${review.reviewer.info.profilePic}`}
-                      alt={review.reviewer.name}
-                    />
+                    {review.reviewer?.info?.profilePic ? (
+                      <img
+                        className="h-10 w-10 rounded-full border border-gray-700"
+                        src={`http://localhost:3000/public${review.reviewer.info.profilePic}`}
+                        alt={review.reviewer.name}
+                      />
+                    ) : (
+                      <div className="h-10 w-10 rounded-full border border-gray-700 bg-gray-600 flex items-center justify-center">
+                        <span className="text-gray-300">{review.reviewer?.name?.charAt(0) || '?'}</span>
+                      </div>
+                    )}
                     <div className="ml-4">
                       <Link
-                        to={`/user/${review.reviewer.username}`}
+                        to={`/user/${review.reviewer?.username}`}
                         className="text-white font-medium hover:text-blue-400 transition-colors duration-200"
                       >
-                        {review.reviewer.name}
+                        {review.reviewer?.name || 'Anonymous'}
                       </Link>
                       <div className="mt-1">
                         <ReactStars

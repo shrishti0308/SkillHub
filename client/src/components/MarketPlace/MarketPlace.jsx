@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaSearch, FaSort } from "react-icons/fa";
 import axiosInstance from "../../api/axiosInstance";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const Marketplace = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -243,12 +244,12 @@ const Marketplace = () => {
                   </div>
 
                   {/* Bid Now Button */}
-                  <a
-                    href={`/jobs/${job._id}`}
+                  <Link
+                    to={`/jobs/${job._id}`}
                     className="mt-6 inline-flex items-center justify-center w-full bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition duration-300 text-lg font-semibold"
                   >
                     Bid Now
-                  </a>
+                  </Link>
                 </div>
               </motion.div>
             ))}

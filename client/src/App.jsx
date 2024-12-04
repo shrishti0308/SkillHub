@@ -59,10 +59,10 @@ function App() {
   const isDashboardRoute = location.pathname.startsWith("/dashboard");
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-900">
+    <div className="flex flex-col min-h-screen justify-between">
       {!hideNavbarRoutes.includes(location.pathname) && <Navbar />}
       
-      <main className={`w-full${isDashboardRoute ? 'flex' : ''}`}>
+      <main className={`w-full${isDashboardRoute ? 'flex' : ''} h-full`}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />

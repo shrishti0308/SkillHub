@@ -137,3 +137,30 @@ exports.getAllReviewsByUser = async (req, res) => {
       .json({ success: false, message: "Error fetching reviews", error });
   }
 };
+
+// Get a specific review by ID
+exports.getReviewById = async (req, res) => {
+  try {
+    const review = await Review.findById(req.params.reviewId)
+      .populate('reviewer', 'name username email')
+      .populate('reviewedUser', 'name username email');
+
+    if (!review) {
+      return res.status(404).json({
+        success: false,
+        message: 'Review not found',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: review,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching review',
+      error: error.message,
+    });
+  }
+};

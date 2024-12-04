@@ -82,8 +82,8 @@ const ProfilePage = () => {
           <div className="relative">
             <img
               className="w-32 h-32 rounded-full border-4 border-gray-900 shadow-xl object-cover"
-              src={`http://localhost:3000/public${user.info.profilePic}`}
-              alt={`${user.name}'s profile`}
+              src={user.info?.profilePic ? `http://localhost:3000/public${user.info.profilePic}` : '/default-avatar.png'}
+              alt={`${user.name || 'User'}'s profile`}
             />
           </div>
         </div>
@@ -93,10 +93,10 @@ const ProfilePage = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-24">
         {/* Profile Header */}
         <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold text-white">{user.name}</h1>
+          <h1 className="text-3xl font-bold text-white">{user.name || 'Anonymous User'}</h1>
           <p className="text-lg text-gray-400">@{user.username}</p>
           <p className="mt-3 text-gray-400 max-w-2xl mx-auto">
-            {user.bio || "No bio available."}
+            {user.bio || "No bio available"}
           </p>
           {currentUsername !== user.username && (
             <button

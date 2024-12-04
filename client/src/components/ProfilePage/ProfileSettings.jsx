@@ -15,6 +15,7 @@ import {
 } from '../../redux/Features/user/ProfileSlice';
 import ImageUpload from './ProfileComponents/ImageUpload';
 import axiosInstance from '../../api/axiosInstance';
+import CustomAlert from '../Notifications/CustomAlert';
 
 const ProfileSettings = () => {
   const dispatch = useDispatch();
@@ -23,18 +24,17 @@ const ProfileSettings = () => {
   const [profilePicPath, setProfilePicPath] = useState(null);
 
   const [formData, setFormData] = useState({
-    name: userProfile.name || "",
-    email: userProfile.email || "",
-    bio: userProfile.bio || "",
-    skills: userProfile.info?.skills || [""],
-    portfolio: userProfile.info?.portfolio || "",
-    experience: userProfile.info?.experience || [""],
-    previousWorks: userProfile.previousWorks || [
-      { title: "", description: "", link: "" },
-    ],
+    name: "",
+    email: "",
+    bio: "",
+    skills: [],
+    portfolio: "",
+    experience: [],
+    previousWorks: [{ title: "", description: "", link: "" }],
     newSkill: "",
   });
   const [errors, setErrors] = useState({});
+  const [alert, setAlert] = useState({ message: '', type: '' });
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -66,15 +66,16 @@ const ProfileSettings = () => {
   useEffect(() => {
     if (userProfile) {
       setFormData({
-        name: userProfile.name,
-        email: userProfile.email,
-        bio: userProfile.bio,
-        skills: userProfile.info.skills,
-        portfolio: userProfile.info.portfolio,
-        experience: userProfile.info.experience,
-        previousWorks: userProfile.previousWorks,
+        name: userProfile.name || "",
+        email: userProfile.email || "",
+        bio: userProfile.bio || "",
+        skills: userProfile.info?.skills || [],
+        portfolio: userProfile.info?.portfolio || "",
+        experience: userProfile.info?.experience || [],
+        previousWorks: userProfile.previousWorks || [{ title: "", description: "", link: "" }],
+        newSkill: "",
       });
-      setProfilePicPath(userProfile.info.profilePic);
+      setProfilePicPath(userProfile.info?.profilePic || null);
     }
   }, [userProfile]);
 
@@ -117,14 +118,14 @@ const ProfileSettings = () => {
       await dispatch(fetchUserProfile());
       
       // Show success message
-      alert("Profile updated successfully!");
+      setAlert({ message: 'Profile updated successfully!', type: 'success' });
       
     } catch (error) {
       console.error(
         "Error updating profile:",
         error.response?.data || error.message
       );
-      alert("Failed to update profile. Please try again.");
+      setAlert({ message: 'Failed to update profile. Please try again.', type: 'error' });
     }
   };
 
@@ -167,6 +168,13 @@ const ProfileSettings = () => {
 
   return (
     <div className="min-h-screen py-12 px-4">
+      {alert.message && (
+        <CustomAlert 
+          message={alert.message} 
+          type={alert.type} 
+          onClose={() => setAlert({ message: '', type: '' })} 
+        />
+      )}
       <div className="max-w-5xl mx-auto">
         <div className="bg-gray-800/50 backdrop-blur-lg p-8 rounded-2xl shadow-2xl border border-gray-700">
           <h1 className="text-4xl font-bold mb-8 text-center text-white">

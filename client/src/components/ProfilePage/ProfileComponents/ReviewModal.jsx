@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import ReactStars from "react-stars";
 
 const ReviewModal = ({
@@ -13,85 +13,64 @@ const ReviewModal = ({
   if (!isOpen) return null;
 
   return (
-    <div
-      id="review-modal"
-      className="fixed inset-0 z-50 flex justify-center items-center bg-gray-900 bg-opacity-50 overflow-y-auto h-screen"
-      aria-hidden={!isOpen}
-    >
-      <div className="relative w-full max-w-2xl p-4 h-auto">
-        <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-          {/* Modal Header */}
-          <div className="flex justify-between items-center p-5 border-b border-gray-200 dark:border-gray-600 rounded-t">
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-              Add Your Review
-            </h3>
-            <button
-              type="button"
-              onClick={onClose}
-              className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-2 inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-              <span className="sr-only">Close</span>
-            </button>
-          </div>
+    <div className="fixed inset-0 z-50 overflow-y-auto">
+      <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+        <div
+          className="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75 backdrop-blur-sm"
+          onClick={onClose}
+        ></div>
 
-          {/* Modal Body */}
-          <div className="p-6 space-y-6">
-            <div>
-              <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                Rating
-              </label>
-              <ReactStars
-                count={5}
-                onChange={setRating}
-                size={30}
-                value={rating}
-                color2={"#ffd700"}
-                className="w-auto"
-              />
-            </div>
-            <div>
-              <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                Comment
-              </label>
-              <textarea
-                className="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
-                rows="4"
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="Leave a comment..."
-              />
+        <span
+          className="hidden sm:inline-block sm:align-middle sm:h-screen"
+          aria-hidden="true"
+        >
+          &#8203;
+        </span>
+
+        <div className="inline-block align-bottom bg-gray-800 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-700">
+          <div className="px-6 pt-5 pb-4">
+            <div className="sm:flex sm:items-start">
+              <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                <h3 className="text-2xl font-semibold text-white mb-6">
+                  Write a Review
+                </h3>
+                <div className="mb-6 flex justify-center sm:justify-start">
+                  <ReactStars
+                    count={5}
+                    value={rating}
+                    size={32}
+                    color2={"#60A5FA"}
+                    half={false}
+                    onChange={setRating}
+                  />
+                </div>
+                <div>
+                  <textarea
+                    rows="4"
+                    className="block w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
+                    placeholder="Share your experience..."
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                  ></textarea>
+                </div>
+              </div>
             </div>
           </div>
-
-          {/* Modal Footer */}
-          <div className="flex items-center justify-end p-5 border-t border-gray-200 dark:border-gray-600">
+          <div className="px-6 py-4 bg-gray-900/50 sm:px-6 sm:flex sm:flex-row-reverse gap-3">
             <button
               type="button"
-              className="text-gray-700 bg-white border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
-              onClick={onClose}
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               onClick={onSubmit}
+              disabled={!rating || !comment.trim()}
+              className="w-full inline-flex justify-center rounded-lg px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40"
             >
               Submit Review
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="mt-3 w-full inline-flex justify-center rounded-lg px-4 py-2 bg-gray-800 text-base font-medium text-gray-300 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:mt-0 sm:w-auto sm:text-sm border border-gray-700 transition-all duration-200"
+            >
+              Cancel
             </button>
           </div>
         </div>

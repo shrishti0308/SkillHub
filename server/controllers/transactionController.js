@@ -81,7 +81,7 @@ exports.createTransaction = async (req, res) => {
       transactionType,
       job,
       commission,
-      status: 'pending'
+      status: "pending",
     });
 
     await newTransaction.save();
@@ -89,11 +89,11 @@ exports.createTransaction = async (req, res) => {
     // Create notification for transaction creation
     const notification = new Notification({
       recipient: userId,
-      type: 'transaction',
-      title: 'New Transaction Created',
+      type: "transaction",
+      title: "New Transaction Created",
       message: `A new ${transactionType} transaction for $${amount} has been created`,
       relatedId: newTransaction._id,
-      onModel: 'Transaction'
+      onModel: "Transaction",
     });
     await notification.save();
 
@@ -148,6 +148,32 @@ exports.updateTransactionStatus = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: "Error updating transaction status",
+      error: error.message,
+    });
+  }
+};
+
+// Fetch recent transactions with populated job details
+exports.getEarningsSummary = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Fetch the 5 most recent transactions with job details populated
+    const recentTransactions = await Transaction.find({ user: userId })
+      .populate({
+        path: "job", // Path to populate
+        select: "title description budget", // Select specific fields
+      })
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    res.status(200).json({
+      recentTransactions,
+    });
+  } catch (error) {
+    console.error("Error in getEarningsSummary:", error.message);
+    res.status(500).json({
+      message: "Error fetching earnings summary",
       error: error.message,
     });
   }

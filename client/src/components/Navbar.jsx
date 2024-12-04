@@ -33,16 +33,7 @@ const Navbar = () => {
   };
 
   const getDashboardLink = () => {
-    switch (userRole) {
-      case "freelancer":
-        return "/freelancer-dashboard";
-      case "enterprise":
-        return "/entrepreneur-dashboard";
-      case "hybrid":
-        return "/hybrid-dashboard";
-      default:
-        return "/freelancer-dashboard";
-    }
+    return "/dashboard";  // All user types now use the same dashboard route
   };
 
   return (

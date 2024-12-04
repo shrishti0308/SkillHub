@@ -40,13 +40,7 @@ function Sidebar() {
           >
             <TiHomeOutline className="mr-2 mt-1.5 text-lg" />
             <Link
-              to={
-                userRole === 'enterprise'
-                  ? '/entrepreneur-dashboard'
-                  : userRole === 'hybrid'
-                  ? '/hybrid-dashboard'
-                  : '/freelancer-dashboard'
-              }
+              to="/dashboard"
               className="text-base font-normal p-0 m-1"
             >
               Dashboard

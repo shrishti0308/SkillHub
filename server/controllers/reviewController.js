@@ -113,7 +113,6 @@ exports.getAllReviewsForUser = async (req, res) => {
       "reviewer",
       "name username info.profilePic"
     );
-    console.log(reviews)
     res.status(200).json({ success: true, reviews });
   } catch (error) {
     res

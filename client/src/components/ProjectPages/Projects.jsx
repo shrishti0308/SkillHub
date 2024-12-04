@@ -24,15 +24,19 @@ const Projects = () => {
   const [error, setError] = useState(null);
 
   const isEmployer = userRole === "enterprise" || userRole === "hybrid";
+  const isFreelancer = userRole === "freelancer" || userRole === "hybrid";
 
   useEffect(() => {
     const fetchProjects = async () => {
       setLoading(true);
       try {
-        const response = await axiosInstance.get("/project/recent-projects");
-        dispatch(setRecentProjects(response.data.recentProjects));
+        // Only fetch projects for freelancers and hybrid users
+        if (isFreelancer) {
+          const response = await axiosInstance.get("/project/recent-projects");
+          dispatch(setRecentProjects(response.data.recentProjects));
+        }
         
-        // Fetch job posts if user is enterprise or hybrid
+        // Fetch job posts for employers and hybrid users
         if (isEmployer) {
           const jobsResponse = await axiosInstance.get("/jobs/employer/jobs");
           dispatch(setMyJobPosts(jobsResponse.data));
@@ -46,7 +50,7 @@ const Projects = () => {
     };
 
     fetchProjects();
-  }, [dispatch, isEmployer]);
+  }, [dispatch, isEmployer, isFreelancer]);
 
   const fetchBidsForJob = async (jobId) => {
     try {
@@ -96,43 +100,45 @@ const Projects = () => {
           <div className="text-red-500 mb-4">{error}</div>
         )}
 
-        {/* Projects Section */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-white mb-4">Recent Projects</h2>
-          <div className="bg-gray-800 rounded-lg overflow-hidden">
-            {projects.map((project) => (
-              <div key={project._id}>
-                <div
-                  className="cursor-pointer hover:bg-gray-700 transition-colors"
-                  onClick={() => handleRowClick(project, 'project')}
-                >
-                  <div className="p-4 border-b border-gray-700">
-                    <div className="flex justify-between items-center">
-                      <h3 className="text-lg text-white">{project.title}</h3>
-                      <span className={`px-2 py-1 rounded text-sm ${
-                        project.status === "in-progress"
-                          ? "bg-emerald-900 text-emerald-200"
-                          : "bg-indigo-900 text-indigo-200"
-                      }`}>
-                        {project.status}
-                      </span>
+        {/* Projects Section - Only show for freelancers and hybrid users */}
+        {isFreelancer && (
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold text-white mb-4">Recent Projects</h2>
+            <div className="bg-gray-800 rounded-lg overflow-hidden">
+              {projects.map((project) => (
+                <div key={project._id}>
+                  <div
+                    className="cursor-pointer hover:bg-gray-700 transition-colors"
+                    onClick={() => handleRowClick(project, 'project')}
+                  >
+                    <div className="p-4 border-b border-gray-700">
+                      <div className="flex justify-between items-center">
+                        <h3 className="text-lg text-white">{project.title}</h3>
+                        <span className={`px-2 py-1 rounded text-sm ${
+                          project.status === "in-progress"
+                            ? "bg-emerald-900 text-emerald-200"
+                            : "bg-indigo-900 text-indigo-200"
+                        }`}>
+                          {project.status}
+                        </span>
+                      </div>
+                      <p className="text-gray-400 mt-2">{project.description}</p>
                     </div>
-                    <p className="text-gray-400 mt-2">{project.description}</p>
                   </div>
+                  {selectedProject && selectedProject._id === project._id && (
+                    <div className="p-4 bg-gray-900">
+                      <ProjectDetails project={project} />
+                    </div>
+                  )}
                 </div>
-                {selectedProject && selectedProject._id === project._id && (
-                  <div className="p-4 bg-gray-900">
-                    <ProjectDetails project={project} />
-                  </div>
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Job Posts Section (Only for enterprise/hybrid users) */}
+        {/* Job Posts Section - Only show for enterprise and hybrid users */}
         {isEmployer && (
-          <div className="mt-8">
+          <div className={`${isFreelancer ? 'mt-8' : ''}`}>
             <h2 className="text-xl font-semibold text-white mb-4">My Job Posts</h2>
             <div className="bg-gray-800 rounded-lg overflow-hidden">
               {myJobPosts.map((job) => (

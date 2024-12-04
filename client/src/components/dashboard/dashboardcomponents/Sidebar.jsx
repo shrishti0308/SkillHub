@@ -5,7 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 import { MdOutlineWorkOutline } from "react-icons/md";
 import { BiDollarCircle } from "react-icons/bi";
 import { GrMoney } from "react-icons/gr";
-import { FaLaptopCode } from "react-icons/fa";
+import { FaExchangeAlt, FaLaptopCode } from "react-icons/fa";
 import { RiAccountCircleLine } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
 import {toggleSidebar,selectIsSidebarMinimized} from "../../../redux/reducers/dashboard/sidebarSlice";
@@ -103,6 +103,18 @@ function Sidebar() {
               >
                 <FaLaptopCode className="mr-3 text-xl" />
                 Projects
+              </Link>
+
+              <Link
+                to="/transactions"
+                className={`flex my-3 ${
+                  activeSection === "/transactions"
+                    ? "bg-dark border-l-4 border-cyan-blue"
+                    : ""
+                } px-4 py-2 hover:bg-dark text-cyan-blue`}
+              >
+                <FaExchangeAlt className="mr-3 text-xl" />
+                Transactions
               </Link>
             </div>
 

@@ -1,45 +1,61 @@
-import { Route, BrowserRouter as Router, Routes, useLocation, Navigate } from 'react-router-dom';
-import About from './components/About';
-import Bids from './components/BidingsPage/Bids';
+import {
+  Route,
+  BrowserRouter as Router,
+  Routes,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
+import About from "./components/About";
+import Bids from "./components/BidingsPage/Bids";
 import Projects from './components/ProjectPages/Projects';
-import FreelancerDashboard from './components/dashboard/FreelancerDashboard';
-import JobDetails from './components/Jobs/JobDetails';
-import PostJob from './components/Jobs/PostJob';
-import Features from './components/Features/FeaturesPage';
-import Jobs from './components/JobsPage/Jobs';
-import LandingPage from './components/LandingPage/LandingPage';
-import Marketplace from './components/MarketPlace/MarketPlace';
-import Navbar from './components/Navbar';
-import ProfilePage from './components/ProfilePage/ProfilePage';
-import ProfileSettings from './components/ProfilePage/ProfileSettings';
-import LoginPage from './components/RegistrationPages/Login';
-import SignupPage from './components/RegistrationPages/Signup';
-import AdminLogin from './components/admin/AdminLogin';
-import AdminLayout from './components/admin/AdminLayout';
-import AdminDashboard from './components/admin/AdminDashboard';
-import AdminUsers from './components/admin/AdminUsers';
-import AdminJobs from './components/admin/AdminJobs';
-import AdminReports from './components/admin/AdminReports';
-import { useSelector } from 'react-redux';
+import FreelancerDashboard from "./components/dashboard/FreelancerDashboard";
+import JobDetails from "./components/Jobs/JobDetails";
+import PostJob from "./components/Jobs/PostJob";
+import Features from "./components/Features/FeaturesPage";
+import Jobs from "./components/JobsPage/Jobs";
+import LandingPage from "./components/LandingPage/LandingPage";
+import Marketplace from "./components/MarketPlace/MarketPlace";
+import Navbar from "./components/Navbar";
+import ProfilePage from "./components/ProfilePage/ProfilePage";
+import ProfileSettings from "./components/ProfilePage/ProfileSettings";
+import LoginPage from "./components/RegistrationPages/Login";
+import SignupPage from "./components/RegistrationPages/Signup";
+import AdminLogin from "./components/admin/AdminLogin";
+import AdminLayout from "./components/admin/AdminLayout";
+import AdminDashboard from "./components/admin/AdminDashboard";
+import AdminUsers from "./components/admin/AdminUsers";
+import AdminJobs from "./components/admin/AdminJobs";
+import AdminReports from "./components/admin/AdminReports";
+import TransactionPage from "./components/TransactionPage/TransactionPage";
+import { useSelector } from "react-redux";
 
 
 // Protected Route component for admin routes
 const AdminProtectedRoute = ({ children }) => {
   const { token } = useSelector((state) => state.admin);
   const location = useLocation();
-  
+
   if (!token) {
     return <Navigate to="/admin/login" state={{ from: location }} replace />;
   }
 
   return children;
 };
-import Footer from './components/Footer';
-import NotificationsPage from './components/Notifications/NotificationsPage';
+import Footer from "./components/Footer";
+import NotificationsPage from "./components/Notifications/NotificationsPage";
 
 function App() {
   const location = useLocation();
-  const hideNavbarRoutes = ['/login', '/signup', '/admin', '/admin/login', '/admin/dashboard', '/admin/users', '/admin/jobs', '/admin/reports'];
+  const hideNavbarRoutes = [
+    "/login",
+    "/signup",
+    "/admin",
+    "/admin/login",
+    "/admin/dashboard",
+    "/admin/users",
+    "/admin/jobs",
+    "/admin/reports",
+  ];
 
   return (
     <>
@@ -64,9 +80,13 @@ function App() {
           <Route path="/bidings" element={<Bids />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/about" element={<About />} />
+          <Route path="/transactions/*" element={<TransactionPage />} />
 
           {/* Admin Routes */}
-          <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
+          <Route
+            path="/admin"
+            element={<Navigate to="/admin/login" replace />}
+          />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route
             path="/admin"

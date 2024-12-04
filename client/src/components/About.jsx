@@ -138,31 +138,6 @@ const About = () => {
           )}
         </div>
 
-        {/* FAQ 4 */}
-        <div className="bg-gray-800 rounded-lg p-6 shadow-md transition-all duration-300 transform hover:-translate-y-1">
-          <div
-            className="cursor-pointer flex justify-between items-center"
-            onClick={() => toggleQuestion(4)}
-          >
-            <h2 className="text-2xl font-semibold text-blue-300">
-              How do I become a hybrid user?
-            </h2>
-            <span
-              className={`transform transition-transform ${
-                openQuestion === 4 ? "rotate-180" : "rotate-0"
-              }`}
-            >
-              ▼
-            </span>
-          </div>
-          {openQuestion === 4 && (
-            <p className="mt-4 text-gray-400 transition-opacity duration-500 ease-in-out opacity-100">
-              You can switch to a hybrid account from your profile settings,
-              allowing you to both post and complete tasks.
-            </p>
-          )}
-        </div>
-
         {/* FAQ 5 */}
         <div className="bg-gray-800 rounded-lg p-6 shadow-md transition-all duration-300 transform hover:-translate-y-1">
           <div

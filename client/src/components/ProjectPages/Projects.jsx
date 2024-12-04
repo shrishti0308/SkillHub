@@ -175,9 +175,6 @@ const Projects = () => {
                         <span className="text-gray-400">
                           Budget: ${job.budget?.min} - ${job.budget?.max}
                         </span>
-                        <span className="text-gray-400">
-                          Bids: {job.bids?.length || 0}
-                        </span>
                       </div>
                     </div>
                   </div>

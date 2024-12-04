@@ -8,6 +8,7 @@ const {
   getFilteredJobs,
   getJobByIdAuthCheck,
   createBid,
+  getJobsByUserId,
 } = require("../controllers/jobController");
 const { authenticateJWT } = require("../middlewares/authMiddleware");
 
@@ -25,6 +26,9 @@ router.put("/:id", updateJob);
 
 // Route to get filtered jobs
 router.get("/jobs/filtered", authenticateJWT, getFilteredJobs);
+
+// Get all jobs by user ID
+router.get("/user/:userId", authenticateJWT, getJobsByUserId);
 
 // Route to get a specific job by ID
 router.get("/user/:id", authenticateJWT, getJobByIdAuthCheck);

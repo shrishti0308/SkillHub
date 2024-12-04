@@ -32,4 +32,11 @@ router.get(
   reviewController.getAllReviewsByUser
 );
 
+// Get a specific review by ID
+router.get(
+  "/review/:reviewId",
+  authenticateJWT,
+  reviewController.getReviewById
+);
+
 module.exports = router;

@@ -158,6 +158,29 @@ const createBid = async (req, res) => {
   }
 };
 
+// Get all jobs posted by a specific user
+const getJobsByUserId = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const jobs = await Job.find({ employer: userId })
+      .populate('employer', 'name username email')
+      .populate('freelancer', 'name username email')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: jobs.length,
+      data: jobs,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching user's jobs",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createJob,
   getMarketplaceJobs,
@@ -166,4 +189,5 @@ module.exports = {
   getFilteredJobs,
   getJobByIdAuthCheck,
   createBid,
+  getJobsByUserId,
 };

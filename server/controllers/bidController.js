@@ -150,10 +150,62 @@ const getBidDetails = async (req, res) => {
   }
 };
 
+// Get a specific bid by ID
+const getBidById = async (req, res) => {
+  try {
+    const bid = await Bid.findById(req.params.bidId)
+      .populate('freelancer', 'name username email')
+      .populate('job');
+
+    if (!bid) {
+      return res.status(404).json({
+        success: false,
+        message: 'Bid not found',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: bid,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching bid',
+      error: error.message,
+    });
+  }
+};
+
+// Get all bids by a specific user
+const getBidsByUserId = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const bids = await Bid.find({ freelancer: userId })
+      .populate('job')
+      .populate('freelancer', 'name username email')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: bids.length,
+      data: bids,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching user's bids",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   placeBid,
   getBidsForJob,
   acceptBid,
   getRecentBids,
   getBidDetails,
+  getBidById,
+  getBidsByUserId,
 };

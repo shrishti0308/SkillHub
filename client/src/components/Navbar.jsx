@@ -12,6 +12,7 @@ import {
 } from "../redux/Features/user/authSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserCircle } from "@fortawesome/free-solid-svg-icons";
+import NotificationIcon from "./Notifications/NotificationIcon";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -134,6 +135,9 @@ const Navbar = () => {
                     >
                       Settings
                     </Link>
+                    <div className="lg:mx-4 lg:my-0 my-2">
+                      <NotificationIcon />
+                    </div>
                     <button
                       onClick={handleLogout}
                       className="px-3 py-2 mx-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
@@ -165,6 +169,7 @@ const Navbar = () => {
                         </div>
                       </button>
                     </Link>
+                    
                   </>
                 ) : (
                   <Link

@@ -14,7 +14,7 @@ exports.createNotification = async (req, res) => {
 // Get all notifications for a user
 exports.getUserNotifications = async (req, res) => {
     try {
-        const notifications = await Notification.find({ recipient: req.user._id })
+        const notifications = await Notification.find({ recipient: req.user.id })
             .sort({ createdAt: -1 })
             .limit(50);
         res.json({ success: true, notifications });
@@ -44,7 +44,7 @@ exports.markAsRead = async (req, res) => {
 exports.markAllAsRead = async (req, res) => {
     try {
         await Notification.updateMany(
-            { recipient: req.user._id, isRead: false },
+            { recipient: req.user.id, isRead: false },
             { isRead: true }
         );
         res.json({ success: true, message: 'All notifications marked as read' });
@@ -58,7 +58,7 @@ exports.deleteNotification = async (req, res) => {
     try {
         const notification = await Notification.findOneAndDelete({
             _id: req.params.id,
-            recipient: req.user._id
+            recipient: req.user.id
         });
         if (!notification) {
             return res.status(404).json({ success: false, message: 'Notification not found' });
@@ -73,7 +73,7 @@ exports.deleteNotification = async (req, res) => {
 exports.getUnreadCount = async (req, res) => {
     try {
         const count = await Notification.countDocuments({
-            recipient: req.user._id,
+            recipient: req.user.id,
             isRead: false
         });
         res.json({ success: true, count });

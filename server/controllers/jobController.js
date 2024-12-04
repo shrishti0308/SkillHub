@@ -1,5 +1,7 @@
 const Job = require("../models/job");
 const Bid = require("../models/bid");
+const Notification = require("../models/notification");
+const User = require("../models/user");
 
 // Create a new job
 const createJob = async (req, res) => {
@@ -17,6 +19,27 @@ const createJob = async (req, res) => {
     });
 
     await newJob.save();
+
+    // Find freelancers with matching skills and notify them
+    const matchingFreelancers = await User.find({
+      role: 'freelancer',
+      skills: { $in: skillsRequired }
+    });
+
+    // Create notifications for matching freelancers
+    const notifications = matchingFreelancers.map(freelancer => ({
+      recipient: freelancer._id,
+      type: 'job',
+      title: 'New Job Matching Your Skills',
+      message: `New job posted: ${title} - Budget: $${budget}`,
+      relatedId: newJob._id,
+      onModel: 'Job'
+    }));
+
+    if (notifications.length > 0) {
+      await Notification.insertMany(notifications);
+    }
+
     res.status(201).json(newJob);
   } catch (error) {
     console.log(error);

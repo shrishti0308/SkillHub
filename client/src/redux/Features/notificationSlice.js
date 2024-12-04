@@ -1,12 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import axiosInstance from '../../api/axiosInstance';
 
 // Async thunks
 export const fetchNotifications = createAsyncThunk(
     'notifications/fetchNotifications',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await axios.get('/api/notifications');
+            const response = await axiosInstance.get('/notifications');
+            console.log("hi");
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response.data);
@@ -18,7 +19,7 @@ export const getUnreadCount = createAsyncThunk(
     'notifications/getUnreadCount',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await axios.get('/api/notifications/unread-count');
+            const response = await axiosInstance.get('/notifications/unread-count');
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response.data);
@@ -30,7 +31,7 @@ export const markAsRead = createAsyncThunk(
     'notifications/markAsRead',
     async (notificationId, { rejectWithValue }) => {
         try {
-            const response = await axios.patch(`/api/notifications/${notificationId}/read`);
+            const response = await axiosInstance.patch(`/notifications/${notificationId}/read`);
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response.data);
@@ -42,7 +43,7 @@ export const markAllAsRead = createAsyncThunk(
     'notifications/markAllAsRead',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await axios.patch('/api/notifications/mark-all-read');
+            const response = await axiosInstance.patch('/notifications/mark-all-read');
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response.data);

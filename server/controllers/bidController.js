@@ -1,6 +1,7 @@
 const Bid = require("../models/bid");
 const mongoose = require("mongoose");
 const Job = require("../models/job");
+const Notification = require("../models/notification");
 
 // Place a new bid
 const placeBid = async (req, res) => {
@@ -16,6 +17,22 @@ const placeBid = async (req, res) => {
     });
 
     await newBid.save();
+    
+    // Get job details to notify the job owner
+    const job = await Job.findById(jobId);
+    if (job) {
+      // Create notification for job owner
+      const notification = new Notification({
+        recipient: job.employer,
+        type: 'bid',
+        title: 'New Bid Received',
+        message: `A new bid of $${amount} has been placed on your job`,
+        relatedId: newBid._id,
+        onModel: 'Bid'
+      });
+      await notification.save();
+    }
+
     res.status(201).json(newBid);
   } catch (error) {
     console.log(error);
@@ -70,6 +87,17 @@ const acceptBid = async (req, res) => {
       { job: job._id, _id: { $ne: bid._id } }, // Find bids for this job, excluding the accepted bid
       { status: "rejected" } // Update their status to 'rejected'
     );
+
+    // Create notification for the freelancer
+    const notification = new Notification({
+      recipient: bid.freelancer,
+      type: 'job_award',
+      title: 'Bid Accepted',
+      message: `Your bid has been accepted for the job: ${job.title}`,
+      relatedId: job._id,
+      onModel: 'Job'
+    });
+    await notification.save();
 
     await job.save();
     res.status(200).json({ message: "Bid accepted", job });

@@ -1,5 +1,6 @@
 // controllers/transactionController.js
 const Transaction = require("../models/transaction");
+const Notification = require("../models/notification");
 
 // Controller to get recent transactions of the logged-in user
 exports.getRecentTransactions = async (req, res) => {
@@ -71,23 +72,34 @@ exports.getTransactionDetails = async (req, res) => {
 
 exports.createTransaction = async (req, res) => {
   try {
-    const { jobId, amount, transactionType, commission } = req.body;
+    const { amount, transactionType, job, commission } = req.body;
     const userId = req.user.id;
 
     const newTransaction = new Transaction({
       user: userId,
-      job: jobId,
       amount,
       transactionType,
+      job,
       commission,
-      status: "pending", // Default status
+      status: 'pending'
     });
 
-    const savedTransaction = await newTransaction.save();
+    await newTransaction.save();
+
+    // Create notification for transaction creation
+    const notification = new Notification({
+      recipient: userId,
+      type: 'transaction',
+      title: 'New Transaction Created',
+      message: `A new ${transactionType} transaction for $${amount} has been created`,
+      relatedId: newTransaction._id,
+      onModel: 'Transaction'
+    });
+    await notification.save();
 
     res.status(201).json({
       message: "Transaction created successfully",
-      transaction: savedTransaction,
+      transaction: newTransaction,
     });
   } catch (error) {
     res.status(500).json({
@@ -108,17 +120,26 @@ exports.updateTransactionStatus = async (req, res) => {
       });
     }
 
-    const transaction = await Transaction.findByIdAndUpdate(
-      transactionId,
-      { status },
-      { new: true }
-    );
-
+    const transaction = await Transaction.findById(transactionId);
     if (!transaction) {
       return res.status(404).json({
         message: "Transaction not found",
       });
     }
+
+    transaction.status = status;
+    await transaction.save();
+
+    // Create notification for status update
+    const notification = new Notification({
+      recipient: transaction.user,
+      type: "transaction",
+      title: "Transaction Status Updated",
+      message: `Your transaction has been ${status}`,
+      relatedId: transaction._id,
+      onModel: "Transaction",
+    });
+    await notification.save();
 
     res.status(200).json({
       message: "Transaction status updated successfully",

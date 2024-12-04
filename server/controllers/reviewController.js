@@ -1,5 +1,6 @@
 const Review = require("../models/review");
 const User = require("../models/user");
+const Notification = require("../models/notification");
 
 // Add a review
 exports.addReview = async (req, res) => {
@@ -30,6 +31,18 @@ exports.addReview = async (req, res) => {
     });
 
     await newReview.save();
+
+    // Create notification for the reviewed user
+    const notification = new Notification({
+      recipient: reviewedUser,
+      type: 'review',
+      title: 'New Review Received',
+      message: `You have received a ${rating}-star review`,
+      relatedId: newReview._id,
+      onModel: 'Review'
+    });
+    await notification.save();
+
     res.status(201).json({ success: true, review: newReview });
   } catch (error) {
     res

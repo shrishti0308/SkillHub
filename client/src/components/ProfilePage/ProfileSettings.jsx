@@ -166,195 +166,197 @@ const ProfileSettings = () => {
   };
 
   return (
-    <div className=" my-10 max-w-5xl mx-auto p-6 bg-dark shadow-lg rounded-lg">
-      <h1 className="text-4xl font-bold text-light pb-6 border-b-4 border-emerald">
-        Profile Settings
-      </h1>
-      <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-6">
-        <ImageUpload
-          profilePicPath={profilePicPath}
-          setProfilePic={setProfilePic}
-        />
+    <div className="min-h-screen py-12 px-4">
+      <div className="max-w-5xl mx-auto">
+        <div className="bg-gray-800/50 backdrop-blur-lg p-8 rounded-2xl shadow-2xl border border-gray-700">
+          <h1 className="text-4xl font-bold mb-8 text-center text-white">
+            Profile Settings
+          </h1>
+          
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="flex justify-center">
+              <ImageUpload
+                profilePicPath={profilePicPath}
+                setProfilePic={setProfilePic}
+              />
+            </div>
 
-        <div className="flex flex-col">
-          <label className="text-lg font-semibold text-light">Name</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            className="w-full p-3 mt-1 bg-grey border border-gray-500 rounded-lg focus:ring-2 focus:ring-emerald focus:outline-none text-light"
-          />
-        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-300">Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full p-3 bg-gray-900/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-white"
+                  placeholder="Enter your name"
+                />
+              </div>
 
-        <div className="flex flex-col">
-          <label className="text-lg font-semibold text-light">Email</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className={`w-full p-3 mt-1 bg-grey border ${
-              errors.email ? 'border-red-500' : 'border-gray-500'
-            } rounded-lg focus:ring-2 focus:ring-emerald focus:outline-none text-light`}
-          />
-          {errors.email && (
-            <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-          )}
-        </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-300">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className={`w-full p-3 bg-gray-900/50 border ${
+                    errors.email ? 'border-red-500' : 'border-gray-600'
+                  } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-white`}
+                  placeholder="Enter your email"
+                />
+                {errors.email && (
+                  <p className="text-red-400 text-sm mt-1">{errors.email}</p>
+                )}
+              </div>
+            </div>
 
-        <div className="flex flex-col">
-          <label className="text-lg font-semibold text-light">Bio</label>
-          <textarea
-            name="bio"
-            value={formData.bio}
-            onChange={handleChange}
-            maxLength="500"
-            className="w-full p-3 mt-1 bg-grey border border-gray-500 rounded-lg focus:ring-2 focus:ring-emerald focus:outline-none text-light"
-          />
-        </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-300">Bio</label>
+              <textarea
+                name="bio"
+                value={formData.bio}
+                onChange={handleChange}
+                maxLength="500"
+                rows="4"
+                className="w-full p-3 bg-gray-900/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-white"
+                placeholder="Tell us about yourself..."
+              />
+              <p className="text-sm text-gray-400 text-right">
+                {formData.bio.length}/500 characters
+              </p>
+            </div>
 
-        {/* Skills Section */}
-        <div className="flex flex-col">
-          <label className="text-lg font-semibold text-light">Skills</label>
-          <div className="flex flex-wrap gap-2">
-            {formData.skills.map((skill, index) => (
-              <div
-                key={index}
-                className="bg-gray-600 text-light p-2 rounded-full flex items-center"
-              >
-                {skill}
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-300">Skills</label>
+              <div className="flex flex-wrap gap-2">
+                {formData.skills.map((skill, index) => (
+                  <div
+                    key={index}
+                    className="bg-blue-500/20 border border-blue-500/30 px-3 py-1.5 rounded-full text-sm font-medium text-blue-400 flex items-center gap-2 transition-all duration-200 hover:bg-blue-500/30"
+                  >
+                    {skill}
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteSkill(index)}
+                      className="text-blue-400 hover:text-blue-300 transition-colors duration-200"
+                    >
+                      <FaTimes size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={formData.newSkill}
+                  onChange={(e) => setFormData({ ...formData, newSkill: e.target.value })}
+                  placeholder="Add a new skill"
+                  className="flex-1 p-3 bg-gray-900/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-white"
+                />
                 <button
                   type="button"
-                  onClick={() => handleDeleteSkill(index)}
-                  className="ml-2 text-red-500"
+                  onClick={handleAddSkill}
+                  className="px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-lg text-blue-400 hover:bg-blue-500/30 transition-all duration-200"
                 >
-                  <FaTimes />
+                  <FaPlus size={16} />
                 </button>
               </div>
-            ))}
-          </div>
+            </div>
 
-          {/* New Skill Input */}
-          <div className="flex items-center mt-3">
-            <input
-              type="text"
-              value={formData.newSkill}
-              onChange={(e) =>
-                setFormData({ ...formData, newSkill: e.target.value })
-              }
-              placeholder="Add a new skill"
-              className="w-full p-2 bg-grey border border-gray-500 rounded-lg focus:ring-2 focus:ring-emerald focus:outline-none text-light"
-            />
-            <button
-              type="button"
-              onClick={handleAddSkill}
-              className="ml-2 text-emerald hover:text-indigo-400"
-            >
-              <FaPlus />
-            </button>
-          </div>
-        </div>
-
-        {/* Experience Section */}
-        <div className="flex flex-col">
-          <label className="text-lg font-semibold text-light">Experience</label>
-          {formData.experience.map((exp, index) => (
-            <div key={index} className="flex items-center">
-              <input
-                type="text"
-                value={exp}
-                onChange={(e) => handleExperienceChange(index, e.target.value)}
-                className="w-full p-3 mt-1 bg-grey border border-gray-500 rounded-lg focus:ring-2 focus:ring-emerald focus:outline-none text-light"
-              />
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-300">Experience</label>
+              <div className="space-y-3">
+                {formData.experience.map((exp, index) => (
+                  <div key={index} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={exp}
+                      onChange={(e) => handleExperienceChange(index, e.target.value)}
+                      className="flex-1 p-3 bg-gray-900/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-white"
+                      placeholder="Add your experience"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteExperience(index)}
+                      className="px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 hover:bg-red-500/30 transition-all duration-200"
+                    >
+                      <FaTimes size={16} />
+                    </button>
+                  </div>
+                ))}
+              </div>
               <button
                 type="button"
-                onClick={() => handleDeleteExperience(index)}
-                className="ml-2 text-red-500"
+                onClick={handleAddExperience}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-lg text-blue-400 hover:bg-blue-500/30 transition-all duration-200"
               >
-                <FaTimes />
+                <FaPlus size={16} /> Add Experience
               </button>
             </div>
-          ))}
-          <button
-            type="button"
-            onClick={handleAddExperience}
-            className="mt-3 flex items-center text-emerald hover:text-indigo-400"
-          >
-            <FaPlus className="mr-2" /> Add Experience
-          </button>
-        </div>
 
-        {/* Previous Works Section */}
-        <div className="flex flex-col">
-          <label className="text-lg font-semibold text-light">
-            Previous Works
-          </label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {formData.previousWorks.map((work, index) => (
-              <div
-                key={index}
-                className="bg-grey p-4 pt-2 rounded-lg shadow-lg space-y-2"
-              >
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    onClick={() => handleDeletePreviousWork(index)}
-                    className="text-red-500"
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-300">Previous Works</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {formData.previousWorks.map((work, index) => (
+                  <div
+                    key={index}
+                    className="bg-gray-900/50 p-4 rounded-xl border border-gray-700 space-y-3"
                   >
-                    <FaTimes />
-                  </button>
-                </div>
-                <input
-                  type="text"
-                  value={work.title}
-                  onChange={(e) =>
-                    handlePreviousWorksChange(index, "title", e.target.value)
-                  }
-                  placeholder="Title"
-                  className="w-full p-3 bg-dark border border-gray-500 rounded-lg focus:ring-2 focus:ring-emerald focus:outline-none text-light"
-                />
-                <input
-                  type="text"
-                  value={work.description}
-                  onChange={(e) =>
-                    handlePreviousWorksChange(
-                      index,
-                      "description",
-                      e.target.value
-                    )
-                  }
-                  placeholder="Description"
-                  className="w-full p-3 bg-dark border border-gray-500 rounded-lg focus:ring-2 focus:ring-emerald focus:outline-none text-light"
-                />
-                <input
-                  type="text"
-                  value={work.link}
-                  onChange={(e) =>
-                    handlePreviousWorksChange(index, "link", e.target.value)
-                  }
-                  placeholder="Link"
-                  className="w-full p-3 bg-dark border border-gray-500 rounded-lg focus:ring-2 focus:ring-emerald focus:outline-none text-light"
-                />
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-sm font-medium text-gray-300">Work #{index + 1}</h3>
+                      <button
+                        type="button"
+                        onClick={() => handleDeletePreviousWork(index)}
+                        className="text-red-400 hover:text-red-300 transition-colors duration-200"
+                      >
+                        <FaTimes size={16} />
+                      </button>
+                    </div>
+                    <input
+                      type="text"
+                      value={work.title}
+                      onChange={(e) => handlePreviousWorksChange(index, "title", e.target.value)}
+                      placeholder="Project Title"
+                      className="w-full p-3 bg-gray-900/80 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-white"
+                    />
+                    <input
+                      type="text"
+                      value={work.description}
+                      onChange={(e) => handlePreviousWorksChange(index, "description", e.target.value)}
+                      placeholder="Project Description"
+                      className="w-full p-3 bg-gray-900/80 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-white"
+                    />
+                    <input
+                      type="text"
+                      value={work.link}
+                      onChange={(e) => handlePreviousWorksChange(index, "link", e.target.value)}
+                      placeholder="Project Link"
+                      className="w-full p-3 bg-gray-900/80 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-white"
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-          <button
-            type="button"
-            onClick={handleAddPreviousWork}
-            className="mt-3 flex items-center text-emerald hover:text-indigo-400"
-          >
-            <FaPlus className="mr-2" /> Add Previous Work
-          </button>
-        </div>
+              <button
+                type="button"
+                onClick={handleAddPreviousWork}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-lg text-blue-400 hover:bg-blue-500/30 transition-all duration-200"
+              >
+                <FaPlus size={16} /> Add Previous Work
+              </button>
+            </div>
 
-        <button
-          type="submit"
-          className="mt-6 bg-white/20 text-light p-2 rounded-lg hover:bg-white/30 transition duration-200"
-        >
-          Update Profile
-        </button>
-      </form>
+            <button
+              type="submit"
+              className="w-full py-4 px-6 mt-8 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transform transition-all duration-200 hover:-translate-y-0.5"
+            >
+              Save Changes
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };

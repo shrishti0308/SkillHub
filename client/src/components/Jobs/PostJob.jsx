@@ -71,132 +71,177 @@ const PostJob = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-      <div className="bg-gray-800 p-8 rounded-lg shadow-lg max-w-3xl w-full">
-        <h2 className="text-3xl font-bold mb-6 text-center">Post a New Job</h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block mb-2 text-sm font-semibold">Job Title</label>
-            <input
-              type="text"
-              className={`w-full p-3 bg-gray-700 border ${errors.title ? 'border-red-500' : 'border-gray-600'} rounded focus:outline-none focus:ring-2 focus:ring-blue-500`}
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              disabled={loading}
-              placeholder="Enter job title"
-            />
-            {errors.title && <p className="mt-1 text-sm text-red-500">{errors.title}</p>}
-          </div>
-          <div>
-            <label className="block mb-2 text-sm font-semibold">Job Description</label>
-            <textarea
-              className={`w-full p-3 bg-gray-700 border ${errors.description ? 'border-red-500' : 'border-gray-600'} rounded focus:outline-none focus:ring-2 focus:ring-blue-500`}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              disabled={loading}
-              required
-              rows="4"
-              placeholder="Enter job description"
-            />
-            {errors.description && <p className="mt-1 text-sm text-red-500">{errors.description}</p>}
-          </div>
-          <div className="flex space-x-4">
-            <div className="w-1/2">
-              <label className="block mb-2 text-sm font-semibold">Budget Min</label>
-              <input
-                type="number"
-                className={`w-full p-3 bg-gray-700 border ${errors.budgetMin ? 'border-red-500' : 'border-gray-600'} rounded focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                value={budgetMin}
-                onChange={(e) => setBudgetMin(e.target.value)}
-                disabled={loading}
-                required
-                placeholder="Minimum budget"
-              />
-              {errors.budgetMin && <p className="mt-1 text-sm text-red-500">{errors.budgetMin}</p>}
-            </div>
-            <div className="w-1/2">
-              <label className="block mb-2 text-sm font-semibold">Budget Max</label>
-              <input
-                type="number"
-                className={`w-full p-3 bg-gray-700 border ${errors.budgetMax ? 'border-red-500' : 'border-gray-600'} rounded focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                value={budgetMax}
-                onChange={(e) => setBudgetMax(e.target.value)}
-                disabled={loading}
-                required
-                placeholder="Maximum budget"
-              />
-              {errors.budgetMax && <p className="mt-1 text-sm text-red-500">{errors.budgetMax}</p>}
-            </div>
-          </div>
-          <div>
-            <label className="block mb-2 text-sm font-semibold">Categories</label>
-            <div className="flex flex-wrap gap-2 mb-3">
-              {categories.map((category, index) => (
-                <div
-                  key={index}
-                  className="flex items-center space-x-2 bg-blue-600 p-2 rounded"
-                >
-                  <span>{category}</span>
-                  <button
-                    type="button"
-                    className="text-sm text-red-500"
-                    onClick={() => removeCategory(index)}
-                  >
-                    x
-                  </button>
+    <div className="min-h-screen bg-gradient-to-br  text-white py-12 px-4">
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-gray-800 bg-opacity-50 backdrop-blur-lg p-8 rounded-2xl shadow-2xl border border-gray-700">
+          <h2 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text">
+            Post a New Job
+          </h2>
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="space-y-6">
+              <div className="group">
+                <label className="block mb-2 text-sm font-medium text-gray-300">Job Title</label>
+                <input
+                  type="text"
+                  className={`w-full p-4 bg-gray-900/50 border ${
+                    errors.title ? 'border-red-500' : 'border-gray-600'
+                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200`}
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  disabled={loading}
+                  placeholder="Enter a compelling job title"
+                />
+                {errors.title && <p className="mt-2 text-sm text-red-400">{errors.title}</p>}
+              </div>
+
+              <div className="group">
+                <label className="block mb-2 text-sm font-medium text-gray-300">Job Description</label>
+                <textarea
+                  className={`w-full p-4 bg-gray-900/50 border ${
+                    errors.description ? 'border-red-500' : 'border-gray-600'
+                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200`}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  disabled={loading}
+                  required
+                  rows="6"
+                  placeholder="Describe the job requirements, responsibilities, and expectations in detail..."
+                />
+                {errors.description && <p className="mt-2 text-sm text-red-400">{errors.description}</p>}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="group">
+                  <label className="block mb-2 text-sm font-medium text-gray-300">Minimum Budget</label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">₹</span>
+                    <input
+                      type="number"
+                      className={`w-full pl-8 p-4 bg-gray-900/50 border ${
+                        errors.budgetMin ? 'border-red-500' : 'border-gray-600'
+                      } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200`}
+                      value={budgetMin}
+                      onChange={(e) => setBudgetMin(e.target.value)}
+                      disabled={loading}
+                      required
+                      placeholder="0"
+                    />
+                  </div>
+                  {errors.budgetMin && <p className="mt-2 text-sm text-red-400">{errors.budgetMin}</p>}
                 </div>
-              ))}
-            </div>
-            {errors.categories && <p className="mt-1 text-sm text-red-500">{errors.categories}</p>}
-            <input
-              type="text"
-              className="w-full p-3 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={categoryInput}
-              onChange={(e) => setCategoryInput(e.target.value)}
-              onKeyDown={handleCategoryKeyPress}
-              disabled={loading}
-              placeholder="Type category and press space"
-            />
-          </div>
-          <div>
-            <label className="block mb-2 text-sm font-semibold">Skills Required</label>
-            <div className="flex flex-wrap gap-2 mb-3">
-              {skillsRequired.map((skill, index) => (
-                <div
-                  key={index}
-                  className="flex items-center space-x-2 bg-gray-600 p-2 rounded"
-                >
-                  <span>{skill}</span>
-                  <button
-                    type="button"
-                    className="text-sm text-red-500"
-                    onClick={() => removeSkill(index)}
-                  >
-                    x
-                  </button>
+
+                <div className="group">
+                  <label className="block mb-2 text-sm font-medium text-gray-300">Maximum Budget</label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">₹</span>
+                    <input
+                      type="number"
+                      className={`w-full pl-8 p-4 bg-gray-900/50 border ${
+                        errors.budgetMax ? 'border-red-500' : 'border-gray-600'
+                      } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200`}
+                      value={budgetMax}
+                      onChange={(e) => setBudgetMax(e.target.value)}
+                      disabled={loading}
+                      required
+                      placeholder="1000"
+                    />
+                  </div>
+                  {errors.budgetMax && <p className="mt-2 text-sm text-red-400">{errors.budgetMax}</p>}
                 </div>
-              ))}
+              </div>
+
+              <div className="group">
+                <label className="block mb-2 text-sm font-medium text-gray-300">Categories</label>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {categories.map((category, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-2 bg-blue-500/20 border border-blue-500/30 px-3 py-1.5 rounded-full text-sm font-medium text-blue-400 transition-all duration-200 hover:bg-blue-500/30"
+                    >
+                      <span>{category}</span>
+                      <button
+                        type="button"
+                        className="text-blue-400 hover:text-blue-300 transition-colors duration-200"
+                        onClick={() => removeCategory(index)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                {errors.categories && <p className="mt-2 text-sm text-red-400">{errors.categories}</p>}
+                <input
+                  type="text"
+                  className="w-full p-4 bg-gray-900/50 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  value={categoryInput}
+                  onChange={(e) => setCategoryInput(e.target.value)}
+                  onKeyDown={handleCategoryKeyPress}
+                  disabled={loading}
+                  placeholder="Type category and press space to add"
+                />
+              </div>
+
+              <div className="group">
+                <label className="block mb-2 text-sm font-medium text-gray-300">Required Skills</label>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {skillsRequired.map((skill, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-2 bg-purple-500/20 border border-purple-500/30 px-3 py-1.5 rounded-full text-sm font-medium text-purple-400 transition-all duration-200 hover:bg-purple-500/30"
+                    >
+                      <span>{skill}</span>
+                      <button
+                        type="button"
+                        className="text-purple-400 hover:text-purple-300 transition-colors duration-200"
+                        onClick={() => removeSkill(index)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                {errors.skills && <p className="mt-2 text-sm text-red-400">{errors.skills}</p>}
+                <input
+                  type="text"
+                  className="w-full p-4 bg-gray-900/50 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  value={skillsInput}
+                  onChange={(e) => setSkillsInput(e.target.value)}
+                  onKeyDown={handleSkillKeyPress}
+                  disabled={loading}
+                  placeholder="Type skill and press space to add"
+                />
+              </div>
             </div>
-            {errors.skills && <p className="mt-1 text-sm text-red-500">{errors.skills}</p>}
-            <input
-              type="text"
-              className="w-full p-3 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={skillsInput}
-              onChange={(e) => setSkillsInput(e.target.value)}
-              onKeyDown={handleSkillKeyPress}
+
+            {errors.submit && (
+              <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+                <p className="text-sm text-red-400">{errors.submit}</p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className={`w-full py-4 px-6 rounded-lg text-white font-semibold text-lg transition-all duration-200 ${
+                loading
+                  ? 'bg-gray-600 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transform hover:-translate-y-0.5'
+              }`}
               disabled={loading}
-              placeholder="Type skill and press space"
-            />
-          </div>
-          {errors.submit && <p className="mt-1 text-sm text-red-500">{errors.submit}</p>}
-          <button
-            type="submit"
-            className={`w-full py-3 ${loading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} rounded-lg text-white font-semibold`}
-            disabled={loading}
-          >
-            {loading ? 'Creating Job...' : 'Post Job'}
-          </button>
-        </form>
+            >
+              {loading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Creating Job...</span>
+                </div>
+              ) : (
+                'Post Job'
+              )}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

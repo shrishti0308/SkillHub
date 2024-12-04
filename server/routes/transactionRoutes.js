@@ -35,4 +35,11 @@ router.patch(
   transactionController.updateTransactionStatus
 );
 
+// GET summary of earnings (wallet balance and recent transactions)
+router.get(
+  "/earnings-summary",
+  authenticateJWT,
+  transactionController.getEarningsSummary
+);
+
 module.exports = router;

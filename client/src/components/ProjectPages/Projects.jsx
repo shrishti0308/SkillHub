@@ -7,6 +7,7 @@ import {
   selectMyJobPosts,
 } from "../../redux/reducers/dashboard/projectsSlice";
 import { selectRole } from "../../redux/Features/user/authSlice";
+import { selectUserProfile } from "../../redux/Features/user/ProfileSlice";
 import Sidebar from "../dashboard/dashboardcomponents/Sidebar";
 import { selectIsSidebarMinimized } from "../../redux/reducers/dashboard/sidebarSlice";
 import axiosInstance from "../../api/axiosInstance";
@@ -17,6 +18,7 @@ const Projects = () => {
   const projects = useSelector(selectRecentProjects);
   const myJobPosts = useSelector(selectMyJobPosts);
   const userRole = useSelector(selectRole);
+  const userProfile = useSelector(selectUserProfile);
   const [selectedProject, setSelectedProject] = useState(null);
   const [selectedJobBids, setSelectedJobBids] = useState(null);
   const isSidebarMinimized = useSelector(selectIsSidebarMinimized);
@@ -37,9 +39,9 @@ const Projects = () => {
         }
 
         // Fetch job posts for employers and hybrid users
-        if (isEmployer) {
-          const jobsResponse = await axiosInstance.get("/jobs/employer/jobs");
-          dispatch(setMyJobPosts(jobsResponse.data));
+        if (isEmployer && userProfile?._id) {
+          const jobsResponse = await axiosInstance.get(`/jobs/user/${userProfile._id}`);
+          dispatch(setMyJobPosts(jobsResponse.data.data));
         }
 
         setError(null);
@@ -50,11 +52,11 @@ const Projects = () => {
     };
 
     fetchProjects();
-  }, [dispatch, isEmployer, isFreelancer]);
+  }, [dispatch, isEmployer, isFreelancer, userProfile?._id]);
 
   const fetchBidsForJob = async (jobId) => {
     try {
-      const response = await axiosInstance.get(`/bids/job/${jobId}`);
+      const response = await axiosInstance.get(`/bids/${jobId}`);
       setSelectedJobBids(response.data);
     } catch (err) {
       console.error("Error fetching bids:", err);

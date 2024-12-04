@@ -83,7 +83,7 @@ function Sidebar() {
                     } px-4 py-2 hover:bg-dark text-cyan-blue`}
                   >
                     <BiDollarCircle className="mr-3 text-xl" />
-                    Biddings
+                    Bidings
                   </Link>
 
                   <Link

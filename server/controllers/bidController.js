@@ -200,6 +200,38 @@ const getBidsByUserId = async (req, res) => {
   }
 };
 
+// Delete a bid
+const deleteBid = async (req, res) => {
+  try {
+    const { bidId } = req.params;
+    // Check if user is authenticated
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: "User not authenticated" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(bidId)) {
+      return res.status(400).json({ message: "Invalid bid ID" });
+    }
+
+    const bid = await Bid.findById(bidId);
+    
+    if (!bid) {
+      return res.status(404).json({ message: "Bid not found" });
+    }
+
+    // Check if the user is the owner of the bid
+    if (bid.freelancer.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Not authorized to delete this bid" });
+    }
+
+    await bid.deleteOne();
+    res.status(200).json({ message: "Bid deleted successfully" });
+  } catch (error) {
+    console.error('Error in deleteBid:', error);
+    res.status(500).json({ message: "Error deleting bid", error: error.message });
+  }
+};
+
 module.exports = {
   placeBid,
   getBidsForJob,
@@ -208,4 +240,5 @@ module.exports = {
   getBidDetails,
   getBidById,
   getBidsByUserId,
+  deleteBid,
 };

@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setRecentProjects, selectRecentProjects } from "../../redux/reducers/dashboard/projectsSlice";
-import Sidebar from "../Dashboard/Dashboardcomponents/Sidebar";
+import {
+  setRecentProjects,
+  selectRecentProjects,
+  setMyJobPosts,
+  selectMyJobPosts,
+} from "../../redux/reducers/dashboard/projectsSlice";
+import { selectRole } from "../../redux/Features/user/authSlice";
+import Sidebar from "../dashboard/dashboardcomponents/Sidebar";
 import { selectIsSidebarMinimized } from "../../redux/reducers/dashboard/sidebarSlice";
 import axiosInstance from "../../api/axiosInstance";
 import ProjectDetails from "./ProjectComponents/ProjectDetails";
@@ -9,18 +15,33 @@ import ProjectDetails from "./ProjectComponents/ProjectDetails";
 const Projects = () => {
   const dispatch = useDispatch();
   const projects = useSelector(selectRecentProjects);
+  const myJobPosts = useSelector(selectMyJobPosts);
+  const userRole = useSelector(selectRole);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedJobBids, setSelectedJobBids] = useState(null);
   const isSidebarMinimized = useSelector(selectIsSidebarMinimized);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const isEmployer = userRole === "enterprise" || userRole === "hybrid";
+  const isFreelancer = userRole === "freelancer" || userRole === "hybrid";
 
   useEffect(() => {
     const fetchProjects = async () => {
       setLoading(true);
       try {
-        const response = await axiosInstance.get("/project/recent-projects");
-        console.log(response.data);
-        dispatch(setRecentProjects(response.data.recentProjects));
+        // Only fetch projects for freelancers and hybrid users
+        if (isFreelancer) {
+          const response = await axiosInstance.get("/project/recent-projects");
+          dispatch(setRecentProjects(response.data.recentProjects));
+        }
+
+        // Fetch job posts for employers and hybrid users
+        if (isEmployer) {
+          const jobsResponse = await axiosInstance.get("/jobs/employer/jobs");
+          dispatch(setMyJobPosts(jobsResponse.data));
+        }
+
         setError(null);
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch projects");
@@ -29,13 +50,34 @@ const Projects = () => {
     };
 
     fetchProjects();
-  }, [dispatch]);
+  }, [dispatch, isEmployer, isFreelancer]);
 
-  const handleRowClick = (project) => {
-    if (selectedProject && selectedProject._id === project._id) {
-      setSelectedProject(null); // Toggle off if same project is clicked
-    } else {
-      setSelectedProject(project); // Select new project
+  const fetchBidsForJob = async (jobId) => {
+    try {
+      const response = await axiosInstance.get(`/bids/job/${jobId}`);
+      setSelectedJobBids(response.data);
+    } catch (err) {
+      console.error("Error fetching bids:", err);
+      setError("Failed to fetch bids for this job");
+    }
+  };
+
+  const handleRowClick = async (item, type) => {
+    if (type === "project") {
+      if (selectedProject && selectedProject._id === item._id) {
+        setSelectedProject(null);
+      } else {
+        setSelectedProject(item);
+        setSelectedJobBids(null);
+      }
+    } else if (type === "job") {
+      if (selectedProject && selectedProject._id === item._id) {
+        setSelectedProject(null);
+        setSelectedJobBids(null);
+      } else {
+        setSelectedProject(item);
+        await fetchBidsForJob(item._id);
+      }
     }
   };
 
@@ -50,82 +92,146 @@ const Projects = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="flex flex-grow p-5 top-16 ml-10 transition-all duration-300">
-        <Sidebar />
-        <div className="w-10/12 mr-6">
-          <div className="text-red-500">Error: {error}</div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div
-      className={`flex flex-grow p-5 top-16 ${
-        isSidebarMinimized ? "ml-5" : "ml-10"
-      } transition-all duration-300`}
-    >
+    <div className="flex flex-grow p-5 top-16 ml-10 transition-all duration-300">
       <Sidebar />
-      <div className="w-10/12 mr-6">
-        <h2>Your Projects</h2>
-        <div className="w-full">
-          <table className="table-auto w-full text-left text-sm bg-gray-800 text-gray-300 border border-gray-700 rounded-lg overflow-hidden">
-            <thead className="bg-gray-700 text-gray-300 uppercase text-xs">
-              <tr>
-                <th className="px-4 py-3">Title</th>
-                <th className="px-4 py-3">Budget</th>
-                <th className="px-4 py-3">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {projects && projects.length !== 0 ? (
-                projects.map((project) => (
-                  <React.Fragment key={project._id}>
-                    <tr
-                      className={`hover:bg-gray-700 cursor-pointer transition-colors ${
-                        selectedProject?._id === project._id ? "bg-gray-700" : ""
-                      }`}
-                      onClick={() => handleRowClick(project)}
-                    >
-                      <td className="px-4 py-3">{project.title}</td>
-                      <td className="px-4 py-3">
-                        ${project.budget?.min} - ${project.budget?.max}
-                      </td>
-                      <td className="px-4 py-3">
+      <div className={`w-10/12 mr-6 ${isSidebarMinimized ? "ml-16" : ""}`}>
+        {error && <div className="text-red-500 mb-4">{error}</div>}
+
+        {/* Projects Section - Only show for freelancers and hybrid users */}
+        {isFreelancer && (
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold text-white mb-4">
+              Recent Projects
+            </h2>
+            <div className="bg-gray-800 rounded-lg overflow-hidden">
+              {projects.map((project) => (
+                <div key={project._id}>
+                  <div
+                    className="cursor-pointer hover:bg-gray-700 transition-colors"
+                    onClick={() => handleRowClick(project, "project")}
+                  >
+                    <div className="p-4 border-b border-gray-700">
+                      <div className="flex justify-between items-center">
+                        <h3 className="text-lg text-white">{project.title}</h3>
                         <span
-                          className={`px-2 py-1 ${
+                          className={`px-2 py-1 rounded text-sm ${
                             project.status === "in-progress"
-                              ? "border-emerald-500 text-emerald-100"
-                              : project.status === "completed"
-                              ? "border-indigo-500 text-indigo-100"
-                              : "bg-red-500"
-                          } text-center border text-xs`}
+                              ? "bg-emerald-900 text-emerald-200"
+                              : "bg-indigo-900 text-indigo-200"
+                          }`}
                         >
                           {project.status}
                         </span>
-                      </td>
-                    </tr>
-                    {selectedProject?._id === project._id && (
-                      <tr>
-                        <td colSpan="3" className="p-0">
-                          <ProjectDetails project={selectedProject} />
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="3" className="px-4 py-3 text-center text-gray-400">
-                    No projects found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                      </div>
+                      <p className="text-gray-400 mt-2">
+                        {project.description}
+                      </p>
+                    </div>
+                  </div>
+                  {selectedProject && selectedProject._id === project._id && (
+                    <div className="p-4 bg-gray-900">
+                      <ProjectDetails project={project} />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Job Posts Section - Only show for enterprise and hybrid users */}
+        {isEmployer && (
+          <div className={`${isFreelancer ? "mt-8" : ""}`}>
+            <h2 className="text-xl font-semibold text-white mb-4">
+              My Job Posts
+            </h2>
+            <div className="bg-gray-800 rounded-lg overflow-hidden">
+              {myJobPosts.map((job) => (
+                <div key={job._id}>
+                  <div
+                    className="cursor-pointer hover:bg-gray-700 transition-colors"
+                    onClick={() => handleRowClick(job, "job")}
+                  >
+                    <div className="p-4 border-b border-gray-700">
+                      <div className="flex justify-between items-center">
+                        <h3 className="text-lg text-white">{job.title}</h3>
+                        <span
+                          className={`px-2 py-1 rounded text-sm ${
+                            job.status === "open"
+                              ? "bg-emerald-900 text-emerald-200"
+                              : job.status === "in-progress"
+                              ? "bg-indigo-900 text-indigo-200"
+                              : "bg-gray-700 text-gray-300"
+                          }`}
+                        >
+                          {job.status}
+                        </span>
+                      </div>
+                      <p className="text-gray-400 mt-2">{job.description}</p>
+                      <div className="flex justify-between mt-2">
+                        <span className="text-gray-400">
+                          Budget: ${job.budget?.min} - ${job.budget?.max}
+                        </span>
+                        <span className="text-gray-400">
+                          Bids: {job.bids?.length || 0}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  {selectedProject && selectedProject._id === job._id && (
+                    <div className="p-4 bg-gray-900">
+                      <ProjectDetails project={job} />
+                      {/* Bids Section */}
+                      {selectedJobBids && (
+                        <div className="mt-4">
+                          <h4 className="text-lg font-semibold text-white mb-3">
+                            Bids
+                          </h4>
+                          <div className="space-y-3">
+                            {selectedJobBids.map((bid) => (
+                              <div
+                                key={bid._id}
+                                className="bg-gray-800 p-3 rounded"
+                              >
+                                <div className="flex justify-between items-center">
+                                  <div>
+                                    <span className="text-white">
+                                      {bid.freelancer.username}
+                                    </span>
+                                    <span className="text-gray-400 ml-4">
+                                      Amount: ${bid.amount}
+                                    </span>
+                                  </div>
+                                  <span
+                                    className={`px-2 py-1 rounded text-sm ${
+                                      bid.status === "pending"
+                                        ? "bg-yellow-900 text-yellow-200"
+                                        : bid.status === "accepted"
+                                        ? "bg-emerald-900 text-emerald-200"
+                                        : "bg-red-900 text-red-200"
+                                    }`}
+                                  >
+                                    {bid.status}
+                                  </span>
+                                </div>
+                                {bid.proposalText && (
+                                  <p className="text-gray-400 mt-2">
+                                    {bid.proposalText}
+                                  </p>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

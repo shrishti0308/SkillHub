@@ -7,9 +7,10 @@ import {
 } from "react-router-dom";
 import About from "./components/About";
 import Bids from "./components/BidingsPage/Bids";
-import Projects from './components/ProjectPages/Projects';
+import Projects from "./components/ProjectPages/Projects";
 import FreelancerDashboard from "./components/dashboard/FreelancerDashboard";
-import EntrepreneurDashboard from "./components/Dashboard/EntrepreneurDashboard";
+import EntrepreneurDashboard from "./components/dashboard/EntrepreneurDashboard";
+import HybridDashboard from "./components/dashboard/HybridDashboard";
 import JobDetails from "./components/Jobs/JobDetails";
 import PostJob from "./components/Jobs/PostJob";
 import Features from "./components/Features/FeaturesPage";
@@ -29,7 +30,6 @@ import AdminJobs from "./components/admin/AdminJobs";
 import AdminReports from "./components/admin/AdminReports";
 import TransactionPage from "./components/TransactionPage/TransactionPage";
 import { useSelector } from "react-redux";
-
 
 // Protected Route component for admin routes
 const AdminProtectedRoute = ({ children }) => {
@@ -78,13 +78,18 @@ function App() {
             element={<FreelancerDashboard />}
           />
           <Route
-            path="/entrepreneur-dashboard"  
-            element={<EntrepreneurDashboard />}/>
+            path="/entrepreneur-dashboard"
+            element={<EntrepreneurDashboard />}
+          />
+          <Route path="/hybrid-dashboard" element={<HybridDashboard />} />
           <Route path="/dashboard/jobs" element={<Jobs />} />
           <Route path="/dashboard/bids" element={<Bids />} />
           <Route path="dashboard/projects" element={<Projects />} />
           <Route path="/about" element={<About />} />
-          <Route path="dashboard/transactions/*" element={<TransactionPage />} />
+          <Route
+            path="dashboard/transactions/*"
+            element={<TransactionPage />}
+          />
 
           {/* Admin Routes */}
           <Route

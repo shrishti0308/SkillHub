@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setRecentProjects,
@@ -12,6 +12,7 @@ import Sidebar from "../dashboard/dashboardcomponents/Sidebar";
 import { selectIsSidebarMinimized } from "../../redux/reducers/dashboard/sidebarSlice";
 import axiosInstance from "../../api/axiosInstance";
 import ProjectDetails from "./ProjectComponents/ProjectDetails";
+import { FiSearch, FiFilter, FiDollarSign, FiClock } from 'react-icons/fi';
 
 const Projects = () => {
   const dispatch = useDispatch();
@@ -24,8 +25,12 @@ const Projects = () => {
   const isSidebarMinimized = useSelector(selectIsSidebarMinimized);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [confirmAction, setConfirmAction] = useState({ jobId: null, status: null });
+
+  // Search and filter states
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [showFilters, setShowFilters] = useState(false);
+  const [budgetRange, setBudgetRange] = useState("all");
 
   const isEmployer = userRole === "enterprise" || userRole === "hybrid";
   const isFreelancer = userRole === "freelancer" || userRole === "hybrid";
@@ -34,13 +39,11 @@ const Projects = () => {
     const fetchProjects = async () => {
       setLoading(true);
       try {
-        // Only fetch projects for freelancers and hybrid users
         if (isFreelancer) {
           const response = await axiosInstance.get("/project/recent-projects");
           dispatch(setRecentProjects(response.data.recentProjects));
         }
 
-        // Fetch job posts for employers and hybrid users
         if (isEmployer && userProfile?._id) {
           const jobsResponse = await axiosInstance.get(`/jobs/user/${userProfile._id}`);
           dispatch(setMyJobPosts(jobsResponse.data.data));
@@ -85,38 +88,45 @@ const Projects = () => {
     }
   };
 
-  const handleStatusUpdate = async (jobId, newStatus) => {
-    try {
-      await axiosInstance.put(`/jobs/${jobId}`, { status: newStatus });
-      // Update the job status in the local state
-      const updatedJobs = myJobPosts.map(job => 
-        job._id === jobId ? { ...job, status: newStatus } : job
-      );
-      dispatch(setMyJobPosts(updatedJobs));
-      setError(null);
-    } catch (err) {
-      setError(err.response?.data?.message || `Failed to update job status to ${newStatus}`);
-    }
-  };
+  // Filter and search logic
+  const filteredProjects = useMemo(() => {
+    const itemsToFilter = isFreelancer ? projects : myJobPosts;
+    
+    return itemsToFilter?.filter((item) => {
+      // Search by title
+      const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
 
-  const handleStatusUpdateClick = (e, jobId, status) => {
-    e.stopPropagation();
-    setConfirmAction({ jobId, status });
-    setShowConfirmModal(true);
-  };
+      // Filter by status
+      const matchesStatus = filterStatus === "all" || item.status === filterStatus;
 
-  const handleConfirmStatusUpdate = async () => {
-    if (confirmAction.jobId && confirmAction.status) {
-      await handleStatusUpdate(confirmAction.jobId, confirmAction.status);
-      setShowConfirmModal(false);
-      setConfirmAction({ jobId: null, status: null });
-    }
-  };
+      // Filter by budget range
+      let matchesBudget = true;
+      if (budgetRange !== "all") {
+        const minBudget = item.budget?.min || 0;
+        const maxBudget = item.budget?.max || 0;
+        const avgBudget = (minBudget + maxBudget) / 2;
 
-  const handleCancelStatusUpdate = () => {
-    setShowConfirmModal(false);
-    setConfirmAction({ jobId: null, status: null });
-  };
+        switch (budgetRange) {
+          case "0-500":
+            matchesBudget = avgBudget <= 500;
+            break;
+          case "501-1000":
+            matchesBudget = avgBudget > 500 && avgBudget <= 1000;
+            break;
+          case "1001-5000":
+            matchesBudget = avgBudget > 1000 && avgBudget <= 5000;
+            break;
+          case "5000+":
+            matchesBudget = avgBudget > 5000;
+            break;
+          default:
+            matchesBudget = true;
+        }
+      }
+
+      return matchesSearch && matchesStatus && matchesBudget;
+    });
+  }, [projects, myJobPosts, searchTerm, filterStatus, budgetRange, isFreelancer]);
 
   if (loading) {
     return (
@@ -130,194 +140,134 @@ const Projects = () => {
   }
 
   return (
-    <>
-      <div className="flex flex-grow p-5 top-16 ml-10 transition-all duration-300">
-        <Sidebar />
-        <div className={`w-10/12 mr-6 ${isSidebarMinimized ? "ml-16" : ""}`}>
-          {error && <div className="text-red-500 mb-4">{error}</div>}
+    <div className="flex flex-grow p-5 top-16 ml-10 transition-all duration-300">
+      <Sidebar />
+      <div className={`w-10/12 mr-6 ${isSidebarMinimized ? "ml-16" : ""}`}>
+        {error && <div className="text-red-500 mb-4">{error}</div>}
 
-          {/* Projects Section - Only show for freelancers and hybrid users */}
-          {isFreelancer && (
-            <div className="mb-8">
-              <h2 className="text-xl font-semibold text-white mb-4">
-                Recent Projects
-              </h2>
-              <div className="bg-gray-800 rounded-lg overflow-hidden">
-                {projects.map((project) => (
-                  <div key={project._id}>
-                    <div
-                      className="cursor-pointer hover:bg-gray-700 transition-colors"
-                      onClick={() => handleRowClick(project, "project")}
-                    >
-                      <div className="p-4 border-b border-gray-700">
-                        <div className="flex justify-between items-center">
-                          <h3 className="text-lg text-white">{project.title}</h3>
-                          <span
-                            className={`px-2 py-1 rounded text-sm ${
-                              project.status === "in-progress"
-                                ? "bg-emerald-900 text-emerald-200"
-                                : "bg-indigo-900 text-indigo-200"
-                            }`}
-                          >
-                            {project.status}
-                          </span>
-                        </div>
-                        <p className="text-gray-400 mt-2">
-                          {project.description}
-                        </p>
-                      </div>
-                    </div>
-                    {selectedProject && selectedProject._id === project._id && (
-                      <div className="p-4 bg-gray-900">
-                        <ProjectDetails project={project} />
-                      </div>
-                    )}
-                  </div>
-                ))}
+        {/* Search and Filter Section */}
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-white mb-4">
+            {isFreelancer ? "Projects" : "My Job Posts"}
+          </h2>
+          
+          <div className="flex flex-col md:flex-row gap-4 mb-4">
+            {/* Search Bar */}
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                placeholder="Search by project title..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pl-10"
+              />
+              <FiSearch className="absolute left-3 top-3 text-gray-400" />
+            </div>
+
+            {/* Filter Button */}
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="px-4 py-2 bg-gray-700 text-white rounded-lg flex items-center gap-2 hover:bg-gray-600 transition-colors"
+            >
+              <FiFilter />
+              Filters
+            </button>
+          </div>
+
+          {/* Filter Options */}
+          {showFilters && (
+            <div className="bg-gray-700 p-4 rounded-lg mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Status Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Status
+                </label>
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className="w-full px-3 py-2 bg-gray-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">All Status</option>
+                  <option value="in-progress">In Progress</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+
+              {/* Budget Range Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Budget Range
+                </label>
+                <select
+                  value={budgetRange}
+                  onChange={(e) => setBudgetRange(e.target.value)}
+                  className="w-full px-3 py-2 bg-gray-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">All Budgets</option>
+                  <option value="0-500">$0 - $500</option>
+                  <option value="501-1000">$501 - $1,000</option>
+                  <option value="1001-5000">$1,001 - $5,000</option>
+                  <option value="5000+">$5,000+</option>
+                </select>
               </div>
             </div>
           )}
+        </div>
 
-          {/* Job Posts Section - Only show for enterprise and hybrid users */}
-          {isEmployer && (
-            <div className={`${isFreelancer ? "mt-8" : ""}`}>
-              <h2 className="text-xl font-semibold text-white mb-4">
-                My Job Posts
-              </h2>
-              <div className="bg-gray-800 rounded-lg overflow-hidden">
-                {myJobPosts.map((job) => (
-                  <div key={job._id}>
-                    <div
-                      className="cursor-pointer hover:bg-gray-700 transition-colors"
-                      onClick={() => handleRowClick(job, "job")}
-                    >
-                      <div className="p-4 border-b border-gray-700">
-                        <div className="flex justify-between items-center">
-                          <h3 className="text-lg text-white">{job.title}</h3>
-                          <span
-                            className={`px-2 py-1 rounded text-sm ${
-                              job.status === "open"
-                                ? "bg-emerald-900 text-emerald-200"
-                                : job.status === "in-progress"
-                                ? "bg-indigo-900 text-indigo-200"
-                                : "bg-gray-700 text-gray-300"
-                            }`}
-                          >
-                            {job.status}
-                          </span>
-                        </div>
-                        <p className="text-gray-400 mt-2">{job.description}</p>
-                        <div className="flex justify-between mt-2">
-                          <span className="text-gray-400">
-                            Budget: ${job.budget?.min} - ${job.budget?.max}
-                          </span>
-                          {job.status === "open" && (
-                            <div className="space-x-2">
-                              <button
-                                onClick={(e) => handleStatusUpdateClick(e, job._id, "completed")}
-                                className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded"
-                              >
-                                Mark Completed
-                              </button>
-                              <button
-                                onClick={(e) => handleStatusUpdateClick(e, job._id, "closed")}
-                                className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded"
-                              >
-                                Close Job
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
+        {/* Projects/Jobs Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredProjects && filteredProjects.length > 0 ? (
+            filteredProjects.map((item) => (
+              <div
+                key={item._id}
+                className={`bg-gray-800 rounded-lg overflow-hidden shadow-lg cursor-pointer transition-all duration-200 hover:shadow-xl hover:bg-gray-700 ${
+                  selectedProject?._id === item._id ? "ring-2 ring-blue-500" : ""
+                }`}
+                onClick={() => handleRowClick(item, isFreelancer ? "project" : "job")}
+              >
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-white mb-2 truncate">
+                    {item.title}
+                  </h3>
+                  <p className="text-gray-400 text-sm mb-3 line-clamp-2">
+                    {item.description}
+                  </p>
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center text-gray-300">
+                      <FiDollarSign className="mr-1" />
+                      ${item.budget?.min} - ${item.budget?.max}
                     </div>
-                    {selectedProject && selectedProject._id === job._id && (
-                      <div className="p-4 bg-gray-900">
-                        <ProjectDetails project={job} />
-                        {/* Bids Section */}
-                        {selectedJobBids && (
-                          <div className="mt-4">
-                            <h4 className="text-lg font-semibold text-white mb-3">
-                              Bids
-                            </h4>
-                            <div className="space-y-3">
-                              {selectedJobBids.map((bid) => (
-                                <div
-                                  key={bid._id}
-                                  className="bg-gray-800 p-3 rounded"
-                                >
-                                  <div className="flex justify-between items-center">
-                                    <div>
-                                      <span className="text-white">
-                                        {bid.freelancer.username}
-                                      </span>
-                                      <span className="text-gray-400 ml-4">
-                                        Amount: ${bid.amount}
-                                      </span>
-                                    </div>
-                                    <span
-                                      className={`px-2 py-1 rounded text-sm ${
-                                        bid.status === "pending"
-                                          ? "bg-yellow-900 text-yellow-200"
-                                          : bid.status === "accepted"
-                                          ? "bg-emerald-900 text-emerald-200"
-                                          : "bg-red-900 text-red-200"
-                                      }`}
-                                    >
-                                      {bid.status}
-                                    </span>
-                                  </div>
-                                  {bid.proposalText && (
-                                    <p className="text-gray-400 mt-2">
-                                      {bid.proposalText}
-                                    </p>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                    <div className="flex items-center">
+                      <FiClock className="mr-1 text-gray-400" />
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          item.status === "completed"
+                            ? "bg-green-900 text-green-200"
+                            : item.status === "in-progress"
+                            ? "bg-blue-900 text-blue-200"
+                            : "bg-yellow-900 text-yellow-200"
+                        }`}
+                      >
+                        {item.status}
+                      </span>
+                    </div>
                   </div>
-                ))}
+                </div>
+                {selectedProject?._id === item._id && (
+                  <div className="border-t border-gray-700 p-4 bg-gray-900">
+                    <ProjectDetails project={item} bids={selectedJobBids} />
+                  </div>
+                )}
               </div>
+            ))
+          ) : (
+            <div className="col-span-full text-center text-gray-400 py-8">
+              No projects found
             </div>
           )}
         </div>
       </div>
-
-      {/* Confirmation Modal */}
-      {showConfirmModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
-            <h3 className="text-xl font-semibold text-white mb-4">
-              Confirm Action
-            </h3>
-            <p className="text-gray-300 mb-6">
-              Are you sure you want to mark this job as {confirmAction.status}? This action cannot be undone.
-            </p>
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={handleCancelStatusUpdate}
-                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirmStatusUpdate}
-                className={`px-4 py-2 rounded text-white ${
-                  confirmAction.status === "completed"
-                    ? "bg-emerald-600 hover:bg-emerald-700"
-                    : "bg-red-600 hover:bg-red-700"
-                }`}
-              >
-                Confirm
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+    </div>
   );
 };
 

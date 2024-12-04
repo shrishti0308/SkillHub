@@ -42,7 +42,7 @@ const JobsList = () => {
   }
 
   return (
-    <div className="p-6">
+    <div className="ml-20 p-6">
       <h2 className="text-xl font-semibold text-white mb-4">Jobs</h2>
 
       {/* Table-like layout using grid */}

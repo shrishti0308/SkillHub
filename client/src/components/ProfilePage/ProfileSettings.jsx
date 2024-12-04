@@ -2,16 +2,16 @@ import React, { useEffect, useState } from "react";
 import { FaPlus, FaTimes } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import {
-    fetchUserProfile,
-    updateUserProfileThunk,
-    selectUserProfile,
-    addSkill,
-    removeSkill,
-    addExperience,
-    removeExperience,
-    addPreviousWork,
-    removePreviousWork,
-    updatePreviousWork
+  fetchUserProfile,
+  updateUserProfileThunk,
+  selectUserProfile,
+  addSkill,
+  removeSkill,
+  addExperience,
+  removeExperience,
+  addPreviousWork,
+  removePreviousWork,
+  updatePreviousWork
 } from '../../redux/Features/user/ProfileSlice';
 import ImageUpload from './ProfileComponents/ImageUpload';
 import axiosInstance from '../../api/axiosInstance';
@@ -34,6 +34,27 @@ const ProfileSettings = () => {
     ],
     newSkill: "",
   });
+  const [errors, setErrors] = useState({});
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    
+    // Clear previous error when user starts typing
+    setErrors({ ...errors, [name]: "" });
+    
+    // Validate email as user types
+    if (name === 'email' && value.trim() !== "") {
+      if (!validateEmail(value)) {
+        setErrors({ ...errors, email: "Please enter a valid email address" });
+      }
+    }
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -57,14 +78,31 @@ const ProfileSettings = () => {
     }
   }, [userProfile]);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate email before submission
+    if (!validateEmail(formData.email)) {
+      setErrors({ ...errors, email: "Please enter a valid email address" });
+      return;
+    }
+    
     try {
-      await dispatch(updateUserProfileThunk(formData));
+      // Create update object with all necessary fields
+      const updateData = {
+        name: formData.name,
+        email: formData.email,
+        bio: formData.bio,
+        skills: formData.skills,
+        portfolio: formData.portfolio,
+        experience: formData.experience,
+        previousWorks: formData.previousWorks,
+      };
+
+      // Update profile data
+      await dispatch(updateUserProfileThunk(updateData));
+      
+      // Handle profile picture upload if there's a new one
       if (profilePic) {
         const formDataPic = new FormData();
         formDataPic.append("profilePic", profilePic);
@@ -74,12 +112,19 @@ const ProfileSettings = () => {
           },
         });
       }
-      location.reload(); // Consider using state management instead of reloading
+      
+      // Fetch updated profile data
+      await dispatch(fetchUserProfile());
+      
+      // Show success message
+      alert("Profile updated successfully!");
+      
     } catch (error) {
       console.error(
         "Error updating profile:",
         error.response?.data || error.message
       );
+      alert("Failed to update profile. Please try again.");
     }
   };
 
@@ -149,8 +194,13 @@ const ProfileSettings = () => {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full p-3 mt-1 bg-grey border border-gray-500 rounded-lg focus:ring-2 focus:ring-emerald focus:outline-none text-light"
+            className={`w-full p-3 mt-1 bg-grey border ${
+              errors.email ? 'border-red-500' : 'border-gray-500'
+            } rounded-lg focus:ring-2 focus:ring-emerald focus:outline-none text-light`}
           />
+          {errors.email && (
+            <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+          )}
         </div>
 
         <div className="flex flex-col">
@@ -214,7 +264,7 @@ const ProfileSettings = () => {
               <input
                 type="text"
                 value={exp}
-                onChange={(e) => handleExperienceChange(index, e.target.value)} // Update here
+                onChange={(e) => handleExperienceChange(index, e.target.value)}
                 className="w-full p-3 mt-1 bg-grey border border-gray-500 rounded-lg focus:ring-2 focus:ring-emerald focus:outline-none text-light"
               />
               <button

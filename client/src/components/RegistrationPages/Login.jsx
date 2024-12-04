@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { useDispatch } from "react-redux";
 import { login } from "../../redux/Features/user/authSlice"; // Adjust path if necessary
 import { useNavigate } from "react-router-dom"; // Import useNavigate
@@ -41,17 +40,6 @@ const LoginPage = () => {
         {errorMessage && (
           <p className="text-red-500 text-center">{errorMessage}</p>
         )}
-
-        <button className="bg-gray-700 text-gray-300 w-full py-3 rounded-md flex justify-center items-center mb-6 hover:bg-gray-600 transition duration-200">
-          <FontAwesomeIcon icon={faGoogle} className="mr-2" />
-          Continue with Google
-        </button>
-
-        <div className="flex items-center justify-center mb-6 text-gray-400">
-          <div className="flex-grow h-px bg-gray-600"></div>
-          <span className="px-3">OR</span>
-          <div className="flex-grow h-px bg-gray-600"></div>
-        </div>
 
         <form onSubmit={handleLogin} className="space-y-6">
           <div className="relative">

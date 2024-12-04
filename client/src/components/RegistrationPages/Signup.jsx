@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { useDispatch } from "react-redux";
 import { signup } from "../../redux/Features/user/authSlice"; // Adjust path if necessary
 import { useNavigate } from "react-router-dom"; // Import useNavigate
@@ -39,6 +38,7 @@ const SignupPage = () => {
       length: password.length >= 8,
       number: /[0-9]/.test(password),
       special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+      alphabet: /[a-zA-Z]/.test(password),
     };
     return requirements;
   };
@@ -69,8 +69,9 @@ const SignupPage = () => {
       if (!passwordRequirements.number)
         errors.password = "Password must contain at least one number";
       if (!passwordRequirements.special)
-        errors.password =
-          "Password must contain at least one special character";
+        errors.password = "Password must contain at least one special character";
+      if (!passwordRequirements.alphabet)
+        errors.password = "Password must contain at least one letter";
     }
 
     // Confirm password validation
@@ -123,17 +124,6 @@ const SignupPage = () => {
             <p className="text-gray-300 mb-5">
               Join our community and get started today!
             </p>
-
-            <button className="bg-gray-700 text-gray-300 w-full py-3 rounded-md flex justify-center items-center mb-6 hover:bg-gray-600 transition duration-200">
-              <FontAwesomeIcon icon={faGoogle} className="mr-2" />
-              Continue with Google
-            </button>
-
-            <div className="flex items-center justify-center mb-6 text-gray-400">
-              <div className="flex-grow h-px bg-gray-600"></div>
-              <span className="px-3">OR</span>
-              <div className="flex-grow h-px bg-gray-600"></div>
-            </div>
 
             <form onSubmit={handleSignup}>
               {["name", "username", "email"].map((field, index) => (

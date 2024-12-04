@@ -102,7 +102,7 @@ function App() {
       </main>
 
       {!hideNavbarRoutes.includes(location.pathname) && (
-        <footer className={isDashboardRoute ? 'ml-64' : ''}>
+        <footer className={isDashboardRoute ? 'ml-56' : ''}>
           <Footer />
         </footer>
       )}

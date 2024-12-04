@@ -8,6 +8,7 @@ const {
   getBidDetails,
   getBidById,
   getBidsByUserId,
+  deleteBid,
 } = require("../controllers/bidController");
 const { authenticateJWT } = require("../middlewares/authMiddleware");
 
@@ -30,5 +31,8 @@ router.get("/user/:userId", authenticateJWT, getBidsByUserId);
 
 // Route to get details of a specific bid (including all bids for the job)
 router.get("/:bidId/details", authenticateJWT, getBidDetails);
+
+// Delete a bid
+router.delete("/:bidId", authenticateJWT, deleteBid);
 
 module.exports = router;

@@ -59,7 +59,6 @@ const RecentJobsSummary = () => {
           key={job._id}
           className="grid grid-cols-4 text-left bg-grey text-white border-b border-gray-700 my-2"
         >
-          {/* <div className="p-3">{job.title}</div> */}
           <Link className="p-3" to={`/jobs/${job._id}`}>
             <span className="text-cyan-blue hover:underline cursor-pointer">
               {job.title}

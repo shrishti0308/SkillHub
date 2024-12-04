@@ -69,24 +69,25 @@ const ProjectsSummary = () => {
     <div className="px-4 sm:px-6 lg:px-8 py-6 w-full">
       {/* Recent Projects Section - For Freelancers and Hybrid */}
       {isFreelancer && projects && projects.length > 0 && (
-        <div className="mb-8">
-          <h3 className="text-lg font-medium mb-4">Recent Projects</h3>
-          <div className="bg-gray-800 rounded-lg overflow-hidden">
+        <div className="w-full bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
+          <h3 className="text-xl font-bold text-white mb-4">Recent Projects</h3>
+          <div className="space-y-4">
             {projects.slice(0, 3).map((project) => (
-              <div key={project._id} className="p-4 border-b border-gray-700">
-                <div className="flex justify-between items-center">
-                  <h4 className="text-white">{project.title}</h4>
-                  <span className={`px-2 py-1 rounded text-sm ${
-                    project.status === "in-progress"
-                      ? "bg-emerald-900 text-emerald-200"
-                      : "bg-indigo-900 text-indigo-200"
+              <div key={project._id} className="p-4 bg-gray-700/50 rounded-lg hover:bg-gray-700 transition-colors">
+                <div className="flex justify-between items-start mb-2">
+                  <h4 className="text-lg font-semibold text-white">{project.title}</h4>
+                  <span className={`px-3 py-1 rounded-full text-sm ${
+                    project.status === "completed"
+                      ? "bg-green-900 text-green-200"
+                      : "bg-yellow-900 text-yellow-200"
                   }`}>
                     {project.status}
                   </span>
                 </div>
-                <p className="text-gray-400 mt-2 truncate">{project.description}</p>
-                <div className="text-gray-400 mt-2">
-                  Budget: ${project.budget?.min} - ${project.budget?.max}
+                <p className="text-gray-300 mb-3">{project.description}</p>
+                <div className="flex justify-between items-center text-sm text-gray-400">
+                  <span>Budget: ${project.budget?.min} - ${project.budget?.max}</span>
+                  <span>Due: {new Date(project.deadline).toLocaleDateString()}</span>
                 </div>
               </div>
             ))}
@@ -96,28 +97,25 @@ const ProjectsSummary = () => {
 
       {/* Job Posts Section - For Enterprise and Hybrid */}
       {isEmployer && myJobPosts && myJobPosts.length > 0 && (
-        <div className=" w-full">
-          <h3 className="text-lg font-medium mb-4">My Job Posts</h3>
-          <div className="bg-gray-800 rounded-lg overflow-hidden">
+        <div className="w-full bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
+          <h3 className="text-xl font-bold text-white mb-4">My Job Posts</h3>
+          <div className="space-y-4">
             {myJobPosts.slice(0, userRole === "hybrid" ? 3 : 5).map((job) => (
-              <div key={job._id} className="p-4 border-b border-gray-700">
-                <div className="flex justify-between items-center">
-                  <h4 className="text-white">{job.title}</h4>
-                  <span className={`px-2 py-1 rounded text-sm ${
+              <div key={job._id} className="p-4 bg-gray-700/50 rounded-lg hover:bg-gray-700 transition-colors">
+                <div className="flex justify-between items-start mb-2">
+                  <h4 className="text-lg font-semibold text-white">{job.title}</h4>
+                  <span className={`px-3 py-1 rounded-full text-sm ${
                     job.status === "open"
-                      ? "bg-emerald-900 text-emerald-200"
-                      : job.status === "in-progress"
-                      ? "bg-indigo-900 text-indigo-200"
-                      : "bg-gray-700 text-gray-300"
+                      ? "bg-green-900 text-green-200"
+                      : "bg-yellow-900 text-yellow-200"
                   }`}>
                     {job.status}
                   </span>
                 </div>
-                <p className="text-gray-400 mt-2 truncate">{job.description}</p>
-                <div className="flex justify-between mt-2">
-                  <span className="text-gray-400">
-                    Budget: ${job.budget?.min} - ${job.budget?.max}
-                  </span>
+                <p className="text-gray-300 mb-3">{job.description}</p>
+                <div className="flex justify-between items-center text-sm text-gray-400">
+                  <span>Budget: ${job.budget?.min} - ${job.budget?.max}</span>
+                  <span>Posted: {new Date(job.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
             ))}

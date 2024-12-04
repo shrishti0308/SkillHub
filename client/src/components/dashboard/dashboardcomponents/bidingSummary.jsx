@@ -1,23 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "../../../api/axiosInstance";
-import {
-  setBids,
-  selectBidsForUser,
-} from "../../../redux/reducers/dashboard/bidingSlice";
-import { selectRecentJobs } from "../../../redux/Features/dashboard/jobsSlice";
+import { setBids,selectBidsForUser } from "../../../redux/reducers/dashboard/bidingSlice";
 
 const BiddingSummary = () => {
   const dispatch = useDispatch();
   const bids = useSelector(selectBidsForUser);
-  const jobs = useSelector(selectRecentJobs);
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchBids = async () => {
       try {
-        const response = await axiosInstance.get("/recent-bids");
+        const response = await axiosInstance.get("bids/recent/bid");
         dispatch(setBids(response.data.recentBids));
         setStatus("succeeded");
       } catch (error) {
@@ -46,20 +41,6 @@ const BiddingSummary = () => {
     );
   }
 
-  // Function to get job title from the map
-  const findJobTitle = (jobId) => {
-    const recentJobs = jobs.jobs;
-    console.log("finding for job title");
-    console.log(recentJobs);
-    let ans = "Unknown";
-    Object.values(recentJobs).forEach((job) => {
-      if (job._id == jobId) {
-        ans = job.title;
-      }
-    });
-    return ans;
-  };
-
   return (
     <div className="bg-dark p-6">
       <h2 className="text-xl font-bold text-light mb-8">Latest Bids</h2>
@@ -70,15 +51,14 @@ const BiddingSummary = () => {
             className="bg-gray p-5 rounded-xl shadow-lg transform transition-all hover:scale-105 hover:shadow-2xl"
           >
             <h3 className="text-xl font-semibold text-cyan-blue mb-3">
-              {findJobTitle(bid.job)}
-              {/* {bid.job} */}
+              {bid.job?.title || "Job Title"}
             </h3>
             <p className="text-light mb-2">
               Bid Amount:{" "}
               <span className="font-medium text-light">${bid.amount}</span>
             </p>
             <p className="text-light mb-4">
-              Status:
+              Status:{" "}
               <span
                 className={`ml-2 inline-block px-3 py-2 border text-sm font-medium ${
                   bid.status === "accepted"

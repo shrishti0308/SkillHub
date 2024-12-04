@@ -1,46 +1,50 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axiosInstance from "../../../api/axiosInstance"; // Use axiosInstance instead of axios
+import { createSlice} from "@reduxjs/toolkit";
 
-// Async thunk to fetch projects taken up by the freelancer
-export const fetchFreelancerJobs = createAsyncThunk(
-  "jobs/fetchFreelancerJobs",
-  async (userId, { rejectWithValue }) => {
-    try {
-      // Axios instance will automatically add baseURL and token
-      const response = await axiosInstance.get(
-        `/api/jobs/freelancer/${userId}`
-      );
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(
-        error.response ? error.response.data : "Network Error"
-      );
-    }
-  }
-);
-
-const jobsSlice = createSlice({
-  name: "jobs",
+const projectsSlice = createSlice({
+  name: "projects",
   initialState: {
-    freelancerJobs: [],
-    status: "idle",
+    recentProjects: [
+      {
+          budget: {
+              min: 4,
+              max: 8
+          },
+          _id: "674f0c287f0771ec84509cf4",
+          title: "fkjatlhtbfdkbjkwbvdnjkmq;la,",
+          description: "knkb ndm ",
+          employer: "6736d9af16d3355f9af8e318",
+          status: "in-progress",
+          bidAccepted: true,
+          categories: [
+              "cdc",
+              "dcfsdf"
+          ],
+          skillsRequired: [
+              "dsfsf",
+              "sdfsf"
+          ],
+          createdAt: "2024-12-03T13:48:24.748Z",
+          updatedAt: "2024-12-04T05:27:54.744Z",
+          __v: 0,
+          freelancer: "66f2a5f3b8add7538ab0b02e"
+      },
+    ],
     error: null,
   },
-  reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchFreelancerJobs.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchFreelancerJobs.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.freelancerJobs = action.payload;
-      })
-      .addCase(fetchFreelancerJobs.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload || "Failed to fetch jobs";
-      });
-  },
+  reducers: {
+    setRecentProjects: (state, action) => {
+      state.recentProjects = action.payload;
+    },
+    getRecentProjects: (state) => {
+      return state.recentProjects;
+    }
+  }
 });
 
-export default jobsSlice.reducer;
+// Export actions
+export const { setRecentProjects, getRecentProjects } = projectsSlice.actions;
+
+// Export selector
+export const selectRecentProjects = (state) => state.projects.recentProjects;
+
+export default projectsSlice.reducer;

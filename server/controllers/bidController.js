@@ -82,10 +82,11 @@ const acceptBid = async (req, res) => {
 const getRecentBids = async (req, res) => {
   try {
     const freelancerId = req.user.id;
-
     const freelancerObjectId = new mongoose.Types.ObjectId(freelancerId);
 
-    const recentBids = await Bid.find({ freelancer: freelancerObjectId });
+    const recentBids = await Bid.find({ freelancer: freelancerObjectId })
+      .populate('job') // Populate job details
+      .sort({ createdAt: -1 }); // Sort by most recent first
 
     if (!recentBids.length) {
       return res

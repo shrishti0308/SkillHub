@@ -1,6 +1,7 @@
 import { Route, BrowserRouter as Router, Routes, useLocation, Navigate } from 'react-router-dom';
 import About from './components/About';
 import Bids from './components/BidingsPage/Bids';
+import Projects from './components/ProjectPages/Projects';
 import FreelancerDashboard from './components/dashboard/FreelancerDashboard';
 import JobDetails from './components/Jobs/JobDetails';
 import PostJob from './components/Jobs/PostJob';
@@ -20,6 +21,7 @@ import AdminUsers from './components/admin/AdminUsers';
 import AdminJobs from './components/admin/AdminJobs';
 import AdminReports from './components/admin/AdminReports';
 import { useSelector } from 'react-redux';
+
 
 // Protected Route component for admin routes
 const AdminProtectedRoute = ({ children }) => {
@@ -60,6 +62,7 @@ function App() {
           />
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/bidings" element={<Bids />} />
+          <Route path="/projects" element={<Projects />} />
           <Route path="/about" element={<About />} />
 
           {/* Admin Routes */}

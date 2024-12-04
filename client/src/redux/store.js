@@ -10,6 +10,7 @@ import bidingReducer from './reducers/dashboard/bidingSlice';
 import jobsReducer from './Features/dashboard/jobsSlice';
 import earningReducer from './reducers/dashboard/earningsSlice';
 import notificationReducer from './Features/notificationSlice';
+import projectsReducer from './reducers/dashboard/projectsSlice';
 
 export const store = configureStore({
   reducer: {
@@ -23,7 +24,8 @@ export const store = configureStore({
     bids: bidingReducer,
     earnings: earningReducer,
     jobs: jobsReducer,
-    notifications: notificationReducer
+    notifications: notificationReducer,
+    projects: projectsReducer,
   },
 });
 

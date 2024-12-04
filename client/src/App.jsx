@@ -9,6 +9,7 @@ import About from "./components/About";
 import Bids from "./components/BidingsPage/Bids";
 import Projects from './components/ProjectPages/Projects';
 import FreelancerDashboard from "./components/dashboard/FreelancerDashboard";
+import EntrepreneurDashboard from "./components/Dashboard/EntrepreneurDashboard";
 import JobDetails from "./components/Jobs/JobDetails";
 import PostJob from "./components/Jobs/PostJob";
 import Features from "./components/Features/FeaturesPage";
@@ -76,11 +77,14 @@ function App() {
             path="/freelancer-dashboard"
             element={<FreelancerDashboard />}
           />
-          <Route path="/jobs" element={<Jobs />} />
-          <Route path="/bidings" element={<Bids />} />
-          <Route path="/projects" element={<Projects />} />
+          <Route
+            path="/entrepreneur-dashboard"  
+            element={<EntrepreneurDashboard />}/>
+          <Route path="/dashboard/jobs" element={<Jobs />} />
+          <Route path="/dashboard/bids" element={<Bids />} />
+          <Route path="dashboard/projects" element={<Projects />} />
           <Route path="/about" element={<About />} />
-          <Route path="/transactions/*" element={<TransactionPage />} />
+          <Route path="dashboard/transactions/*" element={<TransactionPage />} />
 
           {/* Admin Routes */}
           <Route

@@ -1,4 +1,4 @@
-import colors, { green, red } from 'tailwindcss/colors';
+import colors from 'tailwindcss/colors';
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -14,6 +14,12 @@ export default {
       'dark': '#1a1d23',
       'cyan-blue': '#58c4dc',
       'light': '#f6f7f9',
+      // Updated color names
+      'slate': colors.blueGray,
+      'gray': colors.coolGray,
+      'neutral': colors.trueGray,
+      'stone': colors.warmGray,
+      'sky': colors.lightBlue,
     },
     extend: {
       animation: {

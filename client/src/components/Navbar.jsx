@@ -32,6 +32,19 @@ const Navbar = () => {
     setIsOpen(false);
   };
 
+  const getDashboardLink = () => {
+    switch (userRole) {
+      case "freelancer":
+        return "/freelancer-dashboard";
+      case "enterprise":
+        return "/entrepreneur-dashboard";
+      case "hybrid":
+        return "/hybrid-dashboard";
+      default:
+        return "/freelancer-dashboard";
+    }
+  };
+
   return (
     <>
       <nav className="fixed z-[200] w-screen bg-white bg-opacity-60 shadow dark:bg-gray-800 dark:bg-opacity-60 backdrop-blur transition-all duration-300">
@@ -124,7 +137,7 @@ const Navbar = () => {
                       </Link>
                     )}
                     <Link
-                      to={userRole === "freelancer" ? "/freelancer-dashboard" : "/entrepreneur-dashboard"}
+                      to={getDashboardLink()}
                       className="px-3 py-2 mx-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
                     >
                       Dashboard

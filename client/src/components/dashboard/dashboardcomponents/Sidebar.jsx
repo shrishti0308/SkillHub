@@ -22,6 +22,8 @@ function Sidebar() {
   const activeSection = location.pathname;
 
   const isFreelancer = userRole === "freelancer";
+  const isHybrid = userRole === "hybrid";
+  const showFreelancerMenu = isFreelancer || isHybrid;
 
   return (
     <div className="relative h-screen w-[250px]">
@@ -58,12 +60,12 @@ function Sidebar() {
         {!isSidebarMinimized && (
           <div className={`w-full flex flex-col justify-between h-3/4`}>
             <div className="w-3/4 ml-10 flex flex-col justify-start">
-              {isFreelancer && (
+              {showFreelancerMenu && (
                 <>
                   <Link
-                    to="dashboard/jobs"
+                    to="/dashboard/jobs"
                     className={`flex my-3 ${
-                      activeSection === "dashboard/jobs"
+                      activeSection === "/dashboard/jobs"
                         ? "bg-dark border-l-4 border-cyan-blue"
                         : ""
                     } px-4 py-2 hover:bg-dark text-cyan-blue`}
@@ -73,9 +75,9 @@ function Sidebar() {
                   </Link>
 
                   <Link
-                    to="dashboard/bids"
+                    to="/dashboard/bids"
                     className={`flex my-3 ${
-                      activeSection === "/bidings"
+                      activeSection === "/dashboard/bids"
                         ? "bg-dark border-l-4 border-cyan-blue"
                         : ""
                     } px-4 py-2 hover:bg-dark text-cyan-blue`}
@@ -85,9 +87,9 @@ function Sidebar() {
                   </Link>
 
                   <Link
-                    to="dashboard/earnings"
+                    to="/dashboard/earnings"
                     className={`flex my-3 ${
-                      activeSection === "/earnings"
+                      activeSection === "/dashboard/earnings"
                         ? "bg-dark border-l-4 border-cyan-blue"
                         : ""
                     } px-4 py-2 hover:bg-dark text-cyan-blue`}
@@ -100,9 +102,9 @@ function Sidebar() {
 
               {/* Always show Projects and Transactions */}
               <Link
-                to="dashboard/projects"
+                to="/dashboard/projects"
                 className={`flex my-3 ${
-                  activeSection === "/projects"
+                  activeSection === "/dashboard/projects"
                     ? "bg-dark border-l-4 border-cyan-blue"
                     : ""
                 } px-4 py-2 hover:bg-dark text-cyan-blue`}
@@ -112,9 +114,9 @@ function Sidebar() {
               </Link>
 
               <Link
-                to="dashboard/transactions"
+                to="/dashboard/transactions"
                 className={`flex my-3 ${
-                  activeSection === "dashboard/transactions"
+                  activeSection === "/dashboard/transactions"
                     ? "bg-dark border-l-4 border-cyan-blue"
                     : ""
                 } px-4 py-2 hover:bg-dark text-cyan-blue`}

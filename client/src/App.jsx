@@ -10,6 +10,7 @@ import Bids from "./components/BidingsPage/Bids";
 import Projects from './components/ProjectPages/Projects';
 import FreelancerDashboard from "./components/dashboard/FreelancerDashboard";
 import EntrepreneurDashboard from "./components/Dashboard/EntrepreneurDashboard";
+import HybridDashboard from "./components/Dashboard/HybridDashboard";
 import JobDetails from "./components/Jobs/JobDetails";
 import PostJob from "./components/Jobs/PostJob";
 import Features from "./components/Features/FeaturesPage";
@@ -80,6 +81,9 @@ function App() {
           <Route
             path="/entrepreneur-dashboard"  
             element={<EntrepreneurDashboard />}/>
+          <Route
+            path="/hybrid-dashboard"
+            element={<HybridDashboard />}/>
           <Route path="/dashboard/jobs" element={<Jobs />} />
           <Route path="/dashboard/bids" element={<Bids />} />
           <Route path="dashboard/projects" element={<Projects />} />

@@ -54,6 +54,7 @@ function App() {
     "/admin/users",
     "/admin/jobs",
     "/admin/reports",
+    "/admin/analytics",
   ];
 
   const isDashboardRoute = location.pathname.startsWith("/dashboard");
@@ -61,8 +62,8 @@ function App() {
   return (
     <div className="flex flex-col min-h-screen justify-between">
       {!hideNavbarRoutes.includes(location.pathname) && <Navbar />}
-      
-      <main className={`w-full${isDashboardRoute ? 'flex' : ''} h-full`}>
+
+      <main className={`w-full${isDashboardRoute ? "flex" : ""} h-full`}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
@@ -78,10 +79,16 @@ function App() {
           <Route path="/dashboard/bids" element={<Bids />} />
           <Route path="dashboard/projects" element={<Projects />} />
           <Route path="/about" element={<About />} />
-          <Route path="dashboard/transactions/*" element={<TransactionPage />} />
+          <Route
+            path="dashboard/transactions/*"
+            element={<TransactionPage />}
+          />
 
           {/* Admin Routes */}
-          <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
+          <Route
+            path="/admin"
+            element={<Navigate to="/admin/login" replace />}
+          />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route
             path="/admin"
@@ -102,7 +109,7 @@ function App() {
       </main>
 
       {!hideNavbarRoutes.includes(location.pathname) && (
-        <footer className={isDashboardRoute ? 'ml-56' : ''}>
+        <footer className={isDashboardRoute ? "ml-56" : ""}>
           <Footer />
         </footer>
       )}

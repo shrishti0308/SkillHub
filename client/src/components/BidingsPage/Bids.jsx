@@ -58,26 +58,29 @@ const Bids = () => {
       <Sidebar />
       <div className="w-10/12 mr-6">
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-white mb-4">User Bids</h2>
-          <div className="flex flex-col md:flex-row gap-4 mb-4">
-            <div className="flex-1 relative">
-              <input
-                type="text"
-                placeholder="Search by project name or amount..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pl-10"
-              />
-              <FiSearch className="absolute left-3 top-3 text-gray-400" />
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold text-white">
+              User Bids <span className="text-sm text-gray-400 ml-2">({filteredBids?.length || 0})</span>
+            </h2>
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search by project name or amount..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-64 px-4 py-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pl-10"
+                />
+                <FiSearch className="absolute left-3 top-3 text-gray-400" />
+              </div>
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="px-4 py-2 bg-gray-700 text-white rounded-lg flex items-center gap-2 hover:bg-gray-600 transition-colors"
+              >
+                <FiFilter />
+                Filters
+              </button>
             </div>
-            
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="px-4 py-2 bg-gray-700 text-white rounded-lg flex items-center gap-2 hover:bg-gray-600 transition-colors"
-            >
-              <FiFilter />
-              Filters
-            </button>
           </div>
 
           {showFilters && (

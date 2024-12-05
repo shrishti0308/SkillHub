@@ -323,7 +323,8 @@ const AdminDashboard = () => {
                       color="primary"
                       disabled={
                         !currentAdmin?.permissions.includes("manageAdmins") ||
-                        admin.role === "superuser"
+                        (admin.role === "superuser" &&
+                          currentAdmin?.role !== "superuser")
                       }
                     >
                       <EditIcon />

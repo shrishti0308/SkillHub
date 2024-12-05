@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchUserProfile,
@@ -7,8 +7,8 @@ import {
 } from "../redux/Features/user/ProfileSlice";
 import {
   selectAccessToken,
-  logout,
   selectRole,
+  logoutAndNavigate,
 } from "../redux/Features/user/authSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserCircle } from "@fortawesome/free-solid-svg-icons";
@@ -17,6 +17,7 @@ import NotificationIcon from "./Notifications/NotificationIcon";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const accessToken = useSelector(selectAccessToken);
   const userProfile = useSelector(selectUserProfile);
   const userRole = useSelector(selectRole);
@@ -28,8 +29,9 @@ const Navbar = () => {
   }, [accessToken, dispatch]);
 
   const handleLogout = () => {
-    dispatch(logout());
+    dispatch(logoutAndNavigate());
     setIsOpen(false);
+    navigate('/');
   };
 
   const getDashboardLink = () => {

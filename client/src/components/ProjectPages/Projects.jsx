@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setRecentProjects,
@@ -29,6 +30,8 @@ const Projects = () => {
     jobId: null,
     status: null,
   });
+  const [projectSearch, setProjectSearch] = useState("");
+  const [jobSearch, setJobSearch] = useState("");
 
   const isEmployer = userRole === "enterprise" || userRole === "hybrid";
   const isFreelancer = userRole === "freelancer" || userRole === "hybrid";
@@ -126,6 +129,18 @@ const Projects = () => {
     setConfirmAction({ jobId: null, status: null });
   };
 
+  // Filter projects based on search
+  const filteredProjects = projects.filter(project =>
+    project.title.toLowerCase().includes(projectSearch.toLowerCase()) ||
+    project.description.toLowerCase().includes(projectSearch.toLowerCase())
+  );
+
+  // Filter jobs based on search
+  const filteredJobs = myJobPosts.filter(job =>
+    job.title.toLowerCase().includes(jobSearch.toLowerCase()) ||
+    job.description.toLowerCase().includes(jobSearch.toLowerCase())
+  );
+
   if (loading) {
     return (
       <div className="flex flex-grow p-5 top-16 ml-10 transition-all duration-300">
@@ -147,11 +162,22 @@ const Projects = () => {
           {/* Projects Section - Only show for freelancers and hybrid users */}
           {isFreelancer && (
             <div className="mb-8">
-              <h2 className="text-xl font-semibold text-white mb-4">
-                Recent Projects
-              </h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold text-white">
+                  Recent Projects <span className="text-sm text-gray-400">({filteredProjects.length})</span>
+                </h2>
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search projects..."
+                    value={projectSearch}
+                    onChange={(e) => setProjectSearch(e.target.value)}
+                    className="bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
               <div className="bg-gray-800 rounded-lg overflow-hidden">
-                {projects.map((project) => (
+                {filteredProjects.map((project) => (
                   <div key={project._id}>
                     <div
                       className="cursor-pointer hover:bg-gray-700 transition-colors"
@@ -191,11 +217,22 @@ const Projects = () => {
           {/* Job Posts Section - Only show for enterprise and hybrid users */}
           {isEmployer && (
             <div className={`${isFreelancer ? "mt-8" : ""}`}>
-              <h2 className="text-xl font-semibold text-white mb-4">
-                My Job Posts
-              </h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold text-white">
+                  My Job Posts <span className="text-sm text-gray-400">({filteredJobs.length})</span>
+                </h2>
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search jobs..."
+                    value={jobSearch}
+                    onChange={(e) => setJobSearch(e.target.value)}
+                    className="bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
               <div className="bg-gray-800 rounded-lg overflow-hidden">
-                {myJobPosts.map((job) => (
+                {filteredJobs.map((job) => (
                   <div key={job._id}>
                     <div
                       className="cursor-pointer hover:bg-gray-700 transition-colors"
@@ -267,9 +304,12 @@ const Projects = () => {
                                 >
                                   <div className="flex justify-between items-center">
                                     <div>
-                                      <span className="text-white">
+                                      <Link
+                                        to={`/user/${bid.freelancer.username}`}
+                                        className="text-white"
+                                      >
                                         {bid.freelancer.username}
-                                      </span>
+                                      </Link>
                                       <span className="text-gray-400 ml-4">
                                         Amount: ${bid.amount}
                                       </span>

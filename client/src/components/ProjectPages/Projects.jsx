@@ -25,7 +25,10 @@ const Projects = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [confirmAction, setConfirmAction] = useState({ jobId: null, status: null });
+  const [confirmAction, setConfirmAction] = useState({
+    jobId: null,
+    status: null,
+  });
 
   const isEmployer = userRole === "enterprise" || userRole === "hybrid";
   const isFreelancer = userRole === "freelancer" || userRole === "hybrid";
@@ -42,7 +45,9 @@ const Projects = () => {
 
         // Fetch job posts for employers and hybrid users
         if (isEmployer && userProfile?._id) {
-          const jobsResponse = await axiosInstance.get(`/jobs/user/${userProfile._id}`);
+          const jobsResponse = await axiosInstance.get(
+            `/jobs/user/${userProfile._id}`
+          );
           dispatch(setMyJobPosts(jobsResponse.data.data));
         }
 
@@ -89,13 +94,16 @@ const Projects = () => {
     try {
       await axiosInstance.put(`/jobs/${jobId}`, { status: newStatus });
       // Update the job status in the local state
-      const updatedJobs = myJobPosts.map(job => 
+      const updatedJobs = myJobPosts.map((job) =>
         job._id === jobId ? { ...job, status: newStatus } : job
       );
       dispatch(setMyJobPosts(updatedJobs));
       setError(null);
     } catch (err) {
-      setError(err.response?.data?.message || `Failed to update job status to ${newStatus}`);
+      setError(
+        err.response?.data?.message ||
+          `Failed to update job status to ${newStatus}`
+      );
     }
   };
 
@@ -151,7 +159,9 @@ const Projects = () => {
                     >
                       <div className="p-4 border-b border-gray-700">
                         <div className="flex justify-between items-center">
-                          <h3 className="text-lg text-white">{project.title}</h3>
+                          <h3 className="text-lg text-white">
+                            {project.title}
+                          </h3>
                           <span
                             className={`px-2 py-1 rounded text-sm ${
                               project.status === "in-progress"
@@ -211,22 +221,32 @@ const Projects = () => {
                           <span className="text-gray-400">
                             Budget: ${job.budget?.min} - ${job.budget?.max}
                           </span>
-                          {job.status === "open" && (
-                            <div className="space-x-2">
+                          <div className="space-x-2">
+                            {job.status === "open" && (
                               <button
-                                onClick={(e) => handleStatusUpdateClick(e, job._id, "completed")}
-                                className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded"
-                              >
-                                Mark Completed
-                              </button>
-                              <button
-                                onClick={(e) => handleStatusUpdateClick(e, job._id, "closed")}
+                                onClick={(e) =>
+                                  handleStatusUpdateClick(e, job._id, "closed")
+                                }
                                 className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded"
                               >
                                 Close Job
                               </button>
-                            </div>
-                          )}
+                            )}
+                            {job.status === "in-progress" && (
+                              <button
+                                onClick={(e) =>
+                                  handleStatusUpdateClick(
+                                    e,
+                                    job._id,
+                                    "completed"
+                                  )
+                                }
+                                className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded"
+                              >
+                                Mark Completed
+                              </button>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -294,7 +314,8 @@ const Projects = () => {
               Confirm Action
             </h3>
             <p className="text-gray-300 mb-6">
-              Are you sure you want to mark this job as {confirmAction.status}? This action cannot be undone.
+              Are you sure you want to mark this job as {confirmAction.status}?
+              This action cannot be undone.
             </p>
             <div className="flex justify-end space-x-3">
               <button

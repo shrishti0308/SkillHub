@@ -171,6 +171,7 @@ exports.deleteAdmin = async (req, res) => {
 exports.updatePermissions = async (req, res) => {
     try {
         const { permissions } = req.body;
+        console.log(permissions)
         const admin = await Admin.findByIdAndUpdate(
             req.params.id,
             { $set: { permissions } },

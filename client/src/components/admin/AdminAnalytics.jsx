@@ -38,7 +38,9 @@ const AdminAnalytics = () => {
     const [jobStats, setJobStats] = useState({
         totalJobs: 0,
         activeJobs: 0,
-        completedJobs: 0
+        completedJobs: 0,
+        monthlyJobGrowth: [],
+        jobStatusDistribution: []
     });
 
     useEffect(() => {
@@ -81,11 +83,37 @@ const AdminAnalytics = () => {
     }, [users]);
 
     useEffect(() => {
-        if (jobs) {
+        if (jobs && jobs.length > 0) {
+            // Calculate job status distribution
+            const statusStats = jobs.reduce((acc, job) => {
+                const status = job.status.charAt(0).toUpperCase() + job.status.slice(1);
+                acc[status] = (acc[status] || 0) + 1;
+                return acc;
+            }, {});
+
+            // Calculate monthly job growth
+            const monthlyJobData = Array.from({ length: 6 }, (_, i) => {
+                const date = new Date();
+                date.setMonth(date.getMonth() - i);
+                return {
+                    name: date.toLocaleString('default', { month: 'short' }),
+                    jobs: jobs.filter(job => {
+                        const jobDate = new Date(job.createdAt);
+                        return jobDate.getMonth() === date.getMonth() &&
+                               jobDate.getFullYear() === date.getFullYear();
+                    }).length
+                };
+            }).reverse();
+
             setJobStats({
                 totalJobs: jobs.length,
                 activeJobs: jobs.filter(job => job.status === 'active').length,
-                completedJobs: jobs.filter(job => job.status === 'completed').length
+                completedJobs: jobs.filter(job => job.status === 'completed').length,
+                monthlyJobGrowth: monthlyJobData,
+                jobStatusDistribution: Object.entries(statusStats).map(([name, value]) => ({
+                    name,
+                    value
+                }))
             });
         }
     }, [jobs]);
@@ -120,9 +148,9 @@ const AdminAnalytics = () => {
                 </Grid>
             </Grid>
 
-            <Grid container spacing={3}>
+            <Grid container spacing={3} mb={3}>
                 {/* User Growth Chart */}
-                <Grid item xs={12} md={8}>
+                <Grid item xs={12} md={6}>
                     <Paper sx={{ p: 2, backgroundColor: '#1a237e' }}>
                         <Typography variant="h6" gutterBottom color="white">
                             Monthly User Growth
@@ -140,8 +168,29 @@ const AdminAnalytics = () => {
                     </Paper>
                 </Grid>
 
+                {/* Job Growth Chart */}
+                <Grid item xs={12} md={6}>
+                    <Paper sx={{ p: 2, backgroundColor: '#1a237e' }}>
+                        <Typography variant="h6" gutterBottom color="white">
+                            Monthly Job Growth
+                        </Typography>
+                        <ResponsiveContainer width="100%" height={300}>
+                            <LineChart data={jobStats.monthlyJobGrowth}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="name" stroke="white" />
+                                <YAxis stroke="white" />
+                                <Tooltip />
+                                <Legend />
+                                <Line type="monotone" dataKey="jobs" stroke="#FF8042" name="New Jobs" />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </Paper>
+                </Grid>
+            </Grid>
+
+            <Grid container spacing={3}>
                 {/* User Role Distribution */}
-                <Grid item xs={12} md={4}>
+                <Grid item xs={12} md={6}>
                     <Paper sx={{ p: 2, backgroundColor: '#1a237e' }}>
                         <Typography variant="h6" gutterBottom color="white">
                             User Role Distribution
@@ -158,6 +207,34 @@ const AdminAnalytics = () => {
                                     label
                                 >
                                     {userStats.roleDistribution.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip />
+                                <Legend />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </Paper>
+                </Grid>
+
+                {/* Job Status Distribution */}
+                <Grid item xs={12} md={6}>
+                    <Paper sx={{ p: 2, backgroundColor: '#1a237e' }}>
+                        <Typography variant="h6" gutterBottom color="white">
+                            Job Status Distribution
+                        </Typography>
+                        <ResponsiveContainer width="100%" height={300}>
+                            <PieChart>
+                                <Pie
+                                    data={jobStats.jobStatusDistribution}
+                                    cx="50%"
+                                    cy="50%"
+                                    outerRadius={80}
+                                    fill="#8884d8"
+                                    dataKey="value"
+                                    label
+                                >
+                                    {jobStats.jobStatusDistribution.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>

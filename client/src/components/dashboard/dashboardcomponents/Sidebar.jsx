@@ -38,10 +38,7 @@ function Sidebar() {
             }`}
           >
             <TiHomeOutline className="mr-2 mt-1.5 text-lg" />
-            <Link
-              to="/dashboard"
-              className="text-base font-normal p-0 m-1"
-            >
+            <Link to="/dashboard" className="text-base font-normal p-0 m-1">
               Dashboard
             </Link>
           </div>
@@ -98,20 +95,6 @@ function Sidebar() {
               >
                 <FaLaptopCode className="mr-3 text-xl" />
                 Projects
-              </Link>
-            </div>
-
-            <div className="w-full ml-8 flex flex-col justify-start my-3">
-              <Link
-                to="/account"
-                className={`flex my-3 ${
-                  activeSection === "/account"
-                    ? "bg-dark border-l-4 border-cyan-blue"
-                    : ""
-                } px-4 py-2 hover:bg-dark text-cyan-blue`}
-              >
-                <RiAccountCircleLine className="mr-3 text-xl" />
-                Account
               </Link>
             </div>
           </div>

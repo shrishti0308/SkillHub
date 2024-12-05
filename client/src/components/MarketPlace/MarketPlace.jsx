@@ -3,8 +3,11 @@ import { FaSearch, FaSort } from "react-icons/fa";
 import axiosInstance from "../../api/axiosInstance";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { selectRole } from "../../redux/Features/user/authSlice";
 
 const Marketplace = () => {
+  const userRole = useSelector(selectRole);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [budgetMin, setBudgetMin] = useState("");
@@ -243,12 +246,12 @@ const Marketplace = () => {
                     </div>
                   </div>
 
-                  {/* Bid Now Button */}
+                  {/* Bid Now/View Details Button */}
                   <Link
                     to={`/jobs/${job._id}`}
                     className="mt-6 inline-flex items-center justify-center w-full bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition duration-300 text-lg font-semibold"
                   >
-                    Bid Now
+                    {userRole === "enterprise" ? "View Details" : "Bid Now"}
                   </Link>
                 </div>
               </motion.div>

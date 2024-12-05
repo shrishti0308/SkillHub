@@ -259,6 +259,13 @@ const Projects = () => {
                             Budget: ${job.budget?.min} - ${job.budget?.max}
                           </span>
                           <div className="space-x-2">
+                            <Link
+                              to={`/jobs/${job._id}`}
+                              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              More Details
+                            </Link>
                             {job.status === "open" && (
                               <button
                                 onClick={(e) =>

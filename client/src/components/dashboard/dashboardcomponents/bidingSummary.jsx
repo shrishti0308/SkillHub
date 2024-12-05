@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "../../../api/axiosInstance";
-import { setBids,selectBidsForUser } from "../../../redux/reducers/dashboard/bidingSlice";
+import { setBids, selectBidsForUser } from "../../../redux/reducers/dashboard/bidingSlice";
 
 const BiddingSummary = () => {
   const dispatch = useDispatch();
@@ -13,12 +13,23 @@ const BiddingSummary = () => {
     const fetchBids = async () => {
       try {
         const response = await axiosInstance.get("/bids/recent/bid");
-        dispatch(setBids(response.data.recentBids));
-        setStatus("succeeded");
+        if (response.data.recentBids) {
+          dispatch(setBids(response.data.recentBids));
+          setStatus("succeeded");
+        } else {
+          dispatch(setBids([]));
+          setStatus("empty");
+        }
       } catch (error) {
-        console.error("Error fetching bids:", error);
-        setError(error.message || "Failed to fetch bids");
-        setStatus("failed");
+        if (error.response?.status === 404) {
+          // No bids found is a valid state
+          dispatch(setBids([]));
+          setStatus("empty");
+        } else {
+          console.error("Error fetching bids:", error);
+          setError(error.response?.data?.message || "Failed to fetch bids");
+          setStatus("failed");
+        }
       }
     };
 
@@ -27,48 +38,62 @@ const BiddingSummary = () => {
 
   if (status === "loading") {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <p className="text-xl font-semibold">Loading...</p>
+      <div className="w-full bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
+        <h2 className="text-xl font-bold text-white mb-4">Latest Bids</h2>
+        <div className="text-gray-400">Loading bids...</div>
       </div>
     );
   }
 
   if (status === "failed") {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <p className="text-red-500 text-xl">Error: {error}</p>
+      <div className="w-full bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
+        <h2 className="text-xl font-bold text-white mb-4">Latest Bids</h2>
+        <div className="text-red-500">Error: {error}</div>
+      </div>
+    );
+  }
+
+  if (status === "empty" || !bids || bids.length === 0) {
+    return (
+      <div className="w-full bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
+        <h2 className="text-xl font-bold text-white mb-4">Latest Bids</h2>
+        <div className="text-gray-400">No bids found. Start bidding on jobs to see them here!</div>
       </div>
     );
   }
 
   return (
-    <div className="bg-dark p-6">
-      <h2 className="text-xl font-bold text-light mb-8">Latest Bids</h2>
+    <div className="w-full bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
+      <h2 className="text-xl font-bold text-white mb-4">Latest Bids</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {bids.map((bid) => (
           <div
             key={bid._id}
-            className="bg-gray p-5 rounded-xl shadow-lg transform transition-all hover:scale-105 hover:shadow-2xl"
+            className="bg-gray-700/50 p-5 rounded-xl shadow-lg transform transition-all hover:scale-105 hover:shadow-2xl"
           >
-            <h3 className="text-xl font-semibold text-cyan-blue mb-3">
-              {bid.job?.title || "Job Title"}
-            </h3>
-            <p className="text-light mb-2">
-              Bid Amount:{" "}
-              <span className="font-medium text-light">${bid.amount}</span>
-            </p>
-            <p className="text-light mb-4">
-              Status:{" "}
+            <div className="flex justify-between items-start mb-2">
+              <h3 className="text-lg font-semibold text-white">
+                {bid.job?.title || "Job Title Unavailable"}
+              </h3>
               <span
-                className={`ml-2 inline-block px-3 py-2 border text-sm font-medium ${
+                className={`px-3 py-1 rounded-full text-sm ${
                   bid.status === "accepted"
-                    ? "text-emerald-100 border-emerald-600"
-                    : "border-yellow-100 text-yellow-600"
+                    ? "bg-green-900 text-green-200"
+                    : bid.status === "rejected"
+                    ? "bg-red-900 text-red-200"
+                    : "bg-yellow-900 text-yellow-200"
                 }`}
               >
                 {bid.status}
               </span>
-            </p>
+            </div>
+            <p className="text-gray-300 mb-3">Bid Amount: ${bid.amount}</p>
+            <div className="text-sm text-gray-400">
+              {bid.createdAt && (
+                <span>Placed: {new Date(bid.createdAt).toLocaleDateString()}</span>
+              )}
+            </div>
           </div>
         ))}
       </div>

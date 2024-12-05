@@ -25,21 +25,51 @@ const ProjectsSummary = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      setError(null);
+      const errors = [];
+
       try {
         // Fetch recent projects for freelancers and hybrid users
         if (isFreelancer) {
-          const projectsResponse = await axiosInstance.get("/project/recent-projects");
-          dispatch(setRecentProjects(projectsResponse.data.recentProjects));
+          try {
+            const projectsResponse = await axiosInstance.get("/project/recent-projects");
+            if (projectsResponse.data.recentProjects) {
+              dispatch(setRecentProjects(projectsResponse.data.recentProjects));
+            } else {
+              dispatch(setRecentProjects([]));
+            }
+          } catch (err) {
+            if (err.response?.status === 404) {
+              dispatch(setRecentProjects([]));
+            } else {
+              errors.push("Failed to fetch recent projects");
+            }
+          }
         }
 
         // Fetch job posts for employers and hybrid users
         if (isEmployer && userProfile?._id) {
-          const jobsResponse = await axiosInstance.get(`/jobs/user/${userProfile._id}`);
-          dispatch(setMyJobPosts(jobsResponse.data.data));
+          try {
+            const jobsResponse = await axiosInstance.get(`/jobs/user/${userProfile._id}`);
+            if (jobsResponse.data.data) {
+              dispatch(setMyJobPosts(jobsResponse.data.data));
+            } else {
+              dispatch(setMyJobPosts([]));
+            }
+          } catch (err) {
+            if (err.response?.status === 404) {
+              dispatch(setMyJobPosts([]));
+            } else {
+              errors.push("Failed to fetch job posts");
+            }
+          }
         }
-        setError(null);
+
+        if (errors.length > 0) {
+          setError(errors.join(", "));
+        }
       } catch (err) {
-        setError(err.response?.data?.message || "Failed to fetch data");
+        setError("Failed to fetch data");
       }
       setLoading(false);
     };
@@ -49,8 +79,8 @@ const ProjectsSummary = () => {
 
   if (loading) {
     return (
-      <div className="px-4 sm:px-6 lg:px-8 py-6">
-        <h2 className="text-xl font-semibold mb-6">Dashboard Summary</h2>
+      <div className="w-full bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
+        <h2 className="text-xl font-bold text-white mb-4">Dashboard Summary</h2>
         <div className="text-gray-400">Loading...</div>
       </div>
     );
@@ -58,15 +88,33 @@ const ProjectsSummary = () => {
 
   if (error) {
     return (
-      <div className="px-4 sm:px-6 lg:px-8 py-6">
-        <h2 className="text-xl font-semibold mb-6">Dashboard Summary</h2>
+      <div className="w-full bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
+        <h2 className="text-xl font-bold text-white mb-4">Dashboard Summary</h2>
         <div className="text-red-500">Error: {error}</div>
       </div>
     );
   }
 
+  const hasNoData = (!isFreelancer || !projects || projects.length === 0) && 
+                    (!isEmployer || !myJobPosts || myJobPosts.length === 0);
+
+  if (hasNoData) {
+    return (
+      <div className="w-full bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
+        <h2 className="text-xl font-bold text-white mb-4">Dashboard Summary</h2>
+        <div className="text-gray-400">
+          {isFreelancer && isEmployer 
+            ? "No projects or job posts found. Start bidding on jobs or post new jobs to see them here!"
+            : isFreelancer 
+            ? "No projects found. Start bidding on jobs to see them here!"
+            : "No job posts found. Start posting jobs to see them here!"}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-6 w-full">
+    <div className="space-y-6">
       {/* Recent Projects Section - For Freelancers and Hybrid */}
       {isFreelancer && projects && projects.length > 0 && (
         <div className="w-full bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
@@ -100,13 +148,15 @@ const ProjectsSummary = () => {
         <div className="w-full bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
           <h3 className="text-xl font-bold text-white mb-4">My Job Posts</h3>
           <div className="space-y-4">
-            {myJobPosts.slice(0, userRole === "hybrid" ? 3 : 5).map((job) => (
+            {myJobPosts.slice(0, 3).map((job) => (
               <div key={job._id} className="p-4 bg-gray-700/50 rounded-lg hover:bg-gray-700 transition-colors">
                 <div className="flex justify-between items-start mb-2">
                   <h4 className="text-lg font-semibold text-white">{job.title}</h4>
                   <span className={`px-3 py-1 rounded-full text-sm ${
-                    job.status === "open"
+                    job.status === "completed"
                       ? "bg-green-900 text-green-200"
+                      : job.status === "in-progress"
+                      ? "bg-blue-900 text-blue-200"
                       : "bg-yellow-900 text-yellow-200"
                   }`}>
                     {job.status}
@@ -120,12 +170,6 @@ const ProjectsSummary = () => {
               </div>
             ))}
           </div>
-        </div>
-      )}
-
-      {(!isFreelancer && !isEmployer) && (
-        <div className="text-center py-4 text-gray-400">
-          No data to display
         </div>
       )}
     </div>

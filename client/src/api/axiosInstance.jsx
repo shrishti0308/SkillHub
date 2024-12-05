@@ -26,6 +26,7 @@ axiosInstance.interceptors.request.use(
         return config;
     },
     (error) => {
+        console.error('Request interceptor error:', error);
         return Promise.reject(error);
     }
 );
@@ -34,18 +35,18 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
-            // Handle unauthorized access
-            if (error.config.url?.startsWith('/admin')) {
-                // Redirect to admin login
-                window.location.href = '/admin/login';
-            } else {
-                // Clear user tokens and redirect to login
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('role');
-                localStorage.removeItem('username');
-                window.location.href = '/login';
-            }
+        if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            console.error('Response error data:', error.response.data);
+            console.error('Response error status:', error.response.status);
+            console.error('Response error headers:', error.response.headers);
+        } else if (error.request) {
+            // The request was made but no response was received
+            console.error('No response received:', error.request);
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            console.error('Error setting up request:', error.message);
         }
         return Promise.reject(error);
     }

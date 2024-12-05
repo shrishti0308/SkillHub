@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setRecentProjects,
@@ -267,9 +268,12 @@ const Projects = () => {
                                 >
                                   <div className="flex justify-between items-center">
                                     <div>
-                                      <span className="text-white">
+                                      <Link
+                                        to={`/user/${bid.freelancer.username}`}
+                                        className="text-white"
+                                      >
                                         {bid.freelancer.username}
-                                      </span>
+                                      </Link>
                                       <span className="text-gray-400 ml-4">
                                         Amount: ${bid.amount}
                                       </span>

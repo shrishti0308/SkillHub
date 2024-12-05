@@ -39,7 +39,7 @@ const AdminReports = () => {
 
   return (
     <Box p={3}>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" gutterBottom color="white">
         Analytics & Reports
       </Typography>
 

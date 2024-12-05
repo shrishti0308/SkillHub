@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faEyeSlash, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch } from "react-redux";
 import { signup } from "../../redux/Features/user/authSlice"; // Adjust path if necessary
 import { useNavigate } from "react-router-dom"; // Import useNavigate
@@ -17,12 +17,29 @@ const SignupPage = () => {
   const [role, setRole] = useState("");
   const [formErrors, setFormErrors] = useState({});
   const [errorMessage, setErrorMessage] = useState("");
+  const [showToast, setShowToast] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [userInfo, setUserInfo] = useState({
     name: "",
     username: "",
     email: "",
   });
+
+  useEffect(() => {
+    if (errorMessage) {
+      setShowToast(true);
+      const timer = setTimeout(() => {
+        setShowToast(false);
+        setErrorMessage("");
+      }, 5000); // Auto dismiss after 5 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [errorMessage]);
+
+  const dismissToast = () => {
+    setShowToast(false);
+    setTimeout(() => setErrorMessage(""), 300); // Clear message after fade animation
+  };
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
   const toggleConfirmPasswordVisibility = () =>
@@ -31,6 +48,45 @@ const SignupPage = () => {
   const handleUserInfoChange = (e) => {
     const { name, value } = e.target;
     setUserInfo((prev) => ({ ...prev, [name]: value }));
+    
+    // Clear error for this field when user starts typing
+    if (formErrors[name]) {
+      setFormErrors(prev => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const handlePasswordChange = (e) => {
+    const value = e.target.value;
+    setPassword(value);
+    
+    // Clear password error when user starts typing
+    if (formErrors.password) {
+      setFormErrors(prev => ({ ...prev, password: "" }));
+    }
+    
+    // Validate confirm password if it exists
+    if (confirmPassword) {
+      if (value === confirmPassword) {
+        setFormErrors(prev => ({ ...prev, confirmPassword: "" }));
+      } else {
+        setFormErrors(prev => ({ ...prev, confirmPassword: "Passwords do not match" }));
+      }
+    }
+  };
+
+  const handleConfirmPasswordChange = (e) => {
+    const value = e.target.value;
+    setConfirmPassword(value);
+    
+    // Clear confirm password error when user starts typing
+    if (formErrors.confirmPassword) {
+      setFormErrors(prev => ({ ...prev, confirmPassword: "" }));
+    }
+    
+    // Validate against password
+    if (value && value !== password) {
+      setFormErrors(prev => ({ ...prev, confirmPassword: "Passwords do not match" }));
+    }
   };
 
   const validatePassword = (password) => {
@@ -48,8 +104,7 @@ const SignupPage = () => {
     return emailRegex.test(email);
   };
 
-  const handleSignup = async (e) => {
-    e.preventDefault();
+  const validateForm = () => {
     const errors = {};
 
     // Basic field validation
@@ -81,13 +136,67 @@ const SignupPage = () => {
       errors.confirmPassword = "Passwords do not match";
     }
 
-    if (Object.keys(errors).length > 0) {
-      setFormErrors(errors);
-      return;
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSignup = (e) => {
+    e.preventDefault();
+    
+    if (validateForm()) {
+      setShowRoleSelection(true);
+    } else {
+      // Show error toast if there are validation errors
+      const firstError = Object.values(formErrors)[0];
+      setErrorMessage(firstError || "Please fill in all required fields correctly");
+    }
+  };
+
+  // Add validation on input blur
+  const handleInputBlur = (field) => {
+    const errors = {};
+    
+    switch (field) {
+      case 'name':
+        if (!userInfo.name.trim()) errors.name = "Name is required";
+        break;
+      case 'username':
+        if (!userInfo.username.trim()) errors.username = "Username is required";
+        break;
+      case 'email':
+        if (!userInfo.email.trim()) {
+          errors.email = "Email is required";
+        } else if (!validateEmail(userInfo.email)) {
+          errors.email = "Invalid email format";
+        }
+        break;
+      case 'password':
+        if (!password) {
+          errors.password = "Password is required";
+        } else {
+          const passwordRequirements = validatePassword(password);
+          if (!passwordRequirements.length)
+            errors.password = "Password must be at least 8 characters";
+          if (!passwordRequirements.number)
+            errors.password = "Password must contain at least one number";
+          if (!passwordRequirements.special)
+            errors.password = "Password must contain at least one special character";
+          if (!passwordRequirements.alphabet)
+            errors.password = "Password must contain at least one letter";
+        }
+        break;
+      case 'confirmPassword':
+        if (!confirmPassword) {
+          errors.confirmPassword = "Please confirm your password";
+        } else if (password !== confirmPassword) {
+          errors.confirmPassword = "Passwords do not match";
+        }
+        break;
+      default:
+        break;
     }
 
-    setFormErrors({});
-    setShowRoleSelection(true);
+    setFormErrors(prev => ({ ...prev, ...errors }));
   };
 
   const handleRoleSelectionSubmit = async () => {
@@ -97,25 +206,72 @@ const SignupPage = () => {
     }
 
     setIsLoading(true);
+    setErrorMessage("");
     try {
       await dispatch(signup(userInfo, password, role));
       console.log("User registered successfully");
       navigate("/");
     } catch (error) {
       setErrorMessage(
-        error.message || "Registration failed. Please try again."
+        error.response?.data?.message ||
+          "Registration failed. Please try again."
       );
+      setShowRoleSelection(false);
+      return; // Don't proceed if there's an error
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleBack = () => {
+    setShowRoleSelection(false);
+    setErrorMessage("");
+    setRole("");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-r flex justify-center items-center">
+      <div
+        aria-live="polite"
+        className={`fixed top-4 right-4 transition-all duration-300 ease-in-out ${
+          showToast ? "opacity-100 translate-x-0" : "opacity-0 translate-x-full"
+        }`}
+      >
+        {errorMessage && (
+          <div
+            className="max-w-md bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-lg flex items-center justify-between gap-3"
+            role="alert"
+          >
+            <div className="flex items-center">
+              <svg
+                className="h-5 w-5 text-red-500 mr-2"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span className="text-sm font-medium">{errorMessage}</span>
+            </div>
+            <button
+              onClick={dismissToast}
+              className="text-red-500 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 rounded-full p-1 transition-colors duration-200"
+              aria-label="Dismiss error message"
+            >
+              <FontAwesomeIcon
+                icon={faTimes}
+                className="h-4 w-4"
+              />
+            </button>
+          </div>
+        )}
+      </div>
       <div className="bg-gray-800 p-10 rounded-lg shadow-lg text-center min-w-[325px] sm:min-w-[60%] lg:min-w-[35%] max-w-[90%] my-10">
         <img src="/logo.png" className="mx-auto w-20" alt="" />
-        {errorMessage && <p className="text-red-500">{errorMessage}</p>}
-
         {!showRoleSelection ? (
           <>
             <h2 className="text-3xl mb-2 text-white font-semibold">
@@ -134,6 +290,7 @@ const SignupPage = () => {
                     name={field}
                     value={userInfo[field]}
                     onChange={handleUserInfoChange}
+                    onBlur={() => handleInputBlur(field)}
                     placeholder={field
                       .replace("-", " ")
                       .replace(/\b\w/g, (char) => char.toUpperCase())}
@@ -150,22 +307,28 @@ const SignupPage = () => {
               ))}
 
               <div className="relative mb-5">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  id="password"
-                  name="password"
-                  placeholder="Password"
-                  className={`w-full p-3 border ${
-                    formErrors.password ? "border-red-600" : "border-gray-600"
-                  } bg-gray-700 text-white rounded-lg text-lg placeholder-gray-400 transition focus:outline-none focus:ring focus:ring-blue-500`}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <span
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-lg text-gray-400"
-                  onClick={togglePasswordVisibility}
-                >
-                  <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-                </span>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    name="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={handlePasswordChange}
+                    onBlur={() => handleInputBlur('password')}
+                    className={`w-full p-3 border ${
+                      formErrors.password ? "border-red-600" : "border-gray-600"
+                    } bg-gray-700 text-white rounded-lg text-lg placeholder-gray-400 transition focus:outline-none focus:ring focus:ring-blue-500`}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-lg text-gray-400 hover:text-gray-300 focus:outline-none"
+                    onClick={togglePasswordVisibility}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                  </button>
+                </div>
                 {formErrors.password && (
                   <p className="text-red-500 text-sm mt-1">
                     {formErrors.password}
@@ -174,27 +337,32 @@ const SignupPage = () => {
               </div>
 
               <div className="relative mb-5">
-                <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  id="confirm-password"
-                  name="confirm_password"
-                  placeholder="Confirm Password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className={`w-full p-3 border ${
-                    formErrors.confirmPassword
-                      ? "border-red-600"
-                      : "border-gray-600"
-                  } bg-gray-700 text-white rounded-lg text-lg placeholder-gray-400 transition focus:outline-none focus:ring focus:ring-blue-500`}
-                />
-                <span
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-lg text-gray-400"
-                  onClick={toggleConfirmPasswordVisibility}
-                >
-                  <FontAwesomeIcon
-                    icon={showConfirmPassword ? faEyeSlash : faEye}
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    id="confirm-password"
+                    name="confirm_password"
+                    placeholder="Confirm Password"
+                    value={confirmPassword}
+                    onChange={handleConfirmPasswordChange}
+                    onBlur={() => handleInputBlur('confirmPassword')}
+                    className={`w-full p-3 border ${
+                      formErrors.confirmPassword
+                        ? "border-red-600"
+                        : "border-gray-600"
+                    } bg-gray-700 text-white rounded-lg text-lg placeholder-gray-400 transition focus:outline-none focus:ring focus:ring-blue-500`}
                   />
-                </span>
+                  <button
+                    type="button"
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-lg text-gray-400 hover:text-gray-300 focus:outline-none"
+                    onClick={toggleConfirmPasswordVisibility}
+                    aria-label={showConfirmPassword ? "Hide password confirmation" : "Show password confirmation"}
+                  >
+                    <FontAwesomeIcon
+                      icon={showConfirmPassword ? faEyeSlash : faEye}
+                    />
+                  </button>
+                </div>
                 {formErrors.confirmPassword && (
                   <p className="text-red-500 text-sm mt-1">
                     {formErrors.confirmPassword}
@@ -237,7 +405,11 @@ const SignupPage = () => {
                 (roleOption, index) => (
                   <label
                     key={index}
-                    className="relative flex cursor-pointer items-center p-5 rounded-lg shadow-md transition hover:shadow-lg"
+                    className={`relative flex cursor-pointer items-center p-5 rounded-lg shadow-md transition hover:shadow-lg ${
+                      role === roleOption.toLowerCase()
+                        ? "ring-2 ring-blue-400"
+                        : ""
+                    }`}
                     htmlFor={roleOption.toLowerCase()}
                   >
                     <div className="relative">
@@ -284,23 +456,34 @@ const SignupPage = () => {
               )}
             </div>
 
-            <button
-              type="button"
-              disabled={isLoading}
-              style={{
-                backgroundColor: "rgb(37, 99, 235)",
-                color: "white",
-                border: "2px solid rgb(37, 99, 235)",
-              }}
-              className={`w-full py-3 rounded-md font-semibold transition duration-200 text-xl mt-5 ${
-                isLoading
-                  ? "opacity-70 cursor-not-allowed"
-                  : "hover:bg-blue-700"
-              }`}
-              onClick={handleRoleSelectionSubmit}
-            >
-              {isLoading ? "Setting up your account..." : "Start your Journey"}
-            </button>
+            <div className="flex gap-4 mt-5">
+              <button
+                type="button"
+                onClick={handleBack}
+                className="w-1/3 py-3 rounded-md font-semibold transition duration-200 text-xl bg-gray-600 text-white hover:bg-gray-700"
+              >
+                Back
+              </button>
+              <button
+                type="button"
+                disabled={isLoading}
+                style={{
+                  backgroundColor: "rgb(37, 99, 235)",
+                  color: "white",
+                  border: "2px solid rgb(37, 99, 235)",
+                }}
+                className={`w-2/3 py-3 rounded-md font-semibold transition duration-200 text-xl ${
+                  isLoading
+                    ? "opacity-70 cursor-not-allowed"
+                    : "hover:bg-blue-700"
+                }`}
+                onClick={handleRoleSelectionSubmit}
+              >
+                {isLoading
+                  ? "Setting up your account..."
+                  : "Start your Journey"}
+              </button>
+            </div>
           </div>
         )}
       </div>

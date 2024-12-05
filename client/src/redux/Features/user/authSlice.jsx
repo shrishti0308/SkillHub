@@ -87,8 +87,13 @@ export const selectRole = (state) => state.auth?.role;
 export const selectUsername = (state) => state.auth?.username;
 
 // Export the actions created automatically by the slice
-export const { setAccessToken, setRole, setUsername, logout } =
-  authSlice.actions; // Export logout action
+export const { setAccessToken, setRole, setUsername, logout } = authSlice.actions;
+
+// Thunk action to handle logout and navigation
+export const logoutAndNavigate = () => (dispatch) => {
+  dispatch(logout());
+  // Note: Navigation should be handled in the component using useNavigate hook
+};
 
 // Export the reducer to add it to the store
 export default authSlice.reducer;

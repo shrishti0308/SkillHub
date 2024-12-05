@@ -4,8 +4,7 @@ import { TiHomeOutline } from "react-icons/ti";
 import { Link, useLocation } from "react-router-dom";
 import { MdOutlineWorkOutline } from "react-icons/md";
 import { BiDollarCircle } from "react-icons/bi";
-import { GrMoney } from "react-icons/gr";
-import { FaExchangeAlt, FaLaptopCode } from "react-icons/fa";
+import { FaLaptopCode } from "react-icons/fa";
 import { RiAccountCircleLine } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -85,22 +84,10 @@ function Sidebar() {
                     <BiDollarCircle className="mr-3 text-xl" />
                     Bidings
                   </Link>
-
-                  <Link
-                    to="/dashboard/earnings"
-                    className={`flex my-3 ${
-                      activeSection === "/dashboard/earnings"
-                        ? "bg-dark border-l-4 border-cyan-blue"
-                        : ""
-                    } px-4 py-2 hover:bg-dark text-cyan-blue`}
-                  >
-                    <GrMoney className="mr-3 text-xl" />
-                    Earnings
-                  </Link>
                 </>
               )}
 
-              {/* Always show Projects and Transactions */}
+              {/* Always show Projects */}
               <Link
                 to="/dashboard/projects"
                 className={`flex my-3 ${
@@ -111,18 +98,6 @@ function Sidebar() {
               >
                 <FaLaptopCode className="mr-3 text-xl" />
                 Projects
-              </Link>
-
-              <Link
-                to="/dashboard/transactions"
-                className={`flex my-3 ${
-                  activeSection === "/dashboard/transactions"
-                    ? "bg-dark border-l-4 border-cyan-blue"
-                    : ""
-                } px-4 py-2 hover:bg-dark text-cyan-blue`}
-              >
-                <FaExchangeAlt className="mr-3 text-xl" />
-                Transactions
               </Link>
             </div>
 

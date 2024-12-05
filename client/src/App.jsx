@@ -25,7 +25,6 @@ import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import AdminUsers from "./components/admin/AdminUsers";
 import AdminJobs from "./components/admin/AdminJobs";
-import AdminReports from "./components/admin/AdminReports";
 import TransactionPage from "./components/TransactionPage/TransactionPage";
 import { useSelector } from "react-redux";
 import Footer from "./components/Footer";
@@ -94,7 +93,6 @@ function App() {
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="jobs" element={<AdminJobs />} />
-            <Route path="reports" element={<AdminReports />} />
           </Route>
 
           <Route path="/features" element={<Features />} />

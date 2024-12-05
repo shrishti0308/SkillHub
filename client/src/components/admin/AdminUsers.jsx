@@ -32,6 +32,9 @@ const AdminUsers = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState('all');
+  const [filteredUsers, setFilteredUsers] = useState([]);
   const [editFormData, setEditFormData] = useState({
     name: '',
     username: '',
@@ -49,6 +52,28 @@ const AdminUsers = () => {
   useEffect(() => {
     dispatch(fetchUsers());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (users) {
+      let filtered = [...users];
+      
+      // Apply search filter
+      if (searchQuery) {
+        filtered = filtered.filter(user =>
+          user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          user.username?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
+
+      // Apply role filter
+      if (roleFilter !== 'all') {
+        filtered = filtered.filter(user => user.role === roleFilter);
+      }
+
+      setFilteredUsers(filtered);
+    }
+  }, [users, searchQuery, roleFilter]);
 
   const handleEditClick = (user) => {
     setSelectedUser(user);
@@ -103,6 +128,62 @@ const AdminUsers = () => {
       <Typography variant="h4" gutterBottom color="white">
         User Management
       </Typography>
+
+      {/* Search and Filter Section */}
+      <Box mb={3}>
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} sm={4}>
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Search users"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              sx={{ 
+                backgroundColor: 'white',
+                borderRadius: 1,
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: 'white',
+                  },
+                },
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              select
+              fullWidth
+              variant="outlined"
+              label="Filter by role"
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+              sx={{ 
+                backgroundColor: 'white',
+                borderRadius: 1,
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: 'white',
+                  },
+                },
+              }}
+            >
+              <MenuItem value="all">All Roles</MenuItem>
+              {USER_ROLES.map(role => (
+                <MenuItem key={role} value={role}>
+                  {role.charAt(0).toUpperCase() + role.slice(1)}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <Typography variant="body1" color="white">
+              Total Users: {filteredUsers.length}
+            </Typography>
+          </Grid>
+        </Grid>
+      </Box>
+
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -117,7 +198,7 @@ const AdminUsers = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {users.map((user) => (
+            {filteredUsers.map((user) => (
               <TableRow key={user._id}>
                 <TableCell>{user.name}</TableCell>
                 <TableCell>{user.username}</TableCell>

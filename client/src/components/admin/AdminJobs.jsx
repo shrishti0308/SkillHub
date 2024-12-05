@@ -40,10 +40,35 @@ const AdminJobs = () => {
     categories: '',
     skillsRequired: ''
   });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [filteredJobs, setFilteredJobs] = useState([]);
 
   useEffect(() => {
     dispatch(fetchJobs());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (jobs) {
+      let filtered = [...jobs];
+      
+      // Apply search filter
+      if (searchQuery) {
+        filtered = filtered.filter(job =>
+          job.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          job.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          job.skills?.join(' ').toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
+
+      // Apply status filter
+      if (statusFilter !== 'all') {
+        filtered = filtered.filter(job => job.status === statusFilter);
+      }
+
+      setFilteredJobs(filtered);
+    }
+  }, [jobs, searchQuery, statusFilter]);
 
   const handleEditClick = (job) => {
     setSelectedJob(job);
@@ -93,6 +118,61 @@ const AdminJobs = () => {
       <Typography variant="h4" gutterBottom color="white">
         Job Management
       </Typography>
+
+      {/* Search and Filter Section */}
+      <Box mb={3}>
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} sm={4}>
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Search jobs"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              sx={{ 
+                backgroundColor: 'white',
+                borderRadius: 1,
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: 'white',
+                  },
+                },
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              select
+              fullWidth
+              variant="outlined"
+              label="Filter by status"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              sx={{ 
+                backgroundColor: 'white',
+                borderRadius: 1,
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: 'white',
+                  },
+                },
+              }}
+            >
+              <MenuItem value="all">All Status</MenuItem>
+              <MenuItem value="open">Open</MenuItem>
+              <MenuItem value="in-progress">In Progress</MenuItem>
+              <MenuItem value="completed">Completed</MenuItem>
+              <MenuItem value="cancelled">Cancelled</MenuItem>
+            </TextField>
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <Typography variant="body1" color="white">
+              Total Jobs: {filteredJobs.length}
+            </Typography>
+          </Grid>
+        </Grid>
+      </Box>
+
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -107,7 +187,7 @@ const AdminJobs = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {jobs.map((job) => (
+            {filteredJobs.map((job) => (
               <TableRow key={job._id}>
                 <TableCell>{job.title}</TableCell>
                 <TableCell>{job.employer?.name}</TableCell>

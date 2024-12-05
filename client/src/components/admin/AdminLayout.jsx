@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { useTheme } from '@mui/material/styles';
 import {
     AppBar,
     Box,
@@ -28,9 +29,10 @@ import { logout } from '../../redux/slices/adminSlice';
 const drawerWidth = 240;
 
 const AdminLayout = () => {
+    const theme = useTheme();
     const [mobileOpen, setMobileOpen] = React.useState(false);
-    const dispatch = useDispatch();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -49,7 +51,10 @@ const AdminLayout = () => {
 
     const drawer = (
         <div>
-            <Toolbar>
+            <Toolbar sx={{ 
+                backgroundColor: theme.palette.primary.main,
+                color: 'white'
+            }}>
                 <Typography variant="h6" noWrap component="div">
                     Admin Panel
                 </Typography>
@@ -57,34 +62,52 @@ const AdminLayout = () => {
             <Divider />
             <List>
                 {menuItems.map((item) => (
-                    <ListItem
-                        button
-                        key={item.text}
+                    <ListItem 
+                        button 
+                        key={item.text} 
                         onClick={() => navigate(item.path)}
+                        sx={{
+                            '&:hover': {
+                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                            }
+                        }}
                     >
-                        <ListItemIcon>{item.icon}</ListItemIcon>
-                        <ListItemText primary={item.text} />
+                        <ListItemIcon sx={{ color: 'white' }}>
+                            {item.icon}
+                        </ListItemIcon>
+                        <ListItemText primary={item.text} sx={{ color: 'white' }} />
                     </ListItem>
                 ))}
             </List>
-            <Divider />
+            <Divider sx={{ backgroundColor: 'rgba(255, 255, 255, 0.12)' }} />
             <List>
-                <ListItem button onClick={handleLogout}>
-                    <ListItemIcon><LogoutIcon /></ListItemIcon>
-                    <ListItemText primary="Logout" />
+                <ListItem 
+                    button 
+                    onClick={handleLogout}
+                    sx={{
+                        '&:hover': {
+                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        }
+                    }}
+                >
+                    <ListItemIcon sx={{ color: 'white' }}>
+                        <LogoutIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Logout" sx={{ color: 'white' }} />
                 </ListItem>
             </List>
         </div>
     );
 
     return (
-        <Box sx={{ display: 'flex' }}>
+        <Box sx={{ display: 'flex', minHeight: '100vh' }}>
             <CssBaseline />
             <AppBar
                 position="fixed"
                 sx={{
-                    width: { sm: `calc(100% - ${drawerWidth}px)` },
-                    ml: { sm: `${drawerWidth}px` },
+                    backgroundColor: theme.palette.primary.main,
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
                 }}
             >
                 <Toolbar>
@@ -127,7 +150,13 @@ const AdminLayout = () => {
                     variant="permanent"
                     sx={{
                         display: { xs: 'none', sm: 'block' },
-                        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+                        '& .MuiDrawer-paper': {
+                            width: 240,
+                            boxSizing: 'border-box',
+                            backgroundColor: '#1a237e',
+                            borderRight: '1px solid rgba(255, 255, 255, 0.12)',
+                            boxShadow: '4px 0 6px rgba(0, 0, 0, 0.1)'
+                        },
                     }}
                     open
                 >
@@ -139,7 +168,9 @@ const AdminLayout = () => {
                 sx={{
                     flexGrow: 1,
                     p: 3,
-                    width: { sm: `calc(100% - ${drawerWidth}px)` },
+                    backgroundColor: '#121212',
+                    backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))',
+                    minHeight: '100vh',
                     marginTop: '64px'
                 }}
             >

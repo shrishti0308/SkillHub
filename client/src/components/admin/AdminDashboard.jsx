@@ -19,7 +19,6 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  MenuItem,
   Alert,
   FormGroup,
   FormControlLabel,
@@ -40,23 +39,6 @@ import {
   clearError,
   getCurrentAdmin,
 } from "../../redux/slices/adminSlice";
-import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  Cell,
-} from 'recharts';
-
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
@@ -92,16 +74,10 @@ const AdminDashboard = () => {
     "manageSettings",
   ];
 
-  const [userStats, setUserStats] = useState({});
-  const [jobStats, setJobStats] = useState({});
-  const [monthlyStats, setMonthlyStats] = useState([]);
-
   useEffect(() => {
-    // Fetch current admin data if not present
     if (!currentAdmin) {
       dispatch(getCurrentAdmin());
     }
-    console.log("currentAdmin", currentAdmin);
     dispatch(fetchAllAdmins());
   }, [dispatch, currentAdmin]);
 
@@ -113,51 +89,6 @@ const AdminDashboard = () => {
       dispatch(clearSuccess());
     }
   }, [success, dispatch]);
-
-  useEffect(() => {
-    if (admins) {
-      const roleStats = admins.reduce((acc, admin) => {
-        acc[admin.role] = (acc[admin.role] || 0) + 1;
-        return acc;
-      }, {});
-      setUserStats(roleStats);
-    }
-  }, [admins]);
-
-  useEffect(() => {
-    if (admins) {
-      const statusStats = admins.reduce((acc, admin) => {
-        acc[admin.status] = (acc[admin.status] || 0) + 1;
-        return acc;
-      }, {});
-
-      const monthlyData = Array.from({ length: 6 }, (_, i) => {
-        const date = new Date();
-        date.setMonth(date.getMonth() - i);
-        return {
-          name: date.toLocaleString('default', { month: 'short' }),
-          admins: admins.filter(admin => {
-            const adminDate = new Date(admin.createdAt);
-            return adminDate.getMonth() === date.getMonth() &&
-                   adminDate.getFullYear() === date.getFullYear();
-          }).length,
-        };
-      }).reverse();
-
-      setJobStats(statusStats);
-      setMonthlyStats(monthlyData);
-    }
-  }, [admins]);
-
-  const userRoleData = Object.entries(userStats).map(([name, value]) => ({
-    name: name.charAt(0).toUpperCase() + name.slice(1),
-    value
-  }));
-
-  const jobStatusData = Object.entries(jobStats).map(([name, value]) => ({
-    name: name.charAt(0).toUpperCase() + name.slice(1),
-    value
-  }));
 
   const handleOpenDialog = (admin = null) => {
     if (admin) {
@@ -204,7 +135,6 @@ const AdminDashboard = () => {
       ...prev,
       [name]: value,
     }));
-    // Clear error when user starts typing
     if (formErrors[name]) {
       setFormErrors((prev) => ({
         ...prev,
@@ -221,23 +151,17 @@ const AdminDashboard = () => {
       setFormErrors(errors);
       return;
     }
-    formData.role = "admin";
-
-    const submitData = { ...formData };
-    if (selectedAdmin && !submitData.password) {
-      delete submitData.password; // Don't send empty password on update
-    }
 
     try {
       if (selectedAdmin) {
         await dispatch(
           updateAdmin({
             id: selectedAdmin._id,
-            data: submitData,
+            data: formData,
           })
         ).unwrap();
       } else {
-        await dispatch(createAdmin(submitData)).unwrap();
+        await dispatch(createAdmin(formData)).unwrap();
       }
       handleCloseDialog();
     } catch (error) {
@@ -246,7 +170,6 @@ const AdminDashboard = () => {
   };
 
   const handleDeleteClick = (admin) => {
-    // Prevent self-deletion
     if (currentAdmin?.id === admin._id) {
       dispatch({
         type: "admin/setError",
@@ -255,7 +178,6 @@ const AdminDashboard = () => {
       return;
     }
 
-    // Prevent deletion of last superuser
     if (admin.role === "superuser") {
       const superuserCount = admins.filter(
         (a) => a.role === "superuser"
@@ -338,7 +260,7 @@ const AdminDashboard = () => {
             Manage Admins
           </Typography>
           {(currentAdmin?.role === "superuser" ||
-            currentAdmin?.permissions.includes("manageAdmins")) && (
+            currentAdmin?.permissions?.includes("manageAdmins")) && (
             <Button
               variant="contained"
               color="primary"
@@ -349,134 +271,62 @@ const AdminDashboard = () => {
           )}
         </Box>
 
-        <Grid container spacing={2}>
-          {/* Monthly Growth Chart */}
-          <Grid item xs={12} md={8}>
-            <Paper sx={{ p: 2, backgroundColor: '#1a237e' }}>
-              <Typography variant="h6" gutterBottom color="white">
-                Monthly Growth
-              </Typography>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={monthlyStats}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" stroke="white" />
-                  <YAxis stroke="white" />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="admins" stroke="#8884d8" name="Admins" />
-                </LineChart>
-              </ResponsiveContainer>
-            </Paper>
-          </Grid>
-
-          {/* User Distribution Chart */}
-          <Grid item xs={12} md={4}>
-            <Paper sx={{ p: 2, backgroundColor: '#1a237e' }}>
-              <Typography variant="h6" gutterBottom color="white">
-                User Role Distribution
-              </Typography>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={userRoleData}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label
-                  >
-                    {userRoleData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </Paper>
-          </Grid>
-
-          {/* Job Status Chart */}
-          <Grid item xs={12}>
-            <Paper sx={{ p: 2, backgroundColor: '#1a237e' }}>
-              <Typography variant="h6" gutterBottom color="white">
-                Job Status Distribution
-              </Typography>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={jobStatusData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" stroke="white" />
-                  <YAxis stroke="white" />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="value" fill="#8884d8">
-                    {jobStatusData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </Paper>
-          </Grid>
-
-          <Grid item xs={12}>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Email</TableCell>
-                    <TableCell>Role</TableCell>
-                    <TableCell align="right">Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {admins.map((admin) => (
-                    <TableRow key={admin._id}>
-                      <TableCell>{admin.name}</TableCell>
-                      <TableCell>{admin.email}</TableCell>
-                      <TableCell>{admin.role}</TableCell>
-                      <TableCell align="right">
-                        {admin.role !== "superuser" && (
-                          <>
-                            <IconButton
-                              onClick={() => handleOpenPermissionsDialog(admin)}
-                              color="primary"
-                              disabled={currentAdmin?.id === admin._id}
-                            >
-                              <SecurityIcon />
-                            </IconButton>
-                            <IconButton
-                              onClick={() => handleDeleteClick(admin)}
-                              color="error"
-                              disabled={currentAdmin?.id === admin._id}
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          </>
-                        )}
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Role</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell align="right">Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {admins.map((admin) => (
+                <TableRow key={admin._id}>
+                  <TableCell>{admin.name}</TableCell>
+                  <TableCell>{admin.email}</TableCell>
+                  <TableCell>{admin.role}</TableCell>
+                  <TableCell>{admin.status}</TableCell>
+                  <TableCell align="right">
+                    {admin.role !== "superuser" && (
+                      <>
                         <IconButton
-                          onClick={() => handleOpenDialog(admin)}
+                          onClick={() => handleOpenPermissionsDialog(admin)}
                           color="primary"
-                          disabled={
-                            !currentAdmin?.permissions.includes("manageAdmins") ||
-                            (admin.role === "superuser" &&
-                              currentAdmin?.role !== "superuser")
-                          }
+                          disabled={currentAdmin?.id === admin._id}
                         >
-                          <EditIcon />
+                          <SecurityIcon />
                         </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Grid>
-        </Grid>
+                        <IconButton
+                          onClick={() => handleDeleteClick(admin)}
+                          color="error"
+                          disabled={currentAdmin?.id === admin._id}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </>
+                    )}
+                    <IconButton
+                      onClick={() => handleOpenDialog(admin)}
+                      color="primary"
+                      disabled={
+                        !currentAdmin?.permissions?.includes("manageAdmins") ||
+                        (admin.role === "superuser" &&
+                          currentAdmin?.role !== "superuser")
+                      }
+                    >
+                      <EditIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
 
-        {/* Add New Admin Dialog */}
+        {/* Add/Edit Admin Dialog */}
         <Dialog
           open={openDialog}
           onClose={handleCloseDialog}

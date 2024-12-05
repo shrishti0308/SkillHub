@@ -22,7 +22,8 @@ import {
     Dashboard as DashboardIcon,
     People as PeopleIcon,
     Work as WorkIcon,
-    ExitToApp as LogoutIcon
+    ExitToApp as LogoutIcon,
+    Analytics as AnalyticsIcon
 } from '@mui/icons-material';
 import { logout } from '../../redux/slices/adminSlice';
 
@@ -47,6 +48,7 @@ const AdminLayout = () => {
         { text: 'Dashboard', icon: <DashboardIcon />, path: '/admin/dashboard' },
         { text: 'Users', icon: <PeopleIcon />, path: '/admin/users' },
         { text: 'Jobs', icon: <WorkIcon />, path: '/admin/jobs' },
+        { text: 'Analytics', icon: <AnalyticsIcon />, path: '/admin/analytics' },
     ];
 
     const drawer = (

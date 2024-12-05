@@ -100,7 +100,7 @@ const AdminUsers = () => {
 
   return (
     <Box p={3}>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" gutterBottom color="white">
         User Management
       </Typography>
       <TableContainer component={Paper}>

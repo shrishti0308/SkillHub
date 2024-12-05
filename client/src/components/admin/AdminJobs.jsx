@@ -90,7 +90,7 @@ const AdminJobs = () => {
 
   return (
     <Box p={3}>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" gutterBottom color="white">
         Job Management
       </Typography>
       <TableContainer component={Paper}>

@@ -1,6 +1,12 @@
 // controllers/transactionController.js
 const Transaction = require("../models/transaction");
 const Notification = require("../models/notification");
+const {
+  apiSuccess,
+  apiError,
+  apiNotFound,
+  apiBadRequest,
+} = require("../middleware/response");
 
 // Controller to get recent transactions of the logged-in user
 exports.getRecentTransactions = async (req, res) => {
@@ -12,17 +18,14 @@ exports.getRecentTransactions = async (req, res) => {
       .limit(10); // Limit to recent 10 transactions (you can adjust this)
 
     if (!recentTransactions.length) {
-      return res
-        .status(404)
-        .json({ message: "No recent transactions found for this user" });
+      apiNotFound(res, "No recent transactions found for this user");
     }
 
-    res.status(200).json({ recentTransactions });
-  } catch (error) {
-    res.status(500).json({
-      message: "Error retrieving recent transactions",
-      error: error.message,
+    apiSuccess(res, "Recent transactions retrieved successfully", {
+      recentTransactions,
     });
+  } catch (error) {
+    apiError(res, "Error retrieving recent transactions", error);
   }
 };
 
@@ -35,17 +38,12 @@ exports.getAllTransactions = async (req, res) => {
       .sort({ createdAt: -1 }); // Sort by most recent
 
     if (!transactions.length) {
-      return res
-        .status(404)
-        .json({ message: "No transactions found for this user" });
+      apiNotFound(res, "No transactions found for this user");
     }
 
-    res.status(200).json({ transactions });
+    apiSuccess(res, "Transactions retrieved successfully", { transactions });
   } catch (error) {
-    res.status(500).json({
-      message: "Error retrieving transactions",
-      error: error.message,
-    });
+    apiError(res, "Error retrieving transactions", error);
   }
 };
 
@@ -58,15 +56,14 @@ exports.getTransactionDetails = async (req, res) => {
     );
 
     if (!transaction) {
-      return res.status(404).json({ message: "Transaction not found" });
+      apiNotFound(res, "Transaction not found");
     }
 
-    res.status(200).json({ transaction });
-  } catch (error) {
-    res.status(500).json({
-      message: "Error retrieving transaction details",
-      error: error.message,
+    apiSuccess(res, "Transaction details retrieved successfully", {
+      transaction,
     });
+  } catch (error) {
+    apiError(res, "Error retrieving transaction details", error);
   }
 };
 
@@ -97,15 +94,11 @@ exports.createTransaction = async (req, res) => {
     });
     await notification.save();
 
-    res.status(201).json({
-      message: "Transaction created successfully",
+    apiSuccess(res, "Transaction created successfully", {
       transaction: newTransaction,
     });
   } catch (error) {
-    res.status(500).json({
-      message: "Error creating transaction",
-      error: error.message,
-    });
+    apiError(res, "Error creating transaction", error);
   }
 };
 
@@ -115,16 +108,12 @@ exports.updateTransactionStatus = async (req, res) => {
     const { status } = req.body;
 
     if (!["pending", "completed", "failed"].includes(status)) {
-      return res.status(400).json({
-        message: "Invalid status value",
-      });
+      return apiBadRequest(res, "Invalid status value");
     }
 
     const transaction = await Transaction.findById(transactionId);
     if (!transaction) {
-      return res.status(404).json({
-        message: "Transaction not found",
-      });
+      return apiNotFound(res, "Transaction not found");
     }
 
     transaction.status = status;
@@ -141,15 +130,9 @@ exports.updateTransactionStatus = async (req, res) => {
     });
     await notification.save();
 
-    res.status(200).json({
-      message: "Transaction status updated successfully",
-      transaction,
-    });
+    apiSuccess(res, "Transaction status updated successfully", { transaction });
   } catch (error) {
-    res.status(500).json({
-      message: "Error updating transaction status",
-      error: error.message,
-    });
+    apiError(res, "Error updating transaction status", error);
   }
 };
 
@@ -167,14 +150,10 @@ exports.getEarningsSummary = async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(5);
 
-    res.status(200).json({
+    apiSuccess(res, "Earnings summary retrieved successfully", {
       recentTransactions,
     });
   } catch (error) {
-    console.error("Error in getEarningsSummary:", error.message);
-    res.status(500).json({
-      message: "Error fetching earnings summary",
-      error: error.message,
-    });
+    apiError(res, "Error fetching earnings summary", error);
   }
 };

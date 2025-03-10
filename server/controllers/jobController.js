@@ -2,6 +2,12 @@ const Job = require("../models/job");
 const Bid = require("../models/bid");
 const Notification = require("../models/notification");
 const User = require("../models/user");
+const {
+  apiSuccess,
+  apiError,
+  apiNotFound,
+  apiBadRequest,
+} = require("../middleware/response");
 
 // Create a new job
 const createJob = async (req, res) => {
@@ -22,38 +28,37 @@ const createJob = async (req, res) => {
 
     // Find freelancers with matching skills and notify them
     const matchingFreelancers = await User.find({
-      role: 'freelancer',
-      skills: { $in: skillsRequired }
+      role: "freelancer",
+      skills: { $in: skillsRequired },
     });
 
     // Create notifications for matching freelancers
-    const notifications = matchingFreelancers.map(freelancer => ({
+    const notifications = matchingFreelancers.map((freelancer) => ({
       recipient: freelancer._id,
-      type: 'job',
-      title: 'New Job Matching Your Skills',
+      type: "job",
+      title: "New Job Matching Your Skills",
       message: `New job posted: ${title} - Budget: $${budget}`,
       relatedId: newJob._id,
-      onModel: 'Job'
+      onModel: "Job",
     }));
 
     if (notifications.length > 0) {
       await Notification.insertMany(notifications);
     }
 
-    res.status(201).json(newJob);
+    apiSuccess(res, "Job created successfully", { job: newJob });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Error creating job" });
+    apiError(res, "Error creating job", error);
   }
 };
 
 // Get jobs for marketplace
 const getMarketplaceJobs = async (req, res) => {
   try {
-    const jobs = await Job.find({ status: "open" }); // Fetch only open jobs
-    res.status(200).json(jobs);
+    const jobs = await Job.find({ status: "open" });
+    apiSuccess(res, "Jobs fetched successfully", { jobs });
   } catch (error) {
-    res.status(500).json({ error: "Error fetching jobs" });
+    apiError(res, "Error fetching jobs", error);
   }
 };
 
@@ -64,11 +69,11 @@ const getJobById = async (req, res) => {
       "employer freelancer"
     );
     if (!job) {
-      return res.status(404).json({ error: "Job not found" });
+      return apiNotFound(res, "Job not found");
     }
-    res.status(200).json(job);
+    apiSuccess(res, "Job fetched successfully", { job });
   } catch (error) {
-    res.status(500).json({ error: "Error fetching job" });
+    apiError(res, "Error fetching job", error);
   }
 };
 
@@ -77,17 +82,17 @@ const updateJob = async (req, res) => {
   try {
     const job = await Job.findById(req.params.id);
     if (!job) {
-      return res.status(404).json({ error: "Job not found" });
+      return apiNotFound(res, "Job not found");
     }
     job.status = req.body.status || job.status;
     await job.save();
-    res.status(200).json(job);
+    apiSuccess(res, "Job updated successfully", { job });
   } catch (error) {
-    res.status(500).json({ error: "Error updating job" });
+    apiError(res, "Error updating job", error);
   }
 };
 
-// Get recent jobs
+// Get filtered jobs
 const getFilteredJobs = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -100,30 +105,25 @@ const getFilteredJobs = async (req, res) => {
     }
 
     const jobs = await Job.find(filter).sort({ createdAt: -1 });
-
-    res.status(200).json({ jobs });
-  } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Error retrieving jobs", error: err.message });
+    apiSuccess(res, "Jobs fetched successfully", { jobs });
+  } catch (error) {
+    apiError(res, "Error retrieving jobs", error);
   }
 };
 
-// Get a particular job by ID
+// Get job by ID with auth check
 const getJobByIdAuthCheck = async (req, res) => {
   try {
     const { id } = req.params;
     const job = await Job.findById(id).populate("employer freelancer");
 
     if (!job) {
-      return res.status(404).json({ message: "Job not found" });
+      return apiNotFound(res, "Job not found");
     }
 
-    res.status(200).json({ job });
-  } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Error retrieving job", error: err.message });
+    apiSuccess(res, "Job fetched successfully", { job });
+  } catch (error) {
+    apiError(res, "Error retrieving job", error);
   }
 };
 
@@ -137,11 +137,11 @@ const createBid = async (req, res) => {
     const job = await Job.findById(jobId);
 
     if (!job) {
-      return res.status(404).json({ message: "Job not found" });
+      return apiNotFound(res, "Job not found");
     }
 
     if (job.status !== "open") {
-      return res.status(400).json({ message: "Job is not open for bids" });
+      return apiBadRequest(res, "Job is not open for bids");
     }
 
     const newBid = new Bid({
@@ -151,10 +151,9 @@ const createBid = async (req, res) => {
     });
 
     await newBid.save();
-
-    res.status(201).json({ message: "Bid placed successfully", bid: newBid });
-  } catch (err) {
-    res.status(500).json({ message: "Error placing bid", error: err.message });
+    apiSuccess(res, "Bid placed successfully", { bid: newBid });
+  } catch (error) {
+    apiError(res, "Error placing bid", error);
   }
 };
 
@@ -163,21 +162,16 @@ const getJobsByUserId = async (req, res) => {
   try {
     const userId = req.params.userId;
     const jobs = await Job.find({ employer: userId })
-      .populate('employer', 'name username email')
-      .populate('freelancer', 'name username email')
+      .populate("employer", "name username email")
+      .populate("freelancer", "name username email")
       .sort({ createdAt: -1 });
 
-    res.status(200).json({
-      success: true,
+    apiSuccess(res, "User's jobs fetched successfully", {
       count: jobs.length,
-      data: jobs,
+      jobs,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error fetching user's jobs",
-      error: error.message,
-    });
+    apiError(res, "Error fetching user's jobs", error);
   }
 };
 

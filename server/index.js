@@ -5,11 +5,13 @@ const path = require("path"); // Add this to manage file paths
 const { default: mongoose } = require("mongoose");
 
 const morgan = require("morgan");
+const helmet = require("helmet");
 
 const app = express();
 const PORT = 3000;
 
 app.use(morgan("combined"));
+app.use(helmet());
 
 const adminRoutes = require("./routes/adminRoutes");
 const userRoutes = require("./routes/userRoutes");

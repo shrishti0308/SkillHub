@@ -4,10 +4,20 @@
 class ApiResponse {
   constructor(success, message, data = null, error = null) {
     this.success = success;
-    this.message = message;
-    if (data) this.data = data;
+    if (message) this.message = message;
+
+    // If data is a mongoose document, get the clean _doc version
+    if (data && data._doc) {
+      const key = Object.keys(arguments[2])[0];
+      this[key] = data._doc;
+    }
+    // If data is a regular object
+    else if (data) {
+      const key = Object.keys(data)[0];
+      this[key] = data[key];
+    }
+
     if (error) this.error = error;
-    this.timestamp = new Date().toISOString();
   }
 }
 

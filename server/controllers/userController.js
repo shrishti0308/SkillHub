@@ -79,9 +79,10 @@ exports.loginUser = async (req, res) => {
 exports.getUserDetails = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
+
     if (!user) return apiNotFound(res, "User not found");
 
-    apiSuccess(res, "User profile fetched successfully", user);
+    apiSuccess(res, "User profile fetched successfully", { user: user });
   } catch (error) {
     apiError(res, "Error fetching user profile", error);
   }
@@ -154,7 +155,7 @@ exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.find().select("-password");
 
-    apiSuccess(res, "Users fetched successfully", users);
+    apiSuccess(res, "Users fetched successfully", { users: users });
   } catch (error) {
     apiError(res, "Error fetching users", error);
   }

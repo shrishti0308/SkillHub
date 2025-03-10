@@ -129,7 +129,7 @@ exports.getReviewById = async (req, res) => {
       return apiNotFound(res, "Review not found");
     }
 
-    apiSuccess(res, "Review fetched successfully", { review });
+    apiSuccess(res, "Review fetched successfully", { data: review });
   } catch (error) {
     apiError(res, "Error fetching review", error);
   }

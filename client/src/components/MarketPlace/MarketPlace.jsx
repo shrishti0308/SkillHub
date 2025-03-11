@@ -57,17 +57,17 @@ const Marketplace = () => {
       case "oldest":
         return [...jobs].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
       case "budget-high":
-        return [...jobs].sort((a, b) => b.budget.max - a.budget.max);
+        return [...jobs].sort((a, b) => (b.budget?.max || 0) - (a.budget?.max || 0));
       case "budget-low":
-        return [...jobs].sort((a, b) => a.budget.min - b.budget.min);
+        return [...jobs].sort((a, b) => (a.budget?.min || 0) - (b.budget?.min || 0));
       default:
         return jobs;
     }
   };
 
   const filteredJobs = sortJobs(jobs.filter((job) => {
-    const jobMin = job.budget.min;
-    const jobMax = job.budget.max;
+    const jobMin = job.budget?.min || 0;
+    const jobMax = job.budget?.max || 0;
     const min = budgetMin ? parseInt(budgetMin) : 0;
     const max = budgetMax ? parseInt(budgetMax) : Infinity;
 
@@ -211,7 +211,7 @@ const Marketplace = () => {
                     <p className="font-semibold">
                       Budget:{" "}
                       <span className="text-yellow-300">
-                        ₹{job.budget.min.toLocaleString()} - ₹{job.budget.max.toLocaleString()}
+                        ₹{(job.budget?.min || 0).toLocaleString()} - ₹{(job.budget?.max || 0).toLocaleString()}
                       </span>
                     </p>
                   </div>

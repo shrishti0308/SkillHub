@@ -229,9 +229,9 @@ const LandingPage = () => {
               <div className="relative w-full max-w-md">
                 <div className="absolute inset-0 bg-blue-500 rounded-xl blur-2xl opacity-20"></div>
                 <img
-                  //src="/features-image.jpg"
-                  //alt="Features"
-                  //className="relative z-10 rounded-xl border border-gray-700 w-full shadow-2xl"
+                  src="/features-image.png"
+                  alt="Features"
+                  className="relative z-10 rounded-xl border border-gray-700 w-full shadow-2xl"
                 />
               </div>
             </div>
@@ -248,26 +248,26 @@ const LandingPage = () => {
           }}></div>
         </div>
         <div className="max-w-4xl mx-auto text-center px-4 relative z-10">
-          <h2 className="text-3xl font-bold text-white mb-6">
-            Ready to start your journey?
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-8 animate-fade-in">
+            Ready to start your <span className="bg-gradient-to-r from-white via-blue-200 to-white bg-clip-text text-transparent">journey?</span>
           </h2>
-          <Link
-            to="/signup"
-            className="inline-block bg-white text-blue-600 px-8 py-4 rounded-lg font-medium hover:bg-gray-100 transition-colors duration-200"
-          >
-            Join Skill Hub Today
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              to="/signup"
+              className="group relative inline-flex items-center justify-center px-8 py-4 rounded-lg font-medium overflow-hidden bg-white hover:bg-opacity-90 transition-all duration-300 transform hover:scale-105"
+            >
+              <span className="relative z-10 text-blue-600 font-semibold flex items-center">
+                Join Skill Hub Today
+                <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-100 via-white to-blue-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-8 bg-gray-900 border-t border-gray-800">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <p className="text-gray-500">
-            2024 Skill Hub. All rights reserved.
-          </p>
-        </div>
-      </footer>
     </div>
   );
 };

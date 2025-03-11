@@ -71,12 +71,19 @@ exports.login = async (req, res) => {
     admin.lastLogin = new Date();
     await admin.save();
 
-    // Generate JWT token
+    // Generate JWT token with all necessary information
     const token = jwt.sign(
-      { adminId: admin._id, role: admin.role },
+      {
+        adminId: admin._id,
+        role: admin.role,
+        permissions: admin.permissions || [],
+      },
       "admin_secret",
       { expiresIn: "24h" }
     );
+
+    // Log successful login
+    console.log(`Admin login successful: ${admin.email} (${admin.role})`);
 
     res.json({
       message: "Login successful",
@@ -86,11 +93,11 @@ exports.login = async (req, res) => {
         name: admin.name,
         email: admin.email,
         role: admin.role,
-        permissions: admin.permissions,
+        permissions: admin.permissions || [],
       },
     });
   } catch (error) {
-    console.error(error);
+    console.error("Admin login error:", error);
     res
       .status(500)
       .json({ message: "Error during login", error: error.message });

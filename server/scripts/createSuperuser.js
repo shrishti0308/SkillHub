@@ -1,79 +1,79 @@
-require('dotenv').config();
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const Admin = require('../models/admin');
-const readline = require('readline');
+/**
+ * Script to create a superuser account
+ * Run with: node scripts/createSuperuser.js
+ */
 
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const Admin = require("../models/admin");
+const connectDB = require("../config/db");
 
-const question = (query) => new Promise((resolve) => rl.question(query, resolve));
+// Default superuser credentials
+const superuser = {
+  name: "Super Admin",
+  email: "superadmin@skillhub.com",
+  password: "SuperAdmin@123",
+  role: "superuser",
+  permissions: [
+    "manageUsers",
+    "manageJobs",
+    "manageBids",
+    "manageTransactions",
+    "viewReports",
+    "manageAdmins",
+    "manageSettings",
+  ],
+};
 
 async function createSuperuser() {
-    try {
-        // Connect to MongoDB
-        await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/skillhub');
-        console.log('Connected to MongoDB');
+  try {
+    // Connect to database
+    await connectDB();
+    console.log("Connected to database");
 
-        // Check if any superuser already exists
-        const existingSuperuser = await Admin.findOne({ role: 'superuser' });
-        if (existingSuperuser) {
-            console.log('A superuser already exists!');
-            process.exit(1);
-        }
+    // Check if superuser already exists
+    const existingSuperuser = await Admin.findOne({ email: superuser.email });
 
-        // Get superuser details
-        const name = await question('Enter superuser name: ');
-        const email = await question('Enter superuser email: ');
-        const password = await question('Enter superuser password: ');
+    if (existingSuperuser) {
+      console.log("Superuser already exists. Updating permissions...");
 
-        // Validate input
-        if (!name || !email || !password) {
-            console.log('All fields are required!');
-            process.exit(1);
-        }
+      // Update permissions to ensure superuser has all permissions
+      existingSuperuser.permissions = superuser.permissions;
+      existingSuperuser.role = "superuser";
 
-        if (password.length < 8) {
-            console.log('Password must be at least 8 characters long!');
-            process.exit(1);
-        }
+      await existingSuperuser.save();
+      console.log("Superuser permissions updated successfully");
+    } else {
+      // Hash password
+      const hashedPassword = await bcrypt.hash(superuser.password, 12);
 
-        // Hash password
-        const hashedPassword = await bcrypt.hash(password, 12);
+      // Create new superuser
+      const newSuperuser = new Admin({
+        name: superuser.name,
+        email: superuser.email,
+        password: hashedPassword,
+        role: superuser.role,
+        permissions: superuser.permissions,
+        status: "active",
+      });
 
-        // Create superuser
-        const superuser = new Admin({
-            name,
-            email,
-            password: hashedPassword,
-            role: 'superuser',
-            permissions: [
-                'manageUsers',
-                'manageJobs',
-                'manageBids',
-                'manageTransactions',
-                'viewReports',
-                'manageAdmins',
-                'manageSettings'
-            ]
-        });
-
-        await superuser.save();
-
-        console.log('\nSuperuser created successfully!');
-        console.log('Email:', email);
-        console.log('Role: superuser');
-        console.log('\nYou can now log in at /admin/login');
-
-    } catch (error) {
-        console.error('Error creating superuser:', error.message);
-    } finally {
-        rl.close();
-        await mongoose.connection.close();
-        process.exit(0);
+      await newSuperuser.save();
+      console.log("Superuser created successfully");
     }
+
+    console.log("Superuser details:");
+    console.log(`Email: ${superuser.email}`);
+    console.log(`Password: ${superuser.password}`);
+    console.log("Please change the password after first login");
+
+    // Close database connection
+    await mongoose.connection.close();
+    console.log("Database connection closed");
+  } catch (error) {
+    console.error("Error creating superuser:", error);
+    process.exit(1);
+  }
 }
 
+// Run the function
 createSuperuser();

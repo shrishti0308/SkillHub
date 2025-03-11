@@ -4,7 +4,7 @@ import { selectBidsForUser } from "../../redux/reducers/dashboard/bidingSlice";
 import BidDetails from "./BidingComponents/BidDetails";
 import Sidebar from "../dashboard/dashboardcomponents/Sidebar";
 import { selectIsSidebarMinimized } from "../../redux/reducers/dashboard/sidebarSlice";
-import { FiSearch, FiFilter } from 'react-icons/fi'; 
+import { FiSearch, FiFilter } from 'react-icons/fi';
 
 const Bids = () => {
   const bids = useSelector(selectBidsForUser);
@@ -50,135 +50,135 @@ const Bids = () => {
   }, [bids, searchTerm, filterStatus, filterAmount]);
 
   return (
-    <div
-      className={`flex flex-grow p-5 top-16 ${
-        isSidebarMinimized ? "ml-5" : "ml-10"
-      } transition-all duration-300`}
-    >
+    <div className={`flex flex-grow bg-gray-900 min-h-screen ${
+      isSidebarMinimized ? "ml-5" : "ml-10"
+    } transition-all duration-300`}>
       <Sidebar />
-      <div className="w-10/12 mr-6">
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-white">
-              User Bids <span className="text-sm text-gray-400 ml-2">({filteredBids?.length || 0})</span>
-            </h2>
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search by project name or amount..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-64 px-4 py-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pl-10"
-                />
-                <FiSearch className="absolute left-3 top-3 text-gray-400" />
-              </div>
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="px-4 py-2 bg-gray-700 text-white rounded-lg flex items-center gap-2 hover:bg-gray-600 transition-colors"
-              >
-                <FiFilter />
-                Filters
-              </button>
-            </div>
-          </div>
-
-          {showFilters && (
-            <div className="bg-gray-700 p-4 rounded-lg mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Status
-                </label>
-                <select
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                  className="w-full px-3 py-2 bg-gray-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+      <div className="flex-1 p-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-gray-800 rounded-xl p-6 shadow-lg">
+            <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                Your Bids <span className="text-sm text-blue-400 ml-2">({filteredBids?.length || 0})</span>
+              </h2>
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search projects..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-72 px-4 py-3 bg-gray-700 text-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 pl-12 transition-all placeholder-gray-400"
+                  />
+                  <FiSearch className="absolute left-4 top-3.5 text-blue-400 text-lg" />
+                </div>
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="px-6 py-3 bg-gray-700 text-blue-400 rounded-xl flex items-center gap-2 hover:bg-gray-600 transition-all duration-300 shadow-sm"
                 >
-                  <option value="all">All Status</option>
-                  <option value="pending">Pending</option>
-                  <option value="accepted">Accepted</option>
-                  <option value="rejected">Rejected</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Amount Range
-                </label>
-                <select
-                  value={filterAmount}
-                  onChange={(e) => setFilterAmount(e.target.value)}
-                  className="w-full px-3 py-2 bg-gray-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="all">All Amounts</option>
-                  <option value="0-100">$0 - $100</option>
-                  <option value="101-500">$101 - $500</option>
-                  <option value="501-1000">$501 - $1000</option>
-                  <option value="1000+">$1000+</option>
-                </select>
+                  <FiFilter className="text-lg" />
+                  Filters
+                </button>
               </div>
             </div>
-          )}
-        </div>
 
-        <div className="w-full overflow-hidden bg-gray-800 rounded-lg shadow-lg">
-          <table className="w-full text-left text-sm text-gray-300">
-            <thead className="bg-gray-700 text-gray-300 uppercase text-xs">
-              <tr>
-                <th className="px-6 py-4">Project</th>
-                <th className="px-6 py-4">Amount</th>
-                <th className="px-6 py-4">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-700">
-              {filteredBids && filteredBids.length > 0 ? (
-                filteredBids.map((bid) => (
-                  <React.Fragment key={bid._id}>
-                    <tr
-                      className={`hover:bg-gray-700 cursor-pointer transition-colors ${
-                        selectedBid?._id === bid._id ? "bg-gray-700" : ""
-                      }`}
-                      onClick={() => handleRowClick(bid)}
-                    >
-                      <td className="px-6 py-4">
-                        <div className="font-medium">{bid.job.title}</div>
-                        <div className="text-gray-400 text-xs mt-1">
-                          ID: {bid._id.slice(-8)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">${bid.amount}</td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            bid.status === "accepted"
-                              ? "bg-green-900 text-green-200"
-                              : bid.status === "rejected"
-                              ? "bg-red-900 text-red-200"
-                              : "bg-yellow-900 text-yellow-200"
+            {showFilters && (
+              <div className="bg-gray-700 p-6 rounded-xl mb-6 grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeIn">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-3">
+                    Status
+                  </label>
+                  <select
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    className="w-full px-4 py-3 bg-gray-800 text-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  >
+                    <option value="all">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="accepted">Accepted</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-3">
+                    Amount Range
+                  </label>
+                  <select
+                    value={filterAmount}
+                    onChange={(e) => setFilterAmount(e.target.value)}
+                    className="w-full px-4 py-3 bg-gray-800 text-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  >
+                    <option value="all">All Amounts</option>
+                    <option value="0-100">$0 - $100</option>
+                    <option value="101-500">$101 - $500</option>
+                    <option value="501-1000">$501 - $1000</option>
+                    <option value="1000+">$1000+</option>
+                  </select>
+                </div>
+              </div>
+            )}
+
+            <div className="overflow-hidden bg-gray-800 rounded-xl shadow-md">
+              <table className="w-full text-left">
+                <thead className="bg-gray-700 text-gray-300 text-sm uppercase">
+                  <tr>
+                    <th className="px-6 py-4 font-medium">Project</th>
+                    <th className="px-6 py-4 font-medium">Amount</th>
+                    <th className="px-6 py-4 font-medium">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-700">
+                  {filteredBids && filteredBids.length > 0 ? (
+                    filteredBids.map((bid) => (
+                      <React.Fragment key={bid._id}>
+                        <tr
+                          className={`hover:bg-gray-700 cursor-pointer transition-all duration-300 ${
+                            selectedBid?._id === bid._id ? "bg-gray-700" : ""
                           }`}
+                          onClick={() => handleRowClick(bid)}
                         >
-                          {bid.status}
-                        </span>
+                          <td className="px-6 py-4">
+                            <div className="font-medium text-gray-100">{bid.job.title}</div>
+
+                          </td>
+                          <td className="px-6 py-4 text-gray-100 font-medium">
+                            ${bid.amount.toLocaleString()}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span
+                              className={`px-4 py-1.5 rounded-full text-xs font-medium ${
+                                bid.status === "accepted"
+                                  ? "bg-green-900 text-green-300 border border-green-700"
+                                  : bid.status === "rejected"
+                                  ? "bg-red-900 text-red-300 border border-red-700"
+                                  : "bg-yellow-900 text-yellow-300 border border-yellow-700"
+                              }`}
+                            >
+                              {bid.status.charAt(0).toUpperCase() + bid.status.slice(1)}
+                            </span>
+                          </td>
+                        </tr>
+                        {selectedBid?._id === bid._id && (
+                          <tr>
+                            <td colSpan="3" className="bg-gray-700">
+                              <BidDetails bid={bid} />
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="3" className="px-6 py-8 text-center text-gray-400">
+                        No bids found
                       </td>
                     </tr>
-                    {selectedBid?._id === bid._id && (
-                      <tr>
-                        <td colSpan="3" className="bg-gray-900">
-                          <BidDetails bid={bid} />
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="3" className="px-6 py-4 text-center text-gray-400">
-                    No bids found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>

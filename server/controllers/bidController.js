@@ -2,13 +2,20 @@ const Bid = require("../models/bid");
 const mongoose = require("mongoose");
 const Job = require("../models/job");
 const Notification = require("../models/notification");
+const {
+  apiSuccess,
+  apiError,
+  apiNotFound,
+  apiBadRequest,
+  apiUnauthorized,
+  apiForbidden,
+} = require("../middleware/response");
 
 // Place a new bid
 const placeBid = async (req, res) => {
   try {
     const { amount, jobId } = req.body;
     const freelancer = req.user.id;
-    console.log(jobId);
 
     const newBid = new Bid({
       amount,
@@ -17,26 +24,25 @@ const placeBid = async (req, res) => {
     });
 
     await newBid.save();
-    
+
     // Get job details to notify the job owner
     const job = await Job.findById(jobId);
     if (job) {
       // Create notification for job owner
       const notification = new Notification({
         recipient: job.employer,
-        type: 'bid',
-        title: 'New Bid Received',
+        type: "bid",
+        title: "New Bid Received",
         message: `A new bid of $${amount} has been placed on your job`,
         relatedId: newBid._id,
-        onModel: 'Bid'
+        onModel: "Bid",
       });
       await notification.save();
     }
 
-    res.status(201).json(newBid);
+    apiSuccess(res, "Bid placed successfully", { bid: newBid });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Error placing bid" });
+    apiError(res, "Error placing bid", error);
   }
 };
 
@@ -46,9 +52,9 @@ const getBidsForJob = async (req, res) => {
     const bids = await Bid.find({ job: req.params.jobId }).populate(
       "freelancer"
     );
-    res.status(200).json(bids);
+    apiSuccess(res, "Bids fetched successfully", { bids });
   } catch (error) {
-    res.status(500).json({ error: "Error fetching bids" });
+    apiError(res, "Error fetching bids", error);
   }
 };
 
@@ -56,54 +62,45 @@ const acceptBid = async (req, res) => {
   try {
     const bid = await Bid.findById(req.params.bidId);
     if (!bid) {
-      return res.status(404).json({ error: "Bid not found" });
+      return apiNotFound(res, "Bid not found");
     }
 
-    // Find the job associated with the bid
     const job = await Job.findById(bid.job);
     if (!job) {
-      return res.status(404).json({ error: "Job not found" });
+      return apiNotFound(res, "Job not found");
     }
 
-    // Check if the user trying to accept the bid is the job poster
     const currentUserId = req.user.id;
     if (job.employer.toString() !== currentUserId) {
-      return res
-        .status(403)
-        .json({ error: "You are not authorized to accept this bid." });
+      return apiForbidden(res, "You are not authorized to accept this bid");
     }
 
-    // Update the accepted bid's status
     bid.status = "accepted";
     await bid.save();
 
-    // Update job details
     job.freelancer = bid.freelancer;
     job.status = "in-progress";
     job.bidAccepted = true;
 
-    // Reject all other bids for this job
     await Bid.updateMany(
-      { job: job._id, _id: { $ne: bid._id } }, // Find bids for this job, excluding the accepted bid
-      { status: "rejected" } // Update their status to 'rejected'
+      { job: job._id, _id: { $ne: bid._id } },
+      { status: "rejected" }
     );
 
-    // Create notification for the freelancer
     const notification = new Notification({
       recipient: bid.freelancer,
-      type: 'job_award',
-      title: 'Bid Accepted',
+      type: "job_award",
+      title: "Bid Accepted",
       message: `Your bid has been accepted for the job: ${job.title}`,
       relatedId: job._id,
-      onModel: 'Job'
+      onModel: "Job",
     });
     await notification.save();
 
     await job.save();
-    res.status(200).json({ message: "Bid accepted", job });
+    apiSuccess(res, "Bid accepted successfully", { job });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Error accepting bid" });
+    apiError(res, "Error accepting bid", error);
   }
 };
 
@@ -113,122 +110,94 @@ const getRecentBids = async (req, res) => {
     const freelancerObjectId = new mongoose.Types.ObjectId(freelancerId);
 
     const recentBids = await Bid.find({ freelancer: freelancerObjectId })
-      .populate('job') // Populate job details
-      .sort({ createdAt: -1 }); // Sort by most recent first
+      .populate("job")
+      .sort({ createdAt: -1 });
 
     if (!recentBids.length) {
-      return res
-        .status(404)
-        .json({ message: "No recent bids found for this user" });
+      return apiNotFound(res, "No recent bids found for this user");
     }
 
-    res.status(200).json({ recentBids });
+    apiSuccess(res, "Recent bids fetched successfully", { recentBids });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error retrieving recent bids", error: error.message });
+    apiError(res, "Error retrieving recent bids", error);
   }
 };
 
-// Controller to get bid details by ID
 const getBidDetails = async (req, res) => {
   try {
     const { bidId } = req.params;
-
-    // Fetch bid details from DB
     const bid = await Bid.findById(bidId)
-      .populate("freelancer", "name username") // Populate freelancer info
-      .populate("job", "title"); // Populate job info
+      .populate("freelancer", "name username")
+      .populate("job", "title");
 
     if (!bid) {
-      return res.status(404).json({ message: "Bid not found" });
+      return apiNotFound(res, "Bid not found");
     }
 
-    res.status(200).json({ bid });
+    apiSuccess(res, "Bid details fetched successfully", { bid });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    apiError(res, "Error fetching bid details", error);
   }
 };
 
-// Get a specific bid by ID
 const getBidById = async (req, res) => {
   try {
     const bid = await Bid.findById(req.params.bidId)
-      .populate('freelancer', 'name username email')
-      .populate('job');
+      .populate("freelancer", "name username email")
+      .populate("job");
 
     if (!bid) {
-      return res.status(404).json({
-        success: false,
-        message: 'Bid not found',
-      });
+      return apiNotFound(res, "Bid not found");
     }
 
-    res.status(200).json({
-      success: true,
-      data: bid,
-    });
+    apiSuccess(res, "Bid fetched successfully", { bid });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching bid',
-      error: error.message,
-    });
+    apiError(res, "Error fetching bid", error);
   }
 };
 
-// Get all bids by a specific user
 const getBidsByUserId = async (req, res) => {
   try {
     const userId = req.params.userId;
     const bids = await Bid.find({ freelancer: userId })
-      .populate('job')
-      .populate('freelancer', 'name username email')
+      .populate("job")
+      .populate("freelancer", "name username email")
       .sort({ createdAt: -1 });
 
-    res.status(200).json({
-      success: true,
+    apiSuccess(res, "User's bids fetched successfully", {
       count: bids.length,
-      data: bids,
+      bids,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error fetching user's bids",
-      error: error.message,
-    });
+    apiError(res, "Error fetching user's bids", error);
   }
 };
 
-// Delete a bid
 const deleteBid = async (req, res) => {
   try {
     const { bidId } = req.params;
-    // Check if user is authenticated
     if (!req.user || !req.user.id) {
-      return res.status(401).json({ message: "User not authenticated" });
+      return apiUnauthorized(res, "User not authenticated");
     }
 
     if (!mongoose.Types.ObjectId.isValid(bidId)) {
-      return res.status(400).json({ message: "Invalid bid ID" });
+      return apiBadRequest(res, "Invalid bid ID");
     }
 
     const bid = await Bid.findById(bidId);
-    
+
     if (!bid) {
-      return res.status(404).json({ message: "Bid not found" });
+      return apiNotFound(res, "Bid not found");
     }
 
-    // Check if the user is the owner of the bid
     if (bid.freelancer.toString() !== req.user.id) {
-      return res.status(403).json({ message: "Not authorized to delete this bid" });
+      return apiForbidden(res, "Not authorized to delete this bid");
     }
 
     await bid.deleteOne();
-    res.status(200).json({ message: "Bid deleted successfully" });
+    apiSuccess(res, "Bid deleted successfully");
   } catch (error) {
-    console.error('Error in deleteBid:', error);
-    res.status(500).json({ message: "Error deleting bid", error: error.message });
+    apiError(res, "Error deleting bid", error);
   }
 };
 

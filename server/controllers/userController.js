@@ -3,6 +3,15 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { handleProfilePicUpload } = require("../middlewares/uploadMiddleware");
 
+const {
+  apiSuccess,
+  apiError,
+  apiNotFound,
+  apiBadRequest,
+  apiUnauthorized,
+  apiForbidden,
+} = require("../middleware/response");
+
 const jwtSecret = "skill_hub_secret_key";
 
 // Register a new user
@@ -10,10 +19,7 @@ exports.registerUser = async (req, res) => {
   const { name, username, email, password, role, bio, info } = req.body;
   try {
     const existingUser = await User.findOne({ email });
-    if (existingUser)
-      return res
-        .status(400)
-        .json({ success: false, message: "User already exists" });
+    if (existingUser) return apiBadRequest(res, "User already exists");
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
@@ -31,18 +37,14 @@ exports.registerUser = async (req, res) => {
     const token = jwt.sign({ id: newUser._id, role: newUser.role }, jwtSecret, {
       expiresIn: "1h",
     });
-    res
-      .status(201)
-      .json({
-        success: true,
-        token,
-        role: newUser.role,
-        username: newUser.username,
-      });
+
+    apiSuccess(res, "User registered successfully", {
+      token,
+      role: newUser.role,
+      username: newUser.username,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Error registering user", error });
+    apiError(res, "Error registering user", error);
   }
 };
 
@@ -54,27 +56,22 @@ exports.loginUser = async (req, res) => {
     const user = await User.findOne({
       $or: [{ email: usernameOrEmail }, { username: usernameOrEmail }],
     });
-    if (!user)
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+    if (!user) return apiBadRequest(res, "User not found");
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid credentials" });
+    if (!isMatch) return apiUnauthorized(res, "Invalid credentials");
 
     const token = jwt.sign({ id: user._id, role: user.role }, jwtSecret, {
       expiresIn: "1h",
     });
-    res
-      .status(200)
-      .json({ success: true, token, role: user.role, username: user.username });
+
+    apiSuccess(res, "User logged in successfully", {
+      token,
+      role: user.role,
+      username: user.username,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Error logging in", error });
+    apiError(res, "Error logging in", error);
   }
 };
 
@@ -82,15 +79,12 @@ exports.loginUser = async (req, res) => {
 exports.getUserDetails = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
-    if (!user)
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
-    res.status(200).json({ success: true, user });
+
+    if (!user) return apiNotFound(res, "User not found");
+
+    apiSuccess(res, "User profile fetched successfully", { user: user });
   } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Error fetching user profile", error });
+    apiError(res, "Error fetching user profile", error);
   }
 };
 
@@ -102,9 +96,7 @@ exports.updateUserProfile = async (req, res) => {
     const user = await User.findById(req.user.id);
 
     if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+      return apiNotFound(res, "User not found");
     }
 
     // Merge the existing `info` object with the new fields
@@ -127,13 +119,9 @@ exports.updateUserProfile = async (req, res) => {
       { new: true }
     );
 
-    res
-      .status(200)
-      .json({ success: true, message: "Profile updated successfully" });
+    apiSuccess(res, "Profile updated successfully");
   } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Error updating profile", error });
+    apiError(res, "Error updating profile", error);
   }
 };
 
@@ -142,17 +130,11 @@ exports.uploadProfilePic = [
   handleProfilePicUpload,
   (req, res) => {
     if (req.profilePicPath) {
-      return res
-        .status(200)
-        .json({
-          success: true,
-          message: "Profile picture uploaded successfully",
-          profilePic: req.profilePicPath,
-        });
+      apiSuccess(res, "Profile picture uploaded successfully", {
+        profilePic: req.profilePicPath,
+      });
     } else {
-      return res
-        .status(400)
-        .json({ success: false, message: "No picture uploaded" });
+      apiBadRequest(res, "No picture uploaded");
     }
   },
 ];
@@ -161,23 +143,21 @@ exports.getUserProfile = async (req, res) => {
   try {
     const user = await User.findOne({ username: req.params.username });
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return apiNotFound(res, "User not found");
     }
     res.json(user);
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    apiError(res, "Server error", error);
   }
 };
 
-// Get all users (Admin only)
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.find().select("-password");
-    res.status(200).json({ success: true, users });
+
+    apiSuccess(res, "Users fetched successfully", { users: users });
   } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Error fetching users", error });
+    apiError(res, "Error fetching users", error);
   }
 };
 
@@ -185,16 +165,10 @@ exports.getAllUsers = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
-    if (!user)
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
-    res
-      .status(200)
-      .json({ success: true, message: "User deleted successfully" });
+    if (!user) return apiNotFound(res, "User not found");
+
+    apiSuccess(res, "User deleted successfully");
   } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Error deleting user", error });
+    apiError(res, "Error deleting user", error);
   }
 };

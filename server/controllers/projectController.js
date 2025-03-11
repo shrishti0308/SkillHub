@@ -1,5 +1,4 @@
 const Job = require("../models/job");
-const { apiSuccess, apiError } = require("../middleware/response");
 
 // Controller to get recent projects for the logged-in freelancer
 exports.getRecentProjects = async (req, res) => {
@@ -15,14 +14,18 @@ exports.getRecentProjects = async (req, res) => {
       .limit(10); // Limit to the 10 most recent projects
 
     if (!recentProjects.length) {
-      apiError(res, "No recent projects found for this freelancer");
+      return res
+        .status(404)
+        .json({ message: "No recent projects found for this freelancer" });
     }
 
-    // res.status(200).json({ recentProjects });
-    apiSuccess(res, "Recent projects retrieved successfully", {
-      recentProjects,
-    });
+    res.status(200).json({ recentProjects });
   } catch (error) {
-    apiError(res, "Error retrieving recent projects", error);
+    res
+      .status(500)
+      .json({
+        message: "Error retrieving recent projects",
+        error: error.message,
+      });
   }
 };

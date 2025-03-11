@@ -42,13 +42,24 @@ connectDB();
 const corsOptions = {
   origin: "http://localhost:5173", // Allow your frontend
   credentials: true, // Allow credentials
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 app.use(cors(corsOptions)); // Use CORS with options
 app.use(express.json());
 
 // Host the public folder statically
-app.use("/public", express.static(path.join(__dirname, "public")));
+app.use(
+  "/public",
+  express.static(path.join(__dirname, "public"), {
+    setHeaders: (res) => {
+      res.set("Access-Control-Allow-Origin", "*");
+      res.set("Access-Control-Allow-Methods", "GET");
+      res.set("Cross-Origin-Resource-Policy", "cross-origin");
+    },
+  })
+);
 
 // Root endpoint
 app.get("/", (req, res) => {

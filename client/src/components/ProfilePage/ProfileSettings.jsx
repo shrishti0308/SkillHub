@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaPlus, FaTimes } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -11,11 +11,11 @@ import {
   removeExperience,
   addPreviousWork,
   removePreviousWork,
-  updatePreviousWork
-} from '../../redux/Features/user/ProfileSlice';
-import ImageUpload from './ProfileComponents/ImageUpload';
-import axiosInstance from '../../api/axiosInstance';
-import CustomAlert from '../Notifications/CustomAlert';
+  updatePreviousWork,
+} from "../../redux/Features/user/ProfileSlice";
+import ImageUpload from "./ProfileComponents/ImageUpload";
+import axiosInstance from "../../api/axiosInstance";
+import CustomAlert from "../Notifications/CustomAlert";
 
 const ProfileSettings = () => {
   const dispatch = useDispatch();
@@ -34,7 +34,7 @@ const ProfileSettings = () => {
     newSkill: "",
   });
   const [errors, setErrors] = useState({});
-  const [alert, setAlert] = useState({ message: '', type: '' });
+  const [alert, setAlert] = useState({ message: "", type: "" });
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -44,12 +44,12 @@ const ProfileSettings = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    
+
     // Clear previous error when user starts typing
     setErrors({ ...errors, [name]: "" });
-    
+
     // Validate email as user types
-    if (name === 'email' && value.trim() !== "") {
+    if (name === "email" && value.trim() !== "") {
       if (!validateEmail(value)) {
         setErrors({ ...errors, email: "Please enter a valid email address" });
       }
@@ -72,7 +72,9 @@ const ProfileSettings = () => {
         skills: userProfile.info?.skills || [],
         portfolio: userProfile.info?.portfolio || "",
         experience: userProfile.info?.experience || [],
-        previousWorks: userProfile.previousWorks || [{ title: "", description: "", link: "" }],
+        previousWorks: userProfile.previousWorks || [
+          { title: "", description: "", link: "" },
+        ],
         newSkill: "",
       });
       setProfilePicPath(userProfile.info?.profilePic || null);
@@ -81,13 +83,13 @@ const ProfileSettings = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate email before submission
     if (!validateEmail(formData.email)) {
       setErrors({ ...errors, email: "Please enter a valid email address" });
       return;
     }
-    
+
     try {
       // Create update object with all necessary fields
       const updateData = {
@@ -102,30 +104,44 @@ const ProfileSettings = () => {
 
       // Update profile data
       await dispatch(updateUserProfileThunk(updateData));
-      
+
       // Handle profile picture upload if there's a new one
       if (profilePic) {
         const formDataPic = new FormData();
         formDataPic.append("profilePic", profilePic);
-        await axiosInstance.post("/user/upload-profile-pic", formDataPic, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+
+        const response = await axiosInstance.post(
+          "/user/upload-profile-pic",
+          formDataPic,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        if (response.data && response.data.profilePic) {
+          // Update the profile picture path in the state
+          setProfilePicPath(response.data.profilePic);
+          // Reset the profilePic state to prevent re-uploading
+          setProfilePic(null);
+        }
       }
-      
+
       // Fetch updated profile data
       await dispatch(fetchUserProfile());
-      
+
       // Show success message
-      setAlert({ message: 'Profile updated successfully!', type: 'success' });
-      
+      setAlert({ message: "Profile updated successfully!", type: "success" });
     } catch (error) {
       console.error(
         "Error updating profile:",
         error.response?.data || error.message
       );
-      setAlert({ message: 'Failed to update profile. Please try again.', type: 'error' });
+      setAlert({
+        message: "Failed to update profile. Please try again.",
+        type: "error",
+      });
     }
   };
 
@@ -169,10 +185,10 @@ const ProfileSettings = () => {
   return (
     <div className="min-h-screen py-12 px-4">
       {alert.message && (
-        <CustomAlert 
-          message={alert.message} 
-          type={alert.type} 
-          onClose={() => setAlert({ message: '', type: '' })} 
+        <CustomAlert
+          message={alert.message}
+          type={alert.type}
+          onClose={() => setAlert({ message: "", type: "" })}
         />
       )}
       <div className="max-w-5xl mx-auto">
@@ -180,7 +196,7 @@ const ProfileSettings = () => {
           <h1 className="text-4xl font-bold mb-8 text-center text-white">
             Profile Settings
           </h1>
-          
+
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="flex justify-center">
               <ImageUpload
@@ -191,7 +207,9 @@ const ProfileSettings = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-300">Name</label>
+                <label className="block text-sm font-medium text-gray-300">
+                  Name
+                </label>
                 <input
                   type="text"
                   name="name"
@@ -203,14 +221,16 @@ const ProfileSettings = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-300">Email</label>
+                <label className="block text-sm font-medium text-gray-300">
+                  Email
+                </label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
                   className={`w-full p-3 bg-gray-900/50 border ${
-                    errors.email ? 'border-red-500' : 'border-gray-600'
+                    errors.email ? "border-red-500" : "border-gray-600"
                   } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-white`}
                   placeholder="Enter your email"
                 />
@@ -221,7 +241,9 @@ const ProfileSettings = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-300">Bio</label>
+              <label className="block text-sm font-medium text-gray-300">
+                Bio
+              </label>
               <textarea
                 name="bio"
                 value={formData.bio}
@@ -237,7 +259,9 @@ const ProfileSettings = () => {
             </div>
 
             <div className="space-y-3">
-              <label className="block text-sm font-medium text-gray-300">Skills</label>
+              <label className="block text-sm font-medium text-gray-300">
+                Skills
+              </label>
               <div className="flex flex-wrap gap-2">
                 {formData.skills.map((skill, index) => (
                   <div
@@ -260,7 +284,9 @@ const ProfileSettings = () => {
                 <input
                   type="text"
                   value={formData.newSkill}
-                  onChange={(e) => setFormData({ ...formData, newSkill: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, newSkill: e.target.value })
+                  }
                   placeholder="Add a new skill"
                   className="flex-1 p-3 bg-gray-900/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-white"
                 />
@@ -275,14 +301,18 @@ const ProfileSettings = () => {
             </div>
 
             <div className="space-y-3">
-              <label className="block text-sm font-medium text-gray-300">Experience</label>
+              <label className="block text-sm font-medium text-gray-300">
+                Experience
+              </label>
               <div className="space-y-3">
                 {formData.experience.map((exp, index) => (
                   <div key={index} className="flex gap-2">
                     <input
                       type="text"
                       value={exp}
-                      onChange={(e) => handleExperienceChange(index, e.target.value)}
+                      onChange={(e) =>
+                        handleExperienceChange(index, e.target.value)
+                      }
                       className="flex-1 p-3 bg-gray-900/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-white"
                       placeholder="Add your experience"
                     />
@@ -306,7 +336,9 @@ const ProfileSettings = () => {
             </div>
 
             <div className="space-y-3">
-              <label className="block text-sm font-medium text-gray-300">Previous Works</label>
+              <label className="block text-sm font-medium text-gray-300">
+                Previous Works
+              </label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {formData.previousWorks.map((work, index) => (
                   <div
@@ -314,7 +346,9 @@ const ProfileSettings = () => {
                     className="bg-gray-900/50 p-4 rounded-xl border border-gray-700 space-y-3"
                   >
                     <div className="flex justify-between items-center">
-                      <h3 className="text-sm font-medium text-gray-300">Work #{index + 1}</h3>
+                      <h3 className="text-sm font-medium text-gray-300">
+                        Work #{index + 1}
+                      </h3>
                       <button
                         type="button"
                         onClick={() => handleDeletePreviousWork(index)}
@@ -326,21 +360,35 @@ const ProfileSettings = () => {
                     <input
                       type="text"
                       value={work.title}
-                      onChange={(e) => handlePreviousWorksChange(index, "title", e.target.value)}
+                      onChange={(e) =>
+                        handlePreviousWorksChange(
+                          index,
+                          "title",
+                          e.target.value
+                        )
+                      }
                       placeholder="Project Title"
                       className="w-full p-3 bg-gray-900/80 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-white"
                     />
                     <input
                       type="text"
                       value={work.description}
-                      onChange={(e) => handlePreviousWorksChange(index, "description", e.target.value)}
+                      onChange={(e) =>
+                        handlePreviousWorksChange(
+                          index,
+                          "description",
+                          e.target.value
+                        )
+                      }
                       placeholder="Project Description"
                       className="w-full p-3 bg-gray-900/80 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-white"
                     />
                     <input
                       type="text"
                       value={work.link}
-                      onChange={(e) => handlePreviousWorksChange(index, "link", e.target.value)}
+                      onChange={(e) =>
+                        handlePreviousWorksChange(index, "link", e.target.value)
+                      }
                       placeholder="Project Link"
                       className="w-full p-3 bg-gray-900/80 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-white"
                     />

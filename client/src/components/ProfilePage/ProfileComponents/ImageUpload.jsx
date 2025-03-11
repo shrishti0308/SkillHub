@@ -1,14 +1,17 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaPen } from "react-icons/fa";
+import PropTypes from "prop-types";
 
 const ImageUpload = ({ profilePicPath, setProfilePic }) => {
   const [imagePreview, setImagePreview] = useState(
-    `http://localhost:3000/public${profilePicPath}`
+    profilePicPath ? `http://localhost:3000/public${profilePicPath}` : null
   );
   const [error, setError] = useState("");
 
   useEffect(() => {
-    setImagePreview(`http://localhost:3000/public${profilePicPath}`);
+    if (profilePicPath) {
+      setImagePreview(`http://localhost:3000/public${profilePicPath}`);
+    }
   }, [profilePicPath]);
 
   const handleImageUpload = (e) => {
@@ -81,6 +84,11 @@ const ImageUpload = ({ profilePicPath, setProfilePic }) => {
       {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
     </div>
   );
+};
+
+ImageUpload.propTypes = {
+  profilePicPath: PropTypes.string,
+  setProfilePic: PropTypes.func.isRequired,
 };
 
 export default ImageUpload;

@@ -35,14 +35,20 @@ const handleProfilePicUpload = async (req, res, next) => {
 
   if (!user) return res.status(404).json({ message: "User not found" });
 
-  const publicDir = path.join(__dirname, "../public/profilepic");
-  const newFileName = `${user.username}.jpg`;
-  const newFilePath = path.join(publicDir, newFileName);
+  // Create directory structure if it doesn't exist
+  const publicDir = path.join(__dirname, "../public");
+  const profilePicDir = path.join(publicDir, "profilepic");
 
-  // Create directory if it doesn't exist
   if (!fs.existsSync(publicDir)) {
     fs.mkdirSync(publicDir, { recursive: true });
   }
+
+  if (!fs.existsSync(profilePicDir)) {
+    fs.mkdirSync(profilePicDir, { recursive: true });
+  }
+
+  const newFileName = `${user.username}_${Date.now()}.jpg`;
+  const newFilePath = path.join(profilePicDir, newFileName);
 
   // Delete old profile picture if it exists
   if (user.info && user.info.profilePic) {

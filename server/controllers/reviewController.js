@@ -1,12 +1,6 @@
 const Review = require("../models/review");
 const User = require("../models/user");
 const Notification = require("../models/notification");
-const {
-  apiSuccess,
-  apiError,
-  apiNotFound,
-  apiBadRequest,
-} = require("../middleware/response");
 
 // Add a review
 exports.addReview = async (req, res) => {
@@ -14,14 +8,20 @@ exports.addReview = async (req, res) => {
   const reviewer = req.user.id;
 
   if (reviewedUser === reviewer) {
-    return apiBadRequest(res, "Cannot review yourself");
+    return res
+      .status(400)
+      .json({ success: false, message: "Cannot review yourself" });
   }
 
   try {
     const existingReview = await Review.findOne({ reviewer, reviewedUser });
-    if (existingReview) {
-      return apiBadRequest(res, "You have already reviewed this user");
-    }
+    if (existingReview)
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "You have already reviewed this user",
+        });
 
     const newReview = new Review({
       reviewer,
@@ -35,17 +35,19 @@ exports.addReview = async (req, res) => {
     // Create notification for the reviewed user
     const notification = new Notification({
       recipient: reviewedUser,
-      type: "review",
-      title: "New Review Received",
+      type: 'review',
+      title: 'New Review Received',
       message: `You have received a ${rating}-star review`,
       relatedId: newReview._id,
-      onModel: "Review",
+      onModel: 'Review'
     });
     await notification.save();
 
-    apiSuccess(res, "Review added successfully", { review: newReview });
+    res.status(201).json({ success: true, review: newReview });
   } catch (error) {
-    apiError(res, "Error adding review", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error adding review", error });
   }
 };
 
@@ -57,18 +59,24 @@ exports.updateReview = async (req, res) => {
 
   try {
     const review = await Review.findOne({ _id: reviewId, reviewer });
-    if (!review) {
-      return apiNotFound(res, "Review not found or you are not the reviewer");
-    }
+    if (!review)
+      return res
+        .status(404)
+        .json({
+          success: false,
+          message: "Review not found or you are not the reviewer",
+        });
 
     review.rating = rating;
     review.comment = comment;
-    review.updatedAt = Date.now();
+    review.updatedAt = Date.now(); // Update the timestamp
 
     await review.save();
-    apiSuccess(res, "Review updated successfully", { review });
+    res.status(200).json({ success: true, review });
   } catch (error) {
-    apiError(res, "Error updating review", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error updating review", error });
   }
 };
 
@@ -79,12 +87,20 @@ exports.deleteReview = async (req, res) => {
 
   try {
     const review = await Review.findOneAndDelete({ _id: reviewId, reviewer });
-    if (!review) {
-      return apiNotFound(res, "Review not found or you are not the reviewer");
-    }
-    apiSuccess(res, "Review deleted successfully");
+    if (!review)
+      return res
+        .status(404)
+        .json({
+          success: false,
+          message: "Review not found or you are not the reviewer",
+        });
+    res
+      .status(200)
+      .json({ success: true, message: "Review deleted successfully" });
   } catch (error) {
-    apiError(res, "Error deleting review", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error deleting review", error });
   }
 };
 
@@ -97,9 +113,11 @@ exports.getAllReviewsForUser = async (req, res) => {
       "reviewer",
       "name username info.profilePic"
     );
-    apiSuccess(res, "Reviews fetched successfully", { reviews });
+    res.status(200).json({ success: true, reviews });
   } catch (error) {
-    apiError(res, "Error fetching reviews", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error fetching reviews", error });
   }
 };
 
@@ -112,9 +130,11 @@ exports.getAllReviewsByUser = async (req, res) => {
       "reviewedUser",
       "name"
     );
-    apiSuccess(res, "Reviews fetched successfully", { reviews });
+    res.status(200).json({ success: true, reviews });
   } catch (error) {
-    apiError(res, "Error fetching reviews", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error fetching reviews", error });
   }
 };
 
@@ -122,15 +142,25 @@ exports.getAllReviewsByUser = async (req, res) => {
 exports.getReviewById = async (req, res) => {
   try {
     const review = await Review.findById(req.params.reviewId)
-      .populate("reviewer", "name username email")
-      .populate("reviewedUser", "name username email");
+      .populate('reviewer', 'name username email')
+      .populate('reviewedUser', 'name username email');
 
     if (!review) {
-      return apiNotFound(res, "Review not found");
+      return res.status(404).json({
+        success: false,
+        message: 'Review not found',
+      });
     }
 
-    apiSuccess(res, "Review fetched successfully", { data: review });
+    res.status(200).json({
+      success: true,
+      data: review,
+    });
   } catch (error) {
-    apiError(res, "Error fetching review", error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching review',
+      error: error.message,
+    });
   }
 };

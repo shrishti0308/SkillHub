@@ -1,6 +1,5 @@
 // controllers/walletController.js
 const User = require("../models/user");
-const { apiSuccess, apiError, apiNotFound } = require("../middleware/response");
 
 // Controller to get the wallet balance of the logged-in user
 exports.getWalletBalance = async (req, res) => {
@@ -9,13 +8,16 @@ exports.getWalletBalance = async (req, res) => {
     const user = await User.findById(userId).select("wallet"); // Fetch the wallet balance
 
     if (!user) {
-      return apiNotFound(res, "User not found");
+      return res.status(404).json({ message: "User not found" });
     }
 
-    return apiSuccess(res, "Wallet balance retrieved successfully", {
-      walletBalance: user.wallet,
-    });
+    res.status(200).json({ walletBalance: user.wallet });
   } catch (error) {
-    return apiError(res, "Error retrieving wallet balance", error);
+    res
+      .status(500)
+      .json({
+        message: "Error retrieving wallet balance",
+        error: error.message,
+      });
   }
 };

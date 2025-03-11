@@ -2,28 +2,23 @@ const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db");
 const path = require("path"); // Add this to manage file paths
-const { default: mongoose } = require("mongoose");
-
-const morgan = require("morgan");
-const helmet = require("helmet");
 
 const app = express();
 const PORT = 3000;
 
-app.use(morgan("combined"));
-app.use(helmet());
+const adminRoutes = require('./routes/adminRoutes');
+const userRoutes = require('./routes/userRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
+const jobRoutes = require('./routes/jobRoutes');
+const bidRoutes = require('./routes/bidRoutes');
+const projectRoutes = require('./routes/projectRoutes');
+const walletRoutes = require('./routes/walletRoutes');
+const transactionRoutes = require('./routes/transactionRoutes');
+const { default: mongoose } = require('mongoose');
+const bid = require('./models/bid');
+const { authenticateJWT } = require('./middlewares/authMiddleware');
 
-const adminRoutes = require("./routes/adminRoutes");
-const userRoutes = require("./routes/userRoutes");
-const reviewRoutes = require("./routes/reviewRoutes");
-const notificationRoutes = require("./routes/notificationRoutes");
-const jobRoutes = require("./routes/jobRoutes");
-const bidRoutes = require("./routes/bidRoutes");
-const projectRoutes = require("./routes/projectRoutes");
-const walletRoutes = require("./routes/walletRoutes");
-const transactionRoutes = require("./routes/transactionRoutes");
-const bid = require("./models/bid");
-const { authenticateJWT } = require("./middlewares/authMiddleware");
 
 connectDB();
 
@@ -44,15 +39,15 @@ app.get("/", (req, res) => {
   res.send("Hello, My lord!");
 });
 
-app.use("/admin", adminRoutes);
-app.use("/user", userRoutes);
-app.use("/jobs", jobRoutes);
-app.use("/bids", bidRoutes);
-app.use("/review", reviewRoutes);
-app.use("/notifications", notificationRoutes);
-app.use("/project", projectRoutes);
-app.use("/wallet", walletRoutes);
-app.use("/transaction", transactionRoutes);
+app.use('/admin', adminRoutes);
+app.use('/user', userRoutes);
+app.use('/jobs', jobRoutes);
+app.use('/bids', bidRoutes);
+app.use('/review', reviewRoutes);
+app.use('/notifications', notificationRoutes);
+app.use('/project', projectRoutes);
+app.use('/wallet', walletRoutes);
+app.use('/transaction', transactionRoutes);
 
 app.get("/recent-bids", authenticateJWT, async (req, res) => {
   try {

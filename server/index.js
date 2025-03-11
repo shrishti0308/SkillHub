@@ -2,15 +2,26 @@ const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db");
 const path = require("path"); // Add this to manage file paths
+const fs = require("fs");
 
 const morgan = require("morgan");
 const helmet = require("helmet");
+const rfs = require("rotating-file-stream");
 
 const app = express();
 const PORT = 3000;
 
 app.use(morgan("combined"));
 app.use(helmet());
+
+const logDirectory = path.join(__dirname, "log");
+fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);
+const stream = rfs.createStream("access.log", {
+  interval: "1d",
+  path: logDirectory,
+});
+
+app.use(morgan("combined", { stream }));
 
 const adminRoutes = require("./routes/adminRoutes");
 const userRoutes = require("./routes/userRoutes");

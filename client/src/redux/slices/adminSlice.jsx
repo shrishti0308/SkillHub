@@ -14,7 +14,7 @@ const getStoredAdminData = () => {
       error: null,
       success: null,
     };
-  } catch (error) {
+  } catch {
     return {
       token: null,
       currentAdmin: null,
@@ -208,7 +208,19 @@ const adminSlice = createSlice({
       })
       .addCase(createAdmin.fulfilled, (state, action) => {
         state.loading = false;
-        state.admins.push(action.payload);
+        if (action.payload && action.payload.admin) {
+          const adminWithId = {
+            ...action.payload.admin,
+            _id: action.payload.admin._id || action.payload.admin.id,
+          };
+          state.admins.push(adminWithId);
+        } else if (action.payload) {
+          const adminWithId = {
+            ...action.payload,
+            _id: action.payload._id || action.payload.id,
+          };
+          state.admins.push(adminWithId);
+        }
         state.success = "Admin created successfully";
       })
       .addCase(createAdmin.rejected, (state, action) => {

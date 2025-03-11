@@ -1,185 +1,317 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { useTheme } from '@mui/material/styles';
+import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { useMediaQuery } from "@mui/material";
 import {
-    AppBar,
-    Box,
-    CssBaseline,
-    Drawer,
-    IconButton,
-    List,
-    ListItem,
-    ListItemIcon,
-    ListItemText,
-    Toolbar,
-    Typography,
-    Divider,
-    Button
-} from '@mui/material';
+  Box,
+  CssBaseline,
+  Drawer,
+  IconButton,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+  Divider,
+  Tooltip,
+  Fade,
+  Collapse,
+  alpha,
+} from "@mui/material";
 import {
-    Menu as MenuIcon,
-    Dashboard as DashboardIcon,
-    People as PeopleIcon,
-    Work as WorkIcon,
-    ExitToApp as LogoutIcon,
-    Analytics as AnalyticsIcon
-} from '@mui/icons-material';
-import { logout } from '../../redux/slices/adminSlice';
+  Dashboard as DashboardIcon,
+  People as PeopleIcon,
+  Work as WorkIcon,
+  ExitToApp as LogoutIcon,
+  Analytics as AnalyticsIcon,
+  ChevronLeft as ChevronLeftIcon,
+} from "@mui/icons-material";
+import { logout } from "../../redux/slices/adminSlice";
 
-const drawerWidth = 240;
+// Custom dark theme colors from tailwind.config.js
+const darkThemeColors = {
+  background: {
+    default: "#1a1d23", // dark
+    paper: "#23272f", // grey
+    card: "#23272f", // grey
+    lighter: "#2a2f38", // slightly lighter than grey
+  },
+  primary: {
+    main: "#58c4dc", // cyan-blue
+    light: "#7ad4e6", // lighter cyan-blue
+    dark: "#3a9cb2", // darker cyan-blue
+  },
+  text: {
+    primary: "#f6f7f9", // light
+    secondary: "#b0b7c3", // lighter grey
+  },
+  divider: "rgba(246, 247, 249, 0.12)", // light with opacity
+};
+
+const drawerWidth = 260;
 
 const AdminLayout = () => {
-    const theme = useTheme();
-    const [mobileOpen, setMobileOpen] = React.useState(false);
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
+  const isMobile = useMediaQuery(`(max-width: 600px)`);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [drawerCollapsed, setDrawerCollapsed] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const location = useLocation();
 
-    const handleDrawerToggle = () => {
-        setMobileOpen(!mobileOpen);
-    };
+  useEffect(() => {
+    // Close mobile drawer when route changes
+    if (mobileOpen && isMobile) {
+      setMobileOpen(false);
+    }
+  }, [location.pathname, isMobile]);
 
-    const handleLogout = () => {
-        dispatch(logout());
-        navigate('/admin/login');
-    };
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
 
-    const menuItems = [
-        { text: 'Dashboard', icon: <DashboardIcon />, path: '/admin/dashboard' },
-        { text: 'Users', icon: <PeopleIcon />, path: '/admin/users' },
-        { text: 'Jobs', icon: <WorkIcon />, path: '/admin/jobs' },
-        { text: 'Analytics', icon: <AnalyticsIcon />, path: '/admin/analytics' },
-    ];
+  const handleDrawerCollapse = () => {
+    setDrawerCollapsed(!drawerCollapsed);
+  };
 
-    const drawer = (
-        <div>
-            <Toolbar sx={{ 
-                backgroundColor: theme.palette.primary.main,
-                color: 'white'
-            }}>
-                <Typography variant="h6" noWrap component="div">
-                    Admin Panel
-                </Typography>
-            </Toolbar>
-            <Divider />
-            <List>
-                {menuItems.map((item) => (
-                    <ListItem 
-                        button 
-                        key={item.text} 
-                        onClick={() => navigate(item.path)}
-                        sx={{
-                            '&:hover': {
-                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                            }
-                        }}
-                    >
-                        <ListItemIcon sx={{ color: 'white' }}>
-                            {item.icon}
-                        </ListItemIcon>
-                        <ListItemText primary={item.text} sx={{ color: 'white' }} />
-                    </ListItem>
-                ))}
-            </List>
-            <Divider sx={{ backgroundColor: 'rgba(255, 255, 255, 0.12)' }} />
-            <List>
-                <ListItem 
-                    button 
-                    onClick={handleLogout}
-                    sx={{
-                        '&:hover': {
-                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                        }
-                    }}
-                >
-                    <ListItemIcon sx={{ color: 'white' }}>
-                        <LogoutIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Logout" sx={{ color: 'white' }} />
-                </ListItem>
-            </List>
-        </div>
-    );
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/admin/login");
+  };
 
-    return (
-        <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-            <CssBaseline />
-            <AppBar
-                position="fixed"
-                sx={{
-                    backgroundColor: theme.palette.primary.main,
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                }}
+  const menuItems = [
+    { text: "Dashboard", icon: <DashboardIcon />, path: "/admin/dashboard" },
+    { text: "Users", icon: <PeopleIcon />, path: "/admin/users" },
+    { text: "Jobs", icon: <WorkIcon />, path: "/admin/jobs" },
+    { text: "Analytics", icon: <AnalyticsIcon />, path: "/admin/analytics" },
+  ];
+
+  const isActive = (path) => {
+    return location.pathname === path;
+  };
+
+  const drawer = (
+    <Box
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+        backgroundColor: darkThemeColors.background.paper,
+        width: "100%",
+      }}
+    >
+      <Box
+        sx={{
+          backgroundColor: darkThemeColors.background.default,
+          color: darkThemeColors.text.primary,
+          p: 2,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: drawerCollapsed ? "center" : "space-between",
+        }}
+      >
+        <Fade in={!drawerCollapsed}>
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ fontWeight: "bold", color: darkThemeColors.primary.main }}
+          >
+            SkillHub Admin
+          </Typography>
+        </Fade>
+        {!isMobile && (
+          <IconButton
+            onClick={handleDrawerCollapse}
+            sx={{ color: darkThemeColors.text.primary }}
+            size="small"
+          >
+            <ChevronLeftIcon
+              sx={{
+                transform: drawerCollapsed ? "rotate(180deg)" : "none",
+                transition: "transform 0.3s",
+              }}
+            />
+          </IconButton>
+        )}
+      </Box>
+      <Divider sx={{ backgroundColor: darkThemeColors.divider }} />
+      <Box sx={{ flexGrow: 1, overflow: "hidden", py: 2 }}>
+        <List sx={{ width: "100%", padding: 0 }}>
+          {menuItems.map((item) => (
+            <ListItem
+              button
+              key={item.text}
+              onClick={() => navigate(item.path)}
+              sx={{
+                py: 1.5,
+                px: drawerCollapsed ? 1.5 : 3,
+                mb: 1,
+                mx: 1,
+                borderRadius: "8px",
+                backgroundColor: isActive(item.path)
+                  ? alpha(darkThemeColors.primary.main, 0.15)
+                  : "transparent",
+                "&:hover": {
+                  backgroundColor: isActive(item.path)
+                    ? alpha(darkThemeColors.primary.main, 0.2)
+                    : alpha(darkThemeColors.text.primary, 0.08),
+                },
+                transition: "all 0.2s ease-in-out",
+                display: "flex",
+                justifyContent: drawerCollapsed ? "center" : "flex-start",
+                maxWidth: "100%",
+                boxSizing: "border-box",
+              }}
             >
-                <Toolbar>
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        edge="start"
-                        onClick={handleDrawerToggle}
-                        sx={{ mr: 2, display: { sm: 'none' } }}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-                        SkillHub Admin
-                    </Typography>
-                    <Button color="inherit" onClick={handleLogout}>
-                        Logout
-                    </Button>
-                </Toolbar>
-            </AppBar>
-            <Box
-                component="nav"
-                sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-            >
-                <Drawer
-                    variant="temporary"
-                    open={mobileOpen}
-                    onClose={handleDrawerToggle}
-                    ModalProps={{
-                        keepMounted: true, // Better open performance on mobile.
-                    }}
-                    sx={{
-                        display: { xs: 'block', sm: 'none' },
-                        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-                    }}
+              <Tooltip
+                title={drawerCollapsed ? item.text : ""}
+                placement="right"
+              >
+                <ListItemIcon
+                  sx={{
+                    color: isActive(item.path)
+                      ? darkThemeColors.primary.main
+                      : darkThemeColors.text.primary,
+                    minWidth: drawerCollapsed ? 0 : 40,
+                    mr: drawerCollapsed ? 0 : 2,
+                  }}
                 >
-                    {drawer}
-                </Drawer>
-                <Drawer
-                    variant="permanent"
-                    sx={{
-                        display: { xs: 'none', sm: 'block' },
-                        '& .MuiDrawer-paper': {
-                            width: 240,
-                            boxSizing: 'border-box',
-                            backgroundColor: '#1a237e',
-                            borderRight: '1px solid rgba(255, 255, 255, 0.12)',
-                            boxShadow: '4px 0 6px rgba(0, 0, 0, 0.1)'
-                        },
-                    }}
-                    open
-                >
-                    {drawer}
-                </Drawer>
-            </Box>
-            <Box
-                component="main"
-                sx={{
-                    flexGrow: 1,
-                    p: 3,
-                    backgroundColor: '#121212',
-                    backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))',
-                    minHeight: '100vh',
-                    marginTop: '64px'
-                }}
+                  {item.icon}
+                </ListItemIcon>
+              </Tooltip>
+              <Collapse orientation="horizontal" in={!drawerCollapsed}>
+                <ListItemText
+                  primary={item.text}
+                  sx={{
+                    color: darkThemeColors.text.primary,
+                    opacity: isActive(item.path) ? 1 : 0.85,
+                    m: 0,
+                    "& .MuiTypography-root": {
+                      color: isActive(item.path)
+                        ? darkThemeColors.primary.main
+                        : darkThemeColors.text.primary,
+                    },
+                  }}
+                />
+              </Collapse>
+            </ListItem>
+          ))}
+        </List>
+      </Box>
+      <Divider sx={{ backgroundColor: darkThemeColors.divider }} />
+      <List sx={{ py: 2 }}>
+        <ListItem
+          button
+          onClick={handleLogout}
+          sx={{
+            py: 1.5,
+            px: drawerCollapsed ? 1.5 : 3,
+            mx: 1,
+            borderRadius: "8px",
+            "&:hover": {
+              backgroundColor: alpha(darkThemeColors.text.primary, 0.08),
+            },
+            transition: "all 0.2s ease-in-out",
+            display: "flex",
+            justifyContent: drawerCollapsed ? "center" : "flex-start",
+          }}
+        >
+          <Tooltip title={drawerCollapsed ? "Logout" : ""} placement="right">
+            <ListItemIcon
+              sx={{
+                color: darkThemeColors.text.primary,
+                minWidth: drawerCollapsed ? 0 : 40,
+                mr: drawerCollapsed ? 0 : 2,
+              }}
             >
-                <Outlet />
-            </Box>
-        </Box>
-    );
+              <LogoutIcon />
+            </ListItemIcon>
+          </Tooltip>
+          <Collapse orientation="horizontal" in={!drawerCollapsed}>
+            <ListItemText
+              primary="Logout"
+              sx={{ color: darkThemeColors.text.primary, opacity: 0.85, m: 0 }}
+            />
+          </Collapse>
+        </ListItem>
+      </List>
+    </Box>
+  );
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        minHeight: "100vh",
+        backgroundColor: darkThemeColors.background.default,
+      }}
+    >
+      <CssBaseline />
+      <Box
+        component="nav"
+        sx={{
+          width: { sm: drawerCollapsed ? 80 : drawerWidth },
+          flexShrink: { sm: 0 },
+          transition: "width 0.3s",
+        }}
+      >
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile.
+          }}
+          sx={{
+            display: { xs: "block", sm: "none" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+              backgroundColor: darkThemeColors.background.paper,
+              borderRight: `1px solid ${darkThemeColors.divider}`,
+            },
+          }}
+        >
+          {drawer}
+        </Drawer>
+        <Drawer
+          variant="permanent"
+          sx={{
+            display: { xs: "none", sm: "block" },
+            "& .MuiDrawer-paper": {
+              width: drawerCollapsed ? 80 : drawerWidth,
+              boxSizing: "border-box",
+              backgroundColor: darkThemeColors.background.paper,
+              borderRight: `1px solid ${darkThemeColors.divider}`,
+              boxShadow: `4px 0 6px ${alpha("#000", 0.15)}`,
+              transition: "width 0.3s",
+              overflowX: "hidden",
+            },
+          }}
+          open
+        >
+          {drawer}
+        </Drawer>
+      </Box>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          width: {
+            sm: `calc(100% - ${drawerCollapsed ? "80px" : drawerWidth}px)`,
+          },
+          backgroundColor: darkThemeColors.background.default,
+          minHeight: "100vh",
+          transition: "width 0.3s, margin 0.3s",
+          color: darkThemeColors.text.primary,
+        }}
+      >
+        <Outlet />
+      </Box>
+    </Box>
+  );
 };
 
 export default AdminLayout;

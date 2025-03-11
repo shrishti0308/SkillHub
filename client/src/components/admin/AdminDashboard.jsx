@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
   Container,
   Grid,
-  Paper,
   Typography,
   Button,
   IconButton,
@@ -23,11 +22,24 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
+  Card,
+  CardContent,
+  CardHeader,
+  Avatar,
+  Chip,
+  Divider,
+  Tooltip,
+  CircularProgress,
+  useTheme,
+  alpha,
 } from "@mui/material";
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Security as SecurityIcon,
+  Refresh as RefreshIcon,
+  PersonAdd as PersonAddIcon,
+  AdminPanelSettings as AdminPanelSettingsIcon,
 } from "@mui/icons-material";
 import {
   fetchAllAdmins,
@@ -41,6 +53,7 @@ import {
 } from "../../redux/slices/adminSlice";
 
 const AdminDashboard = () => {
+  const theme = useTheme();
   const dispatch = useDispatch();
   const {
     admins = [],
@@ -75,11 +88,11 @@ const AdminDashboard = () => {
   ];
 
   useEffect(() => {
-    if (!currentAdmin) {
-      dispatch(getCurrentAdmin());
-    }
-    dispatch(fetchAllAdmins());
-  }, [dispatch, currentAdmin]);
+    // Always fetch the current admin first to ensure we have the latest data
+    dispatch(getCurrentAdmin()).then(() => {
+      dispatch(fetchAllAdmins());
+    });
+  }, [dispatch]);
 
   useEffect(() => {
     if (success) {
@@ -87,6 +100,9 @@ const AdminDashboard = () => {
       setSelectedAdmin(null);
       setFormData({ name: "", email: "", password: "", role: "admin" });
       dispatch(clearSuccess());
+
+      // Refresh the current admin data to ensure it's up to date
+      dispatch(getCurrentAdmin());
     }
   }, [success, dispatch]);
 
@@ -103,6 +119,7 @@ const AdminDashboard = () => {
       setFormData({ name: "", email: "", password: "", role: "admin" });
       setSelectedAdmin(null);
     }
+    setFormErrors({});
     setOpenDialog(true);
   };
 
@@ -110,95 +127,65 @@ const AdminDashboard = () => {
     setOpenDialog(false);
     setSelectedAdmin(null);
     setFormData({ name: "", email: "", password: "", role: "admin" });
-    dispatch(clearError());
+    setFormErrors({});
   };
 
   const validateForm = () => {
     const errors = {};
     if (!formData.name.trim()) errors.name = "Name is required";
     if (!formData.email.trim()) errors.email = "Email is required";
-    if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-      errors.email = "Invalid email format";
-    }
-    if (!selectedAdmin && !formData.password) {
-      errors.password = "Password is required for new admin";
-    }
-    if (formData.password && formData.password.length < 6) {
-      errors.password = "Password must be at least 6 characters";
-    }
-    return errors;
+    if (!selectedAdmin && !formData.password.trim())
+      errors.password = "Password is required";
+    if (
+      formData.email.trim() &&
+      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email)
+    )
+      errors.email = "Invalid email address";
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
+    setFormData({
+      ...formData,
       [name]: value,
-    }));
+    });
+    // Clear error when user types
     if (formErrors[name]) {
-      setFormErrors((prev) => ({
-        ...prev,
+      setFormErrors({
+        ...formErrors,
         [name]: "",
-      }));
+      });
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const errors = validateForm();
+    if (!validateForm()) return;
 
-    if (Object.keys(errors).length > 0) {
-      setFormErrors(errors);
-      return;
-    }
-
-    try {
-      if (selectedAdmin) {
-        await dispatch(
-          updateAdmin({
-            id: selectedAdmin._id,
-            data: formData,
-          })
-        ).unwrap();
-      } else {
-        await dispatch(createAdmin(formData)).unwrap();
-      }
-      handleCloseDialog();
-    } catch (error) {
-      // Error will be handled by Redux
+    if (selectedAdmin) {
+      // Update existing admin
+      const updates = { ...formData };
+      if (!updates.password) delete updates.password; // Don't send empty password
+      await dispatch(updateAdmin({ id: selectedAdmin._id, data: updates }));
+    } else {
+      // Create new admin
+      await dispatch(createAdmin(formData));
     }
   };
 
   const handleDeleteClick = (admin) => {
-    if (currentAdmin?.id === admin._id) {
-      dispatch({
-        type: "admin/setError",
-        payload: "You cannot delete your own account",
-      });
-      return;
-    }
-
-    if (admin.role === "superuser") {
-      const superuserCount = admins.filter(
-        (a) => a.role === "superuser"
-      ).length;
-      if (superuserCount <= 1) {
-        dispatch({
-          type: "admin/setError",
-          payload: "Cannot delete the last superuser account",
-        });
-        return;
-      }
-    }
-
     setAdminToDelete(admin);
     setDeleteDialogOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
-    await dispatch(deleteAdmin(adminToDelete._id));
-    setDeleteDialogOpen(false);
-    setAdminToDelete(null);
+    if (adminToDelete) {
+      await dispatch(deleteAdmin(adminToDelete._id));
+      setDeleteDialogOpen(false);
+      setAdminToDelete(null);
+    }
   };
 
   const handleDeleteCancel = () => {
@@ -219,13 +206,11 @@ const AdminDashboard = () => {
   };
 
   const handlePermissionChange = (permission) => {
-    setSelectedPermissions((prev) => {
-      if (prev.includes(permission)) {
-        return prev.filter((p) => p !== permission);
-      } else {
-        return [...prev, permission];
-      }
-    });
+    setSelectedPermissions((prev) =>
+      prev.includes(permission)
+        ? prev.filter((p) => p !== permission)
+        : [...prev, permission]
+    );
   };
 
   const handleSavePermissions = async () => {
@@ -236,216 +221,580 @@ const AdminDashboard = () => {
           permissions: selectedPermissions,
         })
       );
-      dispatch(fetchAllAdmins());
       handleClosePermissionsDialog();
     }
   };
 
+  // Get stats for the dashboard
+  const totalAdmins = admins.length;
+  const superAdmins = admins.filter(
+    (admin) => admin.role === "superuser"
+  ).length;
+  const regularAdmins = admins.filter((admin) => admin.role === "admin").length;
+
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="xl">
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <Alert
+          severity="error"
+          onClose={() => dispatch(clearError())}
+          sx={{ mb: 3, borderRadius: 1 }}
+        >
           {error}
         </Alert>
       )}
-      {success && (
-        <Alert severity="success" sx={{ mb: 2 }}>
-          {success}
-        </Alert>
-      )}
 
-      <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
-          <Typography component="h2" variant="h6" color="primary" gutterBottom>
-            Manage Admins
+      {/* Dashboard Header */}
+      <Box
+        sx={{
+          mb: 4,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Box>
+          <Typography
+            variant="h4"
+            component="h1"
+            sx={{ fontWeight: "bold", mb: 1 }}
+          >
+            Admin Dashboard
           </Typography>
-          {(currentAdmin?.role === "superuser" ||
-            currentAdmin?.permissions?.includes("manageAdmins")) && (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleOpenDialog()}
-            >
-              Add New Admin
-            </Button>
-          )}
+          <Typography variant="body1" color="text.secondary">
+            Manage administrators and their permissions
+          </Typography>
         </Box>
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<PersonAddIcon />}
+          onClick={() => handleOpenDialog()}
+          sx={{
+            borderRadius: 2,
+            px: 3,
+            py: 1,
+            boxShadow: 2,
+            "&:hover": {
+              boxShadow: 4,
+            },
+          }}
+        >
+          Add Admin
+        </Button>
+      </Box>
 
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Role</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell align="right">Actions</TableCell>
+      {/* Stats Cards */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} sm={6} md={4}>
+          <Card
+            elevation={0}
+            sx={{
+              borderRadius: 2,
+              height: "100%",
+              border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+              transition:
+                "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
+              "&:hover": {
+                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
+                transform: "translateY(-2px)",
+              },
+            }}
+          >
+            <CardContent sx={{ p: 3 }}>
+              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                <Avatar
+                  sx={{
+                    bgcolor: alpha(theme.palette.primary.main, 0.1),
+                    color: theme.palette.primary.main,
+                    width: 48,
+                    height: 48,
+                  }}
+                >
+                  <AdminPanelSettingsIcon />
+                </Avatar>
+                <Box sx={{ ml: 2 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    Total Admins
+                  </Typography>
+                  <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+                    {loading ? <CircularProgress size={24} /> : totalAdmins}
+                  </Typography>
+                </Box>
+              </Box>
+              <Divider sx={{ my: 2 }} />
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Chip
+                  label={`${superAdmins} Super Admins`}
+                  size="small"
+                  sx={{
+                    bgcolor: alpha(theme.palette.success.main, 0.1),
+                    color: theme.palette.success.main,
+                    fontWeight: "medium",
+                  }}
+                />
+                <Chip
+                  label={`${regularAdmins} Regular Admins`}
+                  size="small"
+                  sx={{
+                    bgcolor: alpha(theme.palette.info.main, 0.1),
+                    color: theme.palette.info.main,
+                    fontWeight: "medium",
+                  }}
+                />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Additional stat cards can be added here */}
+      </Grid>
+
+      {/* Admin List */}
+      <Card
+        elevation={0}
+        sx={{
+          borderRadius: 2,
+          mb: 4,
+          border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+        }}
+      >
+        <CardHeader
+          title={
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography variant="h6">Administrator List</Typography>
+              <Tooltip title="Refresh">
+                <IconButton onClick={() => dispatch(fetchAllAdmins())}>
+                  <RefreshIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          }
+          sx={{
+            borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
+            pb: 2,
+          }}
+        />
+        <TableContainer
+          component={Box}
+          sx={{ maxHeight: 440, overflow: "auto" }}
+        >
+          <Table key="admin-table" stickyHeader sx={{ minWidth: 650 }}>
+            <TableHead key="table-head">
+              <TableRow key="header-row">
+                <TableCell
+                  key="name-header"
+                  sx={{
+                    fontWeight: "bold",
+                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                  }}
+                >
+                  Name
+                </TableCell>
+                <TableCell
+                  key="email-header"
+                  sx={{
+                    fontWeight: "bold",
+                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                  }}
+                >
+                  Email
+                </TableCell>
+                <TableCell
+                  key="role-header"
+                  sx={{
+                    fontWeight: "bold",
+                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                  }}
+                >
+                  Role
+                </TableCell>
+                <TableCell
+                  key="permissions-header"
+                  sx={{
+                    fontWeight: "bold",
+                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                  }}
+                >
+                  Permissions
+                </TableCell>
+                <TableCell
+                  key="actions-header"
+                  sx={{
+                    fontWeight: "bold",
+                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                  }}
+                >
+                  Actions
+                </TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
-              {admins.map((admin) => (
-                <TableRow key={admin._id}>
-                  <TableCell>{admin.name}</TableCell>
-                  <TableCell>{admin.email}</TableCell>
-                  <TableCell>{admin.role}</TableCell>
-                  <TableCell>{admin.status}</TableCell>
-                  <TableCell align="right">
-                    {admin.role !== "superuser" && (
-                      <>
-                        <IconButton
-                          onClick={() => handleOpenPermissionsDialog(admin)}
-                          color="primary"
-                          disabled={currentAdmin?.id === admin._id}
-                        >
-                          <SecurityIcon />
-                        </IconButton>
-                        <IconButton
-                          onClick={() => handleDeleteClick(admin)}
-                          color="error"
-                          disabled={currentAdmin?.id === admin._id}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </>
-                    )}
-                    <IconButton
-                      onClick={() => handleOpenDialog(admin)}
-                      color="primary"
-                      disabled={
-                        !currentAdmin?.permissions?.includes("manageAdmins") ||
-                        (admin.role === "superuser" &&
-                          currentAdmin?.role !== "superuser")
-                      }
-                    >
-                      <EditIcon />
-                    </IconButton>
+            <TableBody key="table-body">
+              {loading ? (
+                <TableRow key="loading-row">
+                  <TableCell
+                    key="loading-cell"
+                    colSpan={5}
+                    align="center"
+                    sx={{ py: 3 }}
+                  >
+                    <CircularProgress size={40} />
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : admins.length === 0 ? (
+                <TableRow key="empty-row">
+                  <TableCell
+                    key="empty-cell"
+                    colSpan={5}
+                    align="center"
+                    sx={{ py: 3 }}
+                  >
+                    <Typography variant="body1" color="text.secondary">
+                      No administrators found
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                admins.map((admin) => (
+                  <TableRow
+                    key={admin._id}
+                    sx={{
+                      "&:hover": {
+                        bgcolor: alpha(theme.palette.primary.main, 0.02),
+                      },
+                      transition: "background-color 0.2s",
+                    }}
+                  >
+                    <TableCell>
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Avatar
+                          sx={{
+                            width: 32,
+                            height: 32,
+                            mr: 1.5,
+                            bgcolor:
+                              admin.role === "superuser"
+                                ? theme.palette.error.main
+                                : theme.palette.primary.main,
+                          }}
+                        >
+                          {admin.name && admin.name.charAt(0).toUpperCase()}
+                        </Avatar>
+                        <Typography
+                          variant="body2"
+                          sx={{ fontWeight: "medium" }}
+                        >
+                          {admin.name || "Unknown"}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell>{admin.email}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={
+                          admin.role === "superuser" ? "Super User" : "Admin"
+                        }
+                        size="small"
+                        sx={{
+                          bgcolor:
+                            admin.role === "superuser"
+                              ? alpha(theme.palette.error.main, 0.1)
+                              : alpha(theme.palette.primary.main, 0.1),
+                          color:
+                            admin.role === "superuser"
+                              ? theme.palette.error.main
+                              : theme.palette.primary.main,
+                          fontWeight: "medium",
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      {admin.permissions && admin.permissions.length > 0 ? (
+                        <Box
+                          sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
+                        >
+                          {admin.permissions.slice(0, 2).map((permission) => (
+                            <Chip
+                              key={`${admin._id}-${permission}`}
+                              label={permission}
+                              size="small"
+                              sx={{
+                                fontSize: "0.7rem",
+                                bgcolor: alpha(theme.palette.info.main, 0.1),
+                                color: theme.palette.info.main,
+                              }}
+                            />
+                          ))}
+                          {admin.permissions.length > 2 && (
+                            <Chip
+                              key={`${admin._id}-more-permissions`}
+                              label={`+${admin.permissions.length - 2}`}
+                              size="small"
+                              sx={{
+                                fontSize: "0.7rem",
+                                bgcolor: alpha(theme.palette.grey[500], 0.1),
+                                color: theme.palette.grey[700],
+                              }}
+                            />
+                          )}
+                        </Box>
+                      ) : (
+                        <Typography variant="body2" color="text.secondary">
+                          No permissions
+                        </Typography>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ display: "flex" }}>
+                        <Tooltip title="Edit Admin">
+                          <IconButton
+                            size="small"
+                            onClick={() => handleOpenDialog(admin)}
+                            sx={{
+                              color: theme.palette.primary.main,
+                              "&:hover": {
+                                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                              },
+                            }}
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Manage Permissions">
+                          <IconButton
+                            size="small"
+                            onClick={() => handleOpenPermissionsDialog(admin)}
+                            sx={{
+                              color: theme.palette.info.main,
+                              "&:hover": {
+                                bgcolor: alpha(theme.palette.info.main, 0.1),
+                              },
+                            }}
+                          >
+                            <SecurityIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        {currentAdmin && currentAdmin._id !== admin._id && (
+                          <Tooltip title="Delete Admin">
+                            <IconButton
+                              size="small"
+                              onClick={() => handleDeleteClick(admin)}
+                              sx={{
+                                color: theme.palette.error.main,
+                                "&:hover": {
+                                  bgcolor: alpha(theme.palette.error.main, 0.1),
+                                },
+                              }}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </TableContainer>
+      </Card>
 
-        {/* Add/Edit Admin Dialog */}
-        <Dialog
-          open={openDialog}
-          onClose={handleCloseDialog}
-          maxWidth="sm"
-          fullWidth
-        >
-          <form onSubmit={handleSubmit}>
-            <DialogTitle>
-              {selectedAdmin ? "Edit Admin" : "Add New Admin"}
-            </DialogTitle>
-            <DialogContent>
-              {error && (
-                <Alert severity="error" sx={{ mb: 2 }}>
-                  {error}
-                </Alert>
-              )}
-              <Box
-                sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}
+      {/* Admin Form Dialog */}
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ pb: 1 }}>
+          {selectedAdmin ? "Edit Administrator" : "Add New Administrator"}
+        </DialogTitle>
+        <DialogContent sx={{ pb: 0, pt: 2 }}>
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Name"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                error={!!formErrors.name}
+                helperText={formErrors.name}
+                variant="outlined"
+                margin="normal"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                error={!!formErrors.email}
+                helperText={formErrors.email}
+                variant="outlined"
+                margin="normal"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label={
+                  selectedAdmin
+                    ? "Password (leave blank to keep current)"
+                    : "Password"
+                }
+                name="password"
+                type="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                error={!!formErrors.password}
+                helperText={formErrors.password}
+                variant="outlined"
+                margin="normal"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                select
+                fullWidth
+                label="Role"
+                name="role"
+                value={formData.role}
+                onChange={handleInputChange}
+                variant="outlined"
+                margin="normal"
+                SelectProps={{
+                  native: true,
+                }}
               >
-                <TextField
-                  name="name"
-                  label="Name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  error={!!formErrors.name}
-                  helperText={formErrors.name}
-                  fullWidth
-                  required
-                />
-                <TextField
-                  name="email"
-                  label="Email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  error={!!formErrors.email}
-                  helperText={formErrors.email}
-                  fullWidth
-                  required
-                />
-                <TextField
-                  name="password"
-                  label={selectedAdmin ? "New Password (optional)" : "Password"}
-                  type="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  error={!!formErrors.password}
-                  helperText={formErrors.password}
-                  fullWidth
-                  required={!selectedAdmin}
-                />
-              </Box>
-            </DialogContent>
-            <DialogActions sx={{ px: 3, pb: 2 }}>
-              <Button onClick={handleCloseDialog}>Cancel</Button>
-              <Button type="submit" variant="contained" color="primary">
-                {selectedAdmin ? "Update" : "Create"}
-              </Button>
-            </DialogActions>
-          </form>
-        </Dialog>
+                <option value="admin">Admin</option>
+                <option value="superuser">Super User</option>
+              </TextField>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, py: 2 }}>
+          <Button
+            onClick={handleCloseDialog}
+            color="inherit"
+            variant="outlined"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            color="primary"
+            variant="contained"
+            disabled={loading}
+            startIcon={
+              loading && <CircularProgress size={20} color="inherit" />
+            }
+          >
+            {selectedAdmin ? "Update" : "Create"}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-        {/* Delete Confirmation Dialog */}
-        <Dialog open={deleteDialogOpen} onClose={handleDeleteCancel}>
-          <DialogTitle>Confirm Delete</DialogTitle>
-          <DialogContent>
-            <Typography>
-              Are you sure you want to delete admin: {adminToDelete?.name}? This
-              action cannot be undone.
-            </Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDeleteCancel}>Cancel</Button>
-            <Button
-              onClick={handleDeleteConfirm}
-              color="error"
-              variant="contained"
-            >
-              Delete
-            </Button>
-          </DialogActions>
-        </Dialog>
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteCancel}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete administrator{" "}
+            <strong>{adminToDelete?.name}</strong>? This action cannot be
+            undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, py: 2 }}>
+          <Button
+            onClick={handleDeleteCancel}
+            color="inherit"
+            variant="outlined"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDeleteConfirm}
+            color="error"
+            variant="contained"
+            disabled={loading}
+            startIcon={
+              loading && <CircularProgress size={20} color="inherit" />
+            }
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-        {/* Permissions Dialog */}
-        <Dialog
-          open={permissionsDialogOpen}
-          onClose={handleClosePermissionsDialog}
-        >
-          <DialogTitle>
-            Manage Permissions for {permissionsAdmin?.name}
-          </DialogTitle>
-          <DialogContent>
-            <FormGroup>
-              {availablePermissions.map((permission) => (
-                <FormControlLabel
-                  key={permission}
-                  control={
-                    <Checkbox
-                      checked={selectedPermissions.includes(permission)}
-                      onChange={() => handlePermissionChange(permission)}
-                    />
-                  }
-                  label={permission}
-                />
-              ))}
-            </FormGroup>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClosePermissionsDialog}>Cancel</Button>
-            <Button
-              onClick={handleSavePermissions}
-              variant="contained"
-              color="primary"
-            >
-              Save Permissions
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Paper>
+      {/* Permissions Dialog */}
+      <Dialog
+        open={permissionsDialogOpen}
+        onClose={handleClosePermissionsDialog}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          Manage Permissions for {permissionsAdmin?.name}
+        </DialogTitle>
+        <DialogContent>
+          <FormGroup>
+            {availablePermissions.map((permission) => (
+              <FormControlLabel
+                key={permission}
+                control={
+                  <Checkbox
+                    checked={selectedPermissions.includes(permission)}
+                    onChange={() => handlePermissionChange(permission)}
+                    color="primary"
+                  />
+                }
+                label={permission}
+              />
+            ))}
+          </FormGroup>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, py: 2 }}>
+          <Button
+            onClick={handleClosePermissionsDialog}
+            color="inherit"
+            variant="outlined"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSavePermissions}
+            color="primary"
+            variant="contained"
+            disabled={loading}
+            startIcon={
+              loading && <CircularProgress size={20} color="inherit" />
+            }
+          >
+            Save Permissions
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

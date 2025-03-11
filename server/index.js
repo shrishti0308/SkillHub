@@ -80,6 +80,11 @@ app.get("/recent-bids", authenticateJWT, async (req, res) => {
   }
 });
 
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send("Something broke!");
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

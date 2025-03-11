@@ -27,59 +27,62 @@ function Sidebar() {
   return (
     <div className="relative h-screen w-[250px]">
       <div
-        className={`bg-grey fixed top-16 h-full z-10 left-0 text-light flex flex-col items-center ${
+        className={`bg-gradient-to-b from-grey to-dark fixed top-16 h-full z-10 left-0 text-light flex flex-col items-center shadow-xl ${
           isSidebarMinimized ? "w-16" : "w-56"
-        } transition-width duration-300`}
+        } transition-all duration-300 ease-in-out`}
       >
-        <div className="flex justify-between my-5 w-full pl-5 pr-5">
+        <div className="flex justify-between items-center my-5 w-full pl-5 pr-5">
           <div
-            className={`text-md flex items-start font-bold ${
+            className={`text-md flex items-center space-x-2 font-bold ${
               isSidebarMinimized ? "hidden" : "block"
             }`}
           >
-            <TiHomeOutline className="mr-2 mt-1.5 text-lg" />
-            <Link to="/dashboard" className="text-base font-normal p-0 m-1">
+            <TiHomeOutline className="text-xl text-cyan-blue" />
+            <Link 
+              to="/dashboard" 
+              className="text-base font-semibold hover:text-cyan-blue transition-colors duration-200"
+            >
               Dashboard
             </Link>
           </div>
           <button
-            className="text-light px-2 py-1 rounded"
+            className="text-cyan-blue hover:bg-dark p-2 rounded-full transition-all duration-200 hover:scale-110"
             onClick={() => dispatch(toggleSidebar())}
           >
             {isSidebarMinimized ? (
-              <FaAngleLeft className="font-light" />
+              <FaAngleLeft className="text-lg" />
             ) : (
-              <FaAngleRight className="font-light" />
+              <FaAngleRight className="text-lg" />
             )}
           </button>
         </div>
         {!isSidebarMinimized && (
-          <div className={`w-full flex flex-col justify-between h-3/4`}>
-            <div className="w-3/4 ml-10 flex flex-col justify-start">
+          <div className="w-full flex flex-col justify-between h-3/4">
+            <div className="w-4/5 mx-auto flex flex-col justify-start space-y-2">
               {showFreelancerMenu && (
                 <>
                   <Link
                     to="/dashboard/jobs"
-                    className={`flex my-3 ${
+                    className={`flex items-center rounded-lg ${
                       activeSection === "/dashboard/jobs"
-                        ? "bg-dark border-l-4 border-cyan-blue"
-                        : ""
-                    } px-4 py-2 hover:bg-dark text-cyan-blue`}
+                        ? "bg-dark border-l-4 border-cyan-blue text-cyan-blue shadow-md"
+                        : "hover:bg-dark/50"
+                    } px-4 py-3 transition-all duration-200 group`}
                   >
-                    <MdOutlineWorkOutline className="text-xl mr-3" />
-                    Jobs
+                    <MdOutlineWorkOutline className="text-xl mr-3 group-hover:text-cyan-blue" />
+                    <span className="group-hover:text-cyan-blue">Jobs</span>
                   </Link>
 
                   <Link
                     to="/dashboard/bids"
-                    className={`flex my-3 ${
+                    className={`flex items-center rounded-lg ${
                       activeSection === "/dashboard/bids"
-                        ? "bg-dark border-l-4 border-cyan-blue"
-                        : ""
-                    } px-4 py-2 hover:bg-dark text-cyan-blue`}
+                        ? "bg-dark border-l-4 border-cyan-blue text-cyan-blue shadow-md"
+                        : "hover:bg-dark/50"
+                    } px-4 py-3 transition-all duration-200 group`}
                   >
-                    <BiDollarCircle className="mr-3 text-xl" />
-                    Bidings
+                    <BiDollarCircle className="text-xl mr-3 group-hover:text-cyan-blue" />
+                    <span className="group-hover:text-cyan-blue">Bidings</span>
                   </Link>
                 </>
               )}
@@ -87,14 +90,14 @@ function Sidebar() {
               {/* Always show Projects */}
               <Link
                 to="/dashboard/projects"
-                className={`flex my-3 ${
+                className={`flex items-center rounded-lg ${
                   activeSection === "/dashboard/projects"
-                    ? "bg-dark border-l-4 border-cyan-blue"
-                    : ""
-                } px-4 py-2 hover:bg-dark text-cyan-blue`}
+                    ? "bg-dark border-l-4 border-cyan-blue text-cyan-blue shadow-md"
+                    : "hover:bg-dark/50"
+                } px-4 py-3 transition-all duration-200 group`}
               >
-                <FaLaptopCode className="mr-3 text-xl" />
-                Projects
+                <FaLaptopCode className="text-xl mr-3 group-hover:text-cyan-blue" />
+                <span className="group-hover:text-cyan-blue">Projects</span>
               </Link>
             </div>
           </div>

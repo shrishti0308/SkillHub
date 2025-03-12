@@ -50,7 +50,6 @@ Third-party middleware is external modules that provide additional functionality
 - `helmet` - Sets security-related HTTP headers
 - `morgan` - HTTP request logger
 - `express-rate-limit` - Limits repeated requests
-- `xss-clean` - Sanitizes user input against XSS attacks
 
 ---
 

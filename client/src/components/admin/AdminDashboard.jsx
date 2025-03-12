@@ -52,6 +52,26 @@ import {
   getCurrentAdmin,
 } from "../../redux/slices/adminSlice";
 
+// Custom dark theme colors for consistent styling
+const darkThemeColors = {
+  background: {
+    default: "#1a1d23", // dark
+    paper: "#23272f", // grey
+    card: "#23272f", // grey
+    lighter: "#2a2f38", // slightly lighter than grey
+  },
+  primary: {
+    main: "#58c4dc", // cyan-blue
+    light: "#7ad4e6", // lighter cyan-blue
+    dark: "#3a9cb2", // darker cyan-blue
+  },
+  text: {
+    primary: "#f6f7f9", // light
+    secondary: "#b0b7c3", // lighter grey
+  },
+  divider: "rgba(246, 247, 249, 0.12)", // light with opacity
+};
+
 const AdminDashboard = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
@@ -233,7 +253,15 @@ const AdminDashboard = () => {
   const regularAdmins = admins.filter((admin) => admin.role === "admin").length;
 
   return (
-    <Container maxWidth="xl">
+    <Container
+      maxWidth="xl"
+      sx={{
+        bgcolor: darkThemeColors.background.default,
+        color: darkThemeColors.text.primary,
+        pt: 2,
+        pb: 4,
+      }}
+    >
       {error && (
         <Alert
           severity="error"
@@ -257,11 +285,18 @@ const AdminDashboard = () => {
           <Typography
             variant="h4"
             component="h1"
-            sx={{ fontWeight: "bold", mb: 1 }}
+            sx={{
+              fontWeight: "bold",
+              mb: 1,
+              color: darkThemeColors.text.primary,
+            }}
           >
             Admin Dashboard
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography
+            variant="body1"
+            sx={{ color: darkThemeColors.text.secondary }}
+          >
             Manage administrators and their permissions
           </Typography>
         </Box>
@@ -275,7 +310,9 @@ const AdminDashboard = () => {
             px: 3,
             py: 1,
             boxShadow: 2,
+            bgcolor: darkThemeColors.primary.main,
             "&:hover": {
+              bgcolor: darkThemeColors.primary.dark,
               boxShadow: 4,
             },
           }}
@@ -292,11 +329,12 @@ const AdminDashboard = () => {
             sx={{
               borderRadius: 2,
               height: "100%",
-              border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+              bgcolor: darkThemeColors.background.card,
+              border: `1px solid ${darkThemeColors.divider}`,
               transition:
                 "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
               "&:hover": {
-                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
+                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
                 transform: "translateY(-2px)",
               },
             }}
@@ -305,8 +343,8 @@ const AdminDashboard = () => {
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <Avatar
                   sx={{
-                    bgcolor: alpha(theme.palette.primary.main, 0.1),
-                    color: theme.palette.primary.main,
+                    bgcolor: alpha(darkThemeColors.primary.main, 0.2),
+                    color: darkThemeColors.primary.main,
                     width: 48,
                     height: 48,
                   }}
@@ -314,22 +352,38 @@ const AdminDashboard = () => {
                   <AdminPanelSettingsIcon />
                 </Avatar>
                 <Box sx={{ ml: 2 }}>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    sx={{ color: darkThemeColors.text.secondary }}
+                  >
                     Total Admins
                   </Typography>
-                  <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-                    {loading ? <CircularProgress size={24} /> : totalAdmins}
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      fontWeight: "bold",
+                      color: darkThemeColors.text.primary,
+                    }}
+                  >
+                    {loading ? (
+                      <CircularProgress
+                        size={24}
+                        sx={{ color: darkThemeColors.primary.main }}
+                      />
+                    ) : (
+                      totalAdmins
+                    )}
                   </Typography>
                 </Box>
               </Box>
-              <Divider sx={{ my: 2 }} />
+              <Divider sx={{ my: 2, bgcolor: darkThemeColors.divider }} />
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Chip
                   label={`${superAdmins} Super Admins`}
                   size="small"
                   sx={{
-                    bgcolor: alpha(theme.palette.success.main, 0.1),
-                    color: theme.palette.success.main,
+                    bgcolor: alpha("#10b981", 0.2),
+                    color: "#10b981",
                     fontWeight: "medium",
                   }}
                 />
@@ -337,8 +391,8 @@ const AdminDashboard = () => {
                   label={`${regularAdmins} Regular Admins`}
                   size="small"
                   sx={{
-                    bgcolor: alpha(theme.palette.info.main, 0.1),
-                    color: theme.palette.info.main,
+                    bgcolor: alpha(darkThemeColors.primary.main, 0.2),
+                    color: darkThemeColors.primary.main,
                     fontWeight: "medium",
                   }}
                 />
@@ -356,7 +410,8 @@ const AdminDashboard = () => {
         sx={{
           borderRadius: 2,
           mb: 4,
-          border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+          bgcolor: darkThemeColors.background.card,
+          border: `1px solid ${darkThemeColors.divider}`,
         }}
       >
         <CardHeader
@@ -368,16 +423,24 @@ const AdminDashboard = () => {
                 justifyContent: "space-between",
               }}
             >
-              <Typography variant="h6">Administrator List</Typography>
+              <Typography
+                variant="h6"
+                sx={{ color: darkThemeColors.text.primary }}
+              >
+                Administrator List
+              </Typography>
               <Tooltip title="Refresh">
-                <IconButton onClick={() => dispatch(fetchAllAdmins())}>
+                <IconButton
+                  onClick={() => dispatch(fetchAllAdmins())}
+                  sx={{ color: darkThemeColors.primary.main }}
+                >
                   <RefreshIcon />
                 </IconButton>
               </Tooltip>
             </Box>
           }
           sx={{
-            borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
+            borderBottom: `1px solid ${darkThemeColors.divider}`,
             pb: 2,
           }}
         />
@@ -392,7 +455,9 @@ const AdminDashboard = () => {
                   key="name-header"
                   sx={{
                     fontWeight: "bold",
-                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                    bgcolor: darkThemeColors.background.lighter,
+                    color: darkThemeColors.text.primary,
+                    borderBottom: `1px solid ${darkThemeColors.divider}`,
                   }}
                 >
                   Name
@@ -401,7 +466,9 @@ const AdminDashboard = () => {
                   key="email-header"
                   sx={{
                     fontWeight: "bold",
-                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                    bgcolor: darkThemeColors.background.lighter,
+                    color: darkThemeColors.text.primary,
+                    borderBottom: `1px solid ${darkThemeColors.divider}`,
                   }}
                 >
                   Email
@@ -410,7 +477,9 @@ const AdminDashboard = () => {
                   key="role-header"
                   sx={{
                     fontWeight: "bold",
-                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                    bgcolor: darkThemeColors.background.lighter,
+                    color: darkThemeColors.text.primary,
+                    borderBottom: `1px solid ${darkThemeColors.divider}`,
                   }}
                 >
                   Role
@@ -419,7 +488,9 @@ const AdminDashboard = () => {
                   key="permissions-header"
                   sx={{
                     fontWeight: "bold",
-                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                    bgcolor: darkThemeColors.background.lighter,
+                    color: darkThemeColors.text.primary,
+                    borderBottom: `1px solid ${darkThemeColors.divider}`,
                   }}
                 >
                   Permissions
@@ -428,7 +499,9 @@ const AdminDashboard = () => {
                   key="actions-header"
                   sx={{
                     fontWeight: "bold",
-                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                    bgcolor: darkThemeColors.background.lighter,
+                    color: darkThemeColors.text.primary,
+                    borderBottom: `1px solid ${darkThemeColors.divider}`,
                   }}
                 >
                   Actions
@@ -442,9 +515,17 @@ const AdminDashboard = () => {
                     key="loading-cell"
                     colSpan={5}
                     align="center"
-                    sx={{ py: 3 }}
+                    sx={{
+                      py: 3,
+                      bgcolor: darkThemeColors.background.paper,
+                      color: darkThemeColors.text.primary,
+                      borderBottom: `1px solid ${darkThemeColors.divider}`,
+                    }}
                   >
-                    <CircularProgress size={40} />
+                    <CircularProgress
+                      size={40}
+                      sx={{ color: darkThemeColors.primary.main }}
+                    />
                   </TableCell>
                 </TableRow>
               ) : admins.length === 0 ? (
@@ -453,9 +534,14 @@ const AdminDashboard = () => {
                     key="empty-cell"
                     colSpan={5}
                     align="center"
-                    sx={{ py: 3 }}
+                    sx={{
+                      py: 3,
+                      bgcolor: darkThemeColors.background.paper,
+                      color: darkThemeColors.text.secondary,
+                      borderBottom: `1px solid ${darkThemeColors.divider}`,
+                    }}
                   >
-                    <Typography variant="body1" color="text.secondary">
+                    <Typography variant="body1" color="inherit">
                       No administrators found
                     </Typography>
                   </TableCell>
@@ -465,13 +551,20 @@ const AdminDashboard = () => {
                   <TableRow
                     key={admin._id}
                     sx={{
+                      bgcolor: darkThemeColors.background.paper,
+                      color: darkThemeColors.text.primary,
                       "&:hover": {
-                        bgcolor: alpha(theme.palette.primary.main, 0.02),
+                        bgcolor: darkThemeColors.background.lighter,
                       },
                       transition: "background-color 0.2s",
                     }}
                   >
-                    <TableCell>
+                    <TableCell
+                      sx={{
+                        color: darkThemeColors.text.primary,
+                        borderBottom: `1px solid ${darkThemeColors.divider}`,
+                      }}
+                    >
                       <Box sx={{ display: "flex", alignItems: "center" }}>
                         <Avatar
                           sx={{
@@ -494,8 +587,20 @@ const AdminDashboard = () => {
                         </Typography>
                       </Box>
                     </TableCell>
-                    <TableCell>{admin.email}</TableCell>
-                    <TableCell>
+                    <TableCell
+                      sx={{
+                        color: darkThemeColors.text.primary,
+                        borderBottom: `1px solid ${darkThemeColors.divider}`,
+                      }}
+                    >
+                      {admin.email}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: darkThemeColors.text.primary,
+                        borderBottom: `1px solid ${darkThemeColors.divider}`,
+                      }}
+                    >
                       <Chip
                         label={
                           admin.role === "superuser" ? "Super User" : "Admin"
@@ -514,7 +619,12 @@ const AdminDashboard = () => {
                         }}
                       />
                     </TableCell>
-                    <TableCell>
+                    <TableCell
+                      sx={{
+                        color: darkThemeColors.text.primary,
+                        borderBottom: `1px solid ${darkThemeColors.divider}`,
+                      }}
+                    >
                       {admin.permissions && admin.permissions.length > 0 ? (
                         <Box
                           sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
@@ -550,7 +660,12 @@ const AdminDashboard = () => {
                         </Typography>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell
+                      sx={{
+                        color: darkThemeColors.text.primary,
+                        borderBottom: `1px solid ${darkThemeColors.divider}`,
+                      }}
+                    >
                       <Box sx={{ display: "flex" }}>
                         <Tooltip title="Edit Admin">
                           <IconButton
@@ -612,8 +727,15 @@ const AdminDashboard = () => {
         onClose={handleCloseDialog}
         maxWidth="sm"
         fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: darkThemeColors.background.paper,
+            color: darkThemeColors.text.primary,
+            borderRadius: 2,
+          },
+        }}
       >
-        <DialogTitle sx={{ pb: 1 }}>
+        <DialogTitle sx={{ pb: 1, color: darkThemeColors.text.primary }}>
           {selectedAdmin ? "Edit Administrator" : "Add New Administrator"}
         </DialogTitle>
         <DialogContent sx={{ pb: 0, pt: 2 }}>
@@ -634,6 +756,23 @@ const AdminDashboard = () => {
                 helperText={formErrors.name}
                 variant="outlined"
                 margin="normal"
+                InputLabelProps={{
+                  sx: { color: darkThemeColors.text.secondary },
+                }}
+                InputProps={{
+                  sx: {
+                    color: darkThemeColors.text.primary,
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.divider,
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -648,6 +787,23 @@ const AdminDashboard = () => {
                 helperText={formErrors.email}
                 variant="outlined"
                 margin="normal"
+                InputLabelProps={{
+                  sx: { color: darkThemeColors.text.secondary },
+                }}
+                InputProps={{
+                  sx: {
+                    color: darkThemeColors.text.primary,
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.divider,
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -666,6 +822,23 @@ const AdminDashboard = () => {
                 helperText={formErrors.password}
                 variant="outlined"
                 margin="normal"
+                InputLabelProps={{
+                  sx: { color: darkThemeColors.text.secondary },
+                }}
+                InputProps={{
+                  sx: {
+                    color: darkThemeColors.text.primary,
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.divider,
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -678,6 +851,23 @@ const AdminDashboard = () => {
                 onChange={handleInputChange}
                 variant="outlined"
                 margin="normal"
+                InputLabelProps={{
+                  sx: { color: darkThemeColors.text.secondary },
+                }}
+                InputProps={{
+                  sx: {
+                    color: darkThemeColors.text.primary,
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.divider,
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                  },
+                }}
                 SelectProps={{
                   native: true,
                 }}
@@ -693,17 +883,30 @@ const AdminDashboard = () => {
             onClick={handleCloseDialog}
             color="inherit"
             variant="outlined"
+            sx={{
+              color: darkThemeColors.text.primary,
+              borderColor: darkThemeColors.divider,
+              "&:hover": {
+                borderColor: darkThemeColors.text.primary,
+                bgcolor: alpha(darkThemeColors.text.primary, 0.1),
+              },
+            }}
           >
             Cancel
           </Button>
           <Button
             onClick={handleSubmit}
-            color="primary"
             variant="contained"
             disabled={loading}
             startIcon={
               loading && <CircularProgress size={20} color="inherit" />
             }
+            sx={{
+              bgcolor: darkThemeColors.primary.main,
+              "&:hover": {
+                bgcolor: darkThemeColors.primary.dark,
+              },
+            }}
           >
             {selectedAdmin ? "Update" : "Create"}
           </Button>
@@ -716,10 +919,19 @@ const AdminDashboard = () => {
         onClose={handleDeleteCancel}
         maxWidth="xs"
         fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: darkThemeColors.background.paper,
+            color: darkThemeColors.text.primary,
+            borderRadius: 2,
+          },
+        }}
       >
-        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogTitle sx={{ color: darkThemeColors.text.primary }}>
+          Confirm Delete
+        </DialogTitle>
         <DialogContent>
-          <Typography>
+          <Typography sx={{ color: darkThemeColors.text.primary }}>
             Are you sure you want to delete administrator{" "}
             <strong>{adminToDelete?.name}</strong>? This action cannot be
             undone.
@@ -730,17 +942,30 @@ const AdminDashboard = () => {
             onClick={handleDeleteCancel}
             color="inherit"
             variant="outlined"
+            sx={{
+              color: darkThemeColors.text.primary,
+              borderColor: darkThemeColors.divider,
+              "&:hover": {
+                borderColor: darkThemeColors.text.primary,
+                bgcolor: alpha(darkThemeColors.text.primary, 0.1),
+              },
+            }}
           >
             Cancel
           </Button>
           <Button
             onClick={handleDeleteConfirm}
-            color="error"
             variant="contained"
             disabled={loading}
             startIcon={
               loading && <CircularProgress size={20} color="inherit" />
             }
+            sx={{
+              bgcolor: "#ef4444", // Tailwind red-500
+              "&:hover": {
+                bgcolor: "#dc2626", // Tailwind red-600
+              },
+            }}
           >
             Delete
           </Button>
@@ -753,8 +978,15 @@ const AdminDashboard = () => {
         onClose={handleClosePermissionsDialog}
         maxWidth="sm"
         fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: darkThemeColors.background.paper,
+            color: darkThemeColors.text.primary,
+            borderRadius: 2,
+          },
+        }}
       >
-        <DialogTitle>
+        <DialogTitle sx={{ color: darkThemeColors.text.primary }}>
           Manage Permissions for {permissionsAdmin?.name}
         </DialogTitle>
         <DialogContent>
@@ -766,10 +998,16 @@ const AdminDashboard = () => {
                   <Checkbox
                     checked={selectedPermissions.includes(permission)}
                     onChange={() => handlePermissionChange(permission)}
-                    color="primary"
+                    sx={{
+                      color: darkThemeColors.primary.main,
+                      "&.Mui-checked": {
+                        color: darkThemeColors.primary.main,
+                      },
+                    }}
                   />
                 }
                 label={permission}
+                sx={{ color: darkThemeColors.text.primary }}
               />
             ))}
           </FormGroup>
@@ -779,17 +1017,30 @@ const AdminDashboard = () => {
             onClick={handleClosePermissionsDialog}
             color="inherit"
             variant="outlined"
+            sx={{
+              color: darkThemeColors.text.primary,
+              borderColor: darkThemeColors.divider,
+              "&:hover": {
+                borderColor: darkThemeColors.text.primary,
+                bgcolor: alpha(darkThemeColors.text.primary, 0.1),
+              },
+            }}
           >
             Cancel
           </Button>
           <Button
             onClick={handleSavePermissions}
-            color="primary"
             variant="contained"
             disabled={loading}
             startIcon={
               loading && <CircularProgress size={20} color="inherit" />
             }
+            sx={{
+              bgcolor: darkThemeColors.primary.main,
+              "&:hover": {
+                bgcolor: darkThemeColors.primary.dark,
+              },
+            }}
           >
             Save Permissions
           </Button>

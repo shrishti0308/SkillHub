@@ -24,7 +24,6 @@ import {
   InputAdornment,
   Tooltip,
   CircularProgress,
-  useTheme,
   alpha,
   Divider,
   Avatar,
@@ -47,10 +46,29 @@ import {
   updateUser,
 } from "../../redux/slices/adminUsersSlice";
 
+// Custom dark theme colors for consistent styling
+const darkThemeColors = {
+  background: {
+    default: "#1a1d23", // dark
+    paper: "#23272f", // grey
+    card: "#23272f", // grey
+    lighter: "#2a2f38", // slightly lighter than grey
+  },
+  primary: {
+    main: "#58c4dc", // cyan-blue
+    light: "#7ad4e6", // lighter cyan-blue
+    dark: "#3a9cb2", // darker cyan-blue
+  },
+  text: {
+    primary: "#f6f7f9", // light
+    secondary: "#b0b7c3", // lighter grey
+  },
+  divider: "rgba(246, 247, 249, 0.12)", // light with opacity
+};
+
 const USER_ROLES = ["freelancer", "enterprise", "hybrid"];
 
 const AdminUsers = () => {
-  const theme = useTheme();
   const dispatch = useDispatch();
   const { users, loading } = useSelector((state) => state.adminUsers);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -166,7 +184,13 @@ const AdminUsers = () => {
   const pageCount = Math.ceil(filteredUsers.length / rowsPerPage);
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box
+      sx={{
+        p: 3,
+        bgcolor: darkThemeColors.background.default,
+        minHeight: "100vh",
+      }}
+    >
       {/* Page Header */}
       <Box
         sx={{
@@ -180,11 +204,18 @@ const AdminUsers = () => {
           <Typography
             variant="h4"
             component="h1"
-            sx={{ fontWeight: "bold", mb: 1 }}
+            sx={{
+              fontWeight: "bold",
+              mb: 1,
+              color: darkThemeColors.text.primary,
+            }}
           >
             User Management
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography
+            variant="body1"
+            sx={{ color: darkThemeColors.text.secondary }}
+          >
             View and manage all users on the platform
           </Typography>
         </Box>
@@ -199,7 +230,9 @@ const AdminUsers = () => {
                   borderRadius: 2,
                   py: 1,
                   boxShadow: 2,
+                  bgcolor: darkThemeColors.primary.main,
                   "&:hover": {
+                    bgcolor: darkThemeColors.primary.dark,
                     boxShadow: 4,
                   },
                 }}
@@ -219,11 +252,12 @@ const AdminUsers = () => {
             sx={{
               borderRadius: 2,
               height: "100%",
-              border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+              bgcolor: darkThemeColors.background.card,
+              border: `1px solid ${darkThemeColors.divider}`,
               transition:
                 "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
               "&:hover": {
-                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
+                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
                 transform: "translateY(-2px)",
               },
             }}
@@ -232,8 +266,8 @@ const AdminUsers = () => {
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <Avatar
                   sx={{
-                    bgcolor: alpha(theme.palette.primary.main, 0.1),
-                    color: theme.palette.primary.main,
+                    bgcolor: alpha(darkThemeColors.primary.main, 0.2),
+                    color: darkThemeColors.primary.main,
                     width: 48,
                     height: 48,
                   }}
@@ -241,15 +275,31 @@ const AdminUsers = () => {
                   <PersonAdd />
                 </Avatar>
                 <Box sx={{ ml: 2 }}>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    sx={{ color: darkThemeColors.text.secondary }}
+                  >
                     Total Users
                   </Typography>
-                  <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-                    {loading ? <CircularProgress size={24} /> : totalUsers}
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      fontWeight: "bold",
+                      color: darkThemeColors.text.primary,
+                    }}
+                  >
+                    {loading ? (
+                      <CircularProgress
+                        size={24}
+                        sx={{ color: darkThemeColors.primary.main }}
+                      />
+                    ) : (
+                      totalUsers
+                    )}
                   </Typography>
                 </Box>
               </Box>
-              <Divider sx={{ my: 2 }} />
+              <Divider sx={{ my: 2, bgcolor: darkThemeColors.divider }} />
             </CardContent>
           </Card>
         </Grid>
@@ -260,11 +310,12 @@ const AdminUsers = () => {
             sx={{
               borderRadius: 2,
               height: "100%",
-              border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+              bgcolor: darkThemeColors.background.card,
+              border: `1px solid ${darkThemeColors.divider}`,
               transition:
                 "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
               "&:hover": {
-                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
+                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
                 transform: "translateY(-2px)",
               },
             }}
@@ -273,8 +324,8 @@ const AdminUsers = () => {
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <Avatar
                   sx={{
-                    bgcolor: alpha(theme.palette.info.main, 0.1),
-                    color: theme.palette.info.main,
+                    bgcolor: alpha(darkThemeColors.primary.main, 0.2),
+                    color: darkThemeColors.primary.main,
                     width: 48,
                     height: 48,
                   }}
@@ -282,19 +333,31 @@ const AdminUsers = () => {
                   <VerifiedUser />
                 </Avatar>
                 <Box sx={{ ml: 2 }}>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    sx={{ color: darkThemeColors.text.secondary }}
+                  >
                     User Roles
                   </Typography>
-                  <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      fontWeight: "bold",
+                      color: darkThemeColors.text.primary,
+                    }}
+                  >
                     {loading ? (
-                      <CircularProgress size={24} />
+                      <CircularProgress
+                        size={24}
+                        sx={{ color: darkThemeColors.primary.main }}
+                      />
                     ) : (
                       USER_ROLES.length
                     )}
                   </Typography>
                 </Box>
               </Box>
-              <Divider sx={{ my: 2 }} />
+              <Divider sx={{ my: 2, bgcolor: darkThemeColors.divider }} />
             </CardContent>
           </Card>
         </Grid>
@@ -306,7 +369,8 @@ const AdminUsers = () => {
         sx={{
           borderRadius: 2,
           mb: 3,
-          border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+          bgcolor: darkThemeColors.background.card,
+          border: `1px solid ${darkThemeColors.divider}`,
         }}
       >
         <CardContent sx={{ p: 2 }}>
@@ -320,10 +384,22 @@ const AdminUsers = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Search color="action" />
+                      <Search sx={{ color: darkThemeColors.text.secondary }} />
                     </InputAdornment>
                   ),
-                  sx: { borderRadius: 2 },
+                  sx: {
+                    borderRadius: 2,
+                    color: darkThemeColors.text.primary,
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.divider,
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                  },
                 }}
                 variant="outlined"
                 size="small"
@@ -331,17 +407,43 @@ const AdminUsers = () => {
             </Grid>
             <Grid item xs={12} md={3}>
               <FormControl fullWidth size="small">
-                <InputLabel id="role-filter-label">Filter by Role</InputLabel>
+                <InputLabel
+                  id="role-filter-label"
+                  sx={{ color: darkThemeColors.text.secondary }}
+                >
+                  Filter by Role
+                </InputLabel>
                 <Select
                   labelId="role-filter-label"
                   value={roleFilter}
                   label="Filter by Role"
                   onChange={(e) => setRoleFilter(e.target.value)}
-                  sx={{ borderRadius: 2 }}
+                  sx={{
+                    borderRadius: 2,
+                    color: darkThemeColors.text.primary,
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.divider,
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                  }}
                 >
-                  <MenuItem value="all">All Roles</MenuItem>
+                  <MenuItem
+                    value="all"
+                    sx={{ color: darkThemeColors.text.primary }}
+                  >
+                    All Roles
+                  </MenuItem>
                   {USER_ROLES.map((role) => (
-                    <MenuItem key={role} value={role}>
+                    <MenuItem
+                      key={role}
+                      value={role}
+                      sx={{ color: darkThemeColors.text.primary }}
+                    >
                       {role.charAt(0).toUpperCase() + role.slice(1)}
                     </MenuItem>
                   ))}
@@ -358,10 +460,10 @@ const AdminUsers = () => {
                 <IconButton
                   onClick={() => dispatch(fetchUsers())}
                   sx={{
-                    bgcolor: alpha(theme.palette.primary.main, 0.1),
-                    color: theme.palette.primary.main,
+                    bgcolor: alpha(darkThemeColors.primary.main, 0.2),
+                    color: darkThemeColors.primary.main,
                     "&:hover": {
-                      bgcolor: alpha(theme.palette.primary.main, 0.2),
+                      bgcolor: alpha(darkThemeColors.primary.main, 0.3),
                     },
                     mr: 1,
                   }}
@@ -380,7 +482,8 @@ const AdminUsers = () => {
         sx={{
           borderRadius: 2,
           mb: 3,
-          border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+          bgcolor: darkThemeColors.background.card,
+          border: `1px solid ${darkThemeColors.divider}`,
         }}
       >
         <TableContainer
@@ -393,7 +496,9 @@ const AdminUsers = () => {
                 <TableCell
                   sx={{
                     fontWeight: "bold",
-                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                    bgcolor: darkThemeColors.background.lighter,
+                    color: darkThemeColors.text.primary,
+                    borderBottom: `1px solid ${darkThemeColors.divider}`,
                   }}
                 >
                   User
@@ -401,7 +506,9 @@ const AdminUsers = () => {
                 <TableCell
                   sx={{
                     fontWeight: "bold",
-                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                    bgcolor: darkThemeColors.background.lighter,
+                    color: darkThemeColors.text.primary,
+                    borderBottom: `1px solid ${darkThemeColors.divider}`,
                   }}
                 >
                   Email
@@ -409,7 +516,9 @@ const AdminUsers = () => {
                 <TableCell
                   sx={{
                     fontWeight: "bold",
-                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                    bgcolor: darkThemeColors.background.lighter,
+                    color: darkThemeColors.text.primary,
+                    borderBottom: `1px solid ${darkThemeColors.divider}`,
                   }}
                 >
                   Role
@@ -417,7 +526,9 @@ const AdminUsers = () => {
                 <TableCell
                   sx={{
                     fontWeight: "bold",
-                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                    bgcolor: darkThemeColors.background.lighter,
+                    color: darkThemeColors.text.primary,
+                    borderBottom: `1px solid ${darkThemeColors.divider}`,
                   }}
                 >
                   Skills
@@ -425,7 +536,9 @@ const AdminUsers = () => {
                 <TableCell
                   sx={{
                     fontWeight: "bold",
-                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                    bgcolor: darkThemeColors.background.lighter,
+                    color: darkThemeColors.text.primary,
+                    borderBottom: `1px solid ${darkThemeColors.divider}`,
                   }}
                 >
                   Actions
@@ -435,14 +548,34 @@ const AdminUsers = () => {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ py: 5 }}>
-                    <CircularProgress />
+                  <TableCell
+                    colSpan={5}
+                    align="center"
+                    sx={{
+                      py: 3,
+                      bgcolor: darkThemeColors.background.paper,
+                      color: darkThemeColors.text.primary,
+                      borderBottom: `1px solid ${darkThemeColors.divider}`,
+                    }}
+                  >
+                    <CircularProgress
+                      sx={{ color: darkThemeColors.primary.main }}
+                    />
                   </TableCell>
                 </TableRow>
-              ) : paginatedUsers.length === 0 ? (
+              ) : filteredUsers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ py: 5 }}>
-                    <Typography variant="body1" color="text.secondary">
+                  <TableCell
+                    colSpan={5}
+                    align="center"
+                    sx={{
+                      py: 3,
+                      bgcolor: darkThemeColors.background.paper,
+                      color: darkThemeColors.text.secondary,
+                      borderBottom: `1px solid ${darkThemeColors.divider}`,
+                    }}
+                  >
+                    <Typography variant="body1" color="inherit">
                       No users found matching your filters
                     </Typography>
                   </TableCell>
@@ -452,13 +585,20 @@ const AdminUsers = () => {
                   <TableRow
                     key={user._id}
                     sx={{
+                      bgcolor: darkThemeColors.background.paper,
+                      color: darkThemeColors.text.primary,
                       "&:hover": {
-                        bgcolor: alpha(theme.palette.primary.main, 0.02),
+                        bgcolor: darkThemeColors.background.lighter,
                       },
                       transition: "background-color 0.2s",
                     }}
                   >
-                    <TableCell>
+                    <TableCell
+                      sx={{
+                        color: darkThemeColors.text.primary,
+                        borderBottom: `1px solid ${darkThemeColors.divider}`,
+                      }}
+                    >
                       <Box sx={{ display: "flex", alignItems: "center" }}>
                         <Avatar
                           src={user.avatar}
@@ -469,7 +609,7 @@ const AdminUsers = () => {
                             mr: 2,
                             bgcolor: user.avatar
                               ? "transparent"
-                              : theme.palette.primary.main,
+                              : darkThemeColors.primary.main,
                           }}
                         >
                           {!user.avatar && user.name?.charAt(0).toUpperCase()}
@@ -477,18 +617,36 @@ const AdminUsers = () => {
                         <Box>
                           <Typography
                             variant="body2"
-                            sx={{ fontWeight: "medium" }}
+                            sx={{
+                              fontWeight: "medium",
+                              color: darkThemeColors.text.primary,
+                            }}
                           >
                             {user.name}
                           </Typography>
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography
+                            variant="caption"
+                            sx={{ color: darkThemeColors.text.secondary }}
+                          >
                             @{user.username}
                           </Typography>
                         </Box>
                       </Box>
                     </TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>
+                    <TableCell
+                      sx={{
+                        color: darkThemeColors.text.primary,
+                        borderBottom: `1px solid ${darkThemeColors.divider}`,
+                      }}
+                    >
+                      {user.email}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: darkThemeColors.text.primary,
+                        borderBottom: `1px solid ${darkThemeColors.divider}`,
+                      }}
+                    >
                       <Chip
                         label={
                           user.role?.charAt(0).toUpperCase() +
@@ -496,23 +654,18 @@ const AdminUsers = () => {
                         }
                         size="small"
                         sx={{
-                          bgcolor:
-                            user.role === "freelancer"
-                              ? alpha(theme.palette.info.main, 0.1)
-                              : user.role === "enterprise"
-                              ? alpha(theme.palette.secondary.main, 0.1)
-                              : alpha(theme.palette.success.main, 0.1),
-                          color:
-                            user.role === "freelancer"
-                              ? theme.palette.info.main
-                              : user.role === "enterprise"
-                              ? theme.palette.secondary.main
-                              : theme.palette.success.main,
+                          bgcolor: alpha(darkThemeColors.primary.main, 0.2),
+                          color: darkThemeColors.primary.main,
                           fontWeight: "medium",
                         }}
                       />
                     </TableCell>
-                    <TableCell>
+                    <TableCell
+                      sx={{
+                        color: darkThemeColors.text.primary,
+                        borderBottom: `1px solid ${darkThemeColors.divider}`,
+                      }}
+                    >
                       {user.info?.skills && user.info.skills.length > 0 ? (
                         <Box
                           sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
@@ -524,8 +677,11 @@ const AdminUsers = () => {
                               size="small"
                               sx={{
                                 fontSize: "0.7rem",
-                                bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                color: theme.palette.primary.main,
+                                bgcolor: alpha(
+                                  darkThemeColors.primary.main,
+                                  0.2
+                                ),
+                                color: darkThemeColors.primary.main,
                               }}
                             />
                           ))}
@@ -535,28 +691,42 @@ const AdminUsers = () => {
                               size="small"
                               sx={{
                                 fontSize: "0.7rem",
-                                bgcolor: alpha(theme.palette.grey[500], 0.1),
-                                color: theme.palette.grey[700],
+                                bgcolor: alpha(
+                                  darkThemeColors.text.secondary,
+                                  0.2
+                                ),
+                                color: darkThemeColors.text.secondary,
                               }}
                             />
                           )}
                         </Box>
                       ) : (
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography
+                          variant="body2"
+                          sx={{ color: darkThemeColors.text.secondary }}
+                        >
                           No skills listed
                         </Typography>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell
+                      sx={{
+                        color: darkThemeColors.text.primary,
+                        borderBottom: `1px solid ${darkThemeColors.divider}`,
+                      }}
+                    >
                       <Box sx={{ display: "flex" }}>
                         <Tooltip title="Edit User">
                           <IconButton
                             size="small"
                             onClick={() => handleEditClick(user)}
                             sx={{
-                              color: theme.palette.primary.main,
+                              color: darkThemeColors.primary.main,
                               "&:hover": {
-                                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                                bgcolor: alpha(
+                                  darkThemeColors.primary.main,
+                                  0.2
+                                ),
                               },
                             }}
                           >
@@ -568,9 +738,9 @@ const AdminUsers = () => {
                             size="small"
                             onClick={() => handleDeleteClick(user)}
                             sx={{
-                              color: theme.palette.error.main,
+                              color: "#ef4444",
                               "&:hover": {
-                                bgcolor: alpha(theme.palette.error.main, 0.1),
+                                bgcolor: alpha("#ef4444", 0.2),
                               },
                             }}
                           >
@@ -593,7 +763,21 @@ const AdminUsers = () => {
               count={pageCount}
               page={page}
               onChange={(event, value) => setPage(value)}
-              color="primary"
+              sx={{
+                "& .MuiPaginationItem-root": {
+                  color: darkThemeColors.text.primary,
+                  "&.Mui-selected": {
+                    bgcolor: alpha(darkThemeColors.primary.main, 0.2),
+                    color: darkThemeColors.primary.main,
+                    "&:hover": {
+                      bgcolor: alpha(darkThemeColors.primary.main, 0.3),
+                    },
+                  },
+                  "&:hover": {
+                    bgcolor: alpha(darkThemeColors.text.primary, 0.1),
+                  },
+                },
+              }}
               showFirstButton
               showLastButton
             />
@@ -607,9 +791,18 @@ const AdminUsers = () => {
         onClose={() => setOpenEditDialog(false)}
         maxWidth="md"
         fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: darkThemeColors.background.paper,
+            color: darkThemeColors.text.primary,
+            borderRadius: 2,
+          },
+        }}
       >
-        <DialogTitle>Edit User</DialogTitle>
-        <DialogContent dividers>
+        <DialogTitle sx={{ color: darkThemeColors.text.primary }}>
+          Edit User
+        </DialogTitle>
+        <DialogContent dividers sx={{ borderColor: darkThemeColors.divider }}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
               <TextField
@@ -620,6 +813,23 @@ const AdminUsers = () => {
                   setEditFormData({ ...editFormData, name: e.target.value })
                 }
                 margin="normal"
+                InputLabelProps={{
+                  sx: { color: darkThemeColors.text.secondary },
+                }}
+                InputProps={{
+                  sx: {
+                    color: darkThemeColors.text.primary,
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.divider,
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -631,6 +841,23 @@ const AdminUsers = () => {
                   setEditFormData({ ...editFormData, username: e.target.value })
                 }
                 margin="normal"
+                InputLabelProps={{
+                  sx: { color: darkThemeColors.text.secondary },
+                }}
+                InputProps={{
+                  sx: {
+                    color: darkThemeColors.text.primary,
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.divider,
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -643,20 +870,55 @@ const AdminUsers = () => {
                   setEditFormData({ ...editFormData, email: e.target.value })
                 }
                 margin="normal"
+                InputLabelProps={{
+                  sx: { color: darkThemeColors.text.secondary },
+                }}
+                InputProps={{
+                  sx: {
+                    color: darkThemeColors.text.primary,
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.divider,
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12} md={6}>
               <FormControl fullWidth margin="normal">
-                <InputLabel>Role</InputLabel>
+                <InputLabel sx={{ color: darkThemeColors.text.secondary }}>
+                  Role
+                </InputLabel>
                 <Select
                   value={editFormData.role}
                   label="Role"
                   onChange={(e) =>
                     setEditFormData({ ...editFormData, role: e.target.value })
                   }
+                  sx={{
+                    color: darkThemeColors.text.primary,
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.divider,
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                  }}
                 >
                   {USER_ROLES.map((role) => (
-                    <MenuItem key={role} value={role}>
+                    <MenuItem
+                      key={role}
+                      value={role}
+                      sx={{ color: darkThemeColors.text.primary }}
+                    >
                       {role.charAt(0).toUpperCase() + role.slice(1)}
                     </MenuItem>
                   ))}
@@ -676,10 +938,22 @@ const AdminUsers = () => {
                   })
                 }
                 margin="normal"
+                InputLabelProps={{
+                  sx: { color: darkThemeColors.text.secondary },
+                }}
                 InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">%</InputAdornment>
-                  ),
+                  sx: {
+                    color: darkThemeColors.text.primary,
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.divider,
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                  },
                 }}
               />
             </Grid>
@@ -694,6 +968,23 @@ const AdminUsers = () => {
                   setEditFormData({ ...editFormData, bio: e.target.value })
                 }
                 margin="normal"
+                InputLabelProps={{
+                  sx: { color: darkThemeColors.text.secondary },
+                }}
+                InputProps={{
+                  sx: {
+                    color: darkThemeColors.text.primary,
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.divider,
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -708,6 +999,23 @@ const AdminUsers = () => {
                   })
                 }
                 margin="normal"
+                InputLabelProps={{
+                  sx: { color: darkThemeColors.text.secondary },
+                }}
+                InputProps={{
+                  sx: {
+                    color: darkThemeColors.text.primary,
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.divider,
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -722,6 +1030,23 @@ const AdminUsers = () => {
                   })
                 }
                 margin="normal"
+                InputLabelProps={{
+                  sx: { color: darkThemeColors.text.secondary },
+                }}
+                InputProps={{
+                  sx: {
+                    color: darkThemeColors.text.primary,
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.divider,
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                  },
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -736,6 +1061,23 @@ const AdminUsers = () => {
                   })
                 }
                 margin="normal"
+                InputLabelProps={{
+                  sx: { color: darkThemeColors.text.secondary },
+                }}
+                InputProps={{
+                  sx: {
+                    color: darkThemeColors.text.primary,
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.divider,
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: darkThemeColors.primary.main,
+                    },
+                  },
+                }}
               />
             </Grid>
           </Grid>
@@ -743,19 +1085,31 @@ const AdminUsers = () => {
         <DialogActions sx={{ px: 3, py: 2 }}>
           <Button
             onClick={() => setOpenEditDialog(false)}
-            color="inherit"
             variant="outlined"
+            sx={{
+              color: darkThemeColors.text.primary,
+              borderColor: darkThemeColors.divider,
+              "&:hover": {
+                borderColor: darkThemeColors.text.primary,
+                bgcolor: alpha(darkThemeColors.text.primary, 0.1),
+              },
+            }}
           >
             Cancel
           </Button>
           <Button
             onClick={handleEditSubmit}
-            color="primary"
             variant="contained"
             disabled={loading}
             startIcon={
               loading && <CircularProgress size={20} color="inherit" />
             }
+            sx={{
+              bgcolor: darkThemeColors.primary.main,
+              "&:hover": {
+                bgcolor: darkThemeColors.primary.dark,
+              },
+            }}
           >
             Save Changes
           </Button>
@@ -768,10 +1122,19 @@ const AdminUsers = () => {
         onClose={() => setOpenDeleteDialog(false)}
         maxWidth="xs"
         fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: darkThemeColors.background.paper,
+            color: darkThemeColors.text.primary,
+            borderRadius: 2,
+          },
+        }}
       >
-        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogTitle sx={{ color: darkThemeColors.text.primary }}>
+          Confirm Delete
+        </DialogTitle>
         <DialogContent>
-          <Typography>
+          <Typography sx={{ color: darkThemeColors.text.primary }}>
             Are you sure you want to delete user{" "}
             <strong>{selectedUser?.name}</strong>? This action cannot be undone.
           </Typography>
@@ -779,19 +1142,31 @@ const AdminUsers = () => {
         <DialogActions sx={{ px: 3, py: 2 }}>
           <Button
             onClick={() => setOpenDeleteDialog(false)}
-            color="inherit"
             variant="outlined"
+            sx={{
+              color: darkThemeColors.text.primary,
+              borderColor: darkThemeColors.divider,
+              "&:hover": {
+                borderColor: darkThemeColors.text.primary,
+                bgcolor: alpha(darkThemeColors.text.primary, 0.1),
+              },
+            }}
           >
             Cancel
           </Button>
           <Button
             onClick={handleConfirmDelete}
-            color="error"
             variant="contained"
             disabled={loading}
             startIcon={
               loading && <CircularProgress size={20} color="inherit" />
             }
+            sx={{
+              bgcolor: "#ef4444", // Tailwind red-500
+              "&:hover": {
+                bgcolor: "#dc2626", // Tailwind red-600
+              },
+            }}
           >
             Delete
           </Button>

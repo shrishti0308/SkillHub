@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import axiosInstance from "../../api/axiosInstance";
 import ReactStars from "react-stars";
 import ReviewModal from "./ProfileComponents/ReviewModal";
 import { selectUsername } from "../../redux/Features/user/authSlice";
+import { createChat } from "../../redux/Features/chat/chatSlice";
 
 const ProfilePage = () => {
   const { username } = useParams();
@@ -15,6 +16,8 @@ const ProfilePage = () => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [activeSection, setActiveSection] = useState("skills");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const currentUsername = useSelector(selectUsername);
 
@@ -56,6 +59,20 @@ const ProfilePage = () => {
     }
   };
 
+  const handleStartChat = async () => {
+    if (user && user._id) {
+      try {
+        const result = await dispatch(createChat(user._id));
+        if (!result.error) {
+          const chatId = result.payload.chatId;
+          navigate(`/chat/${chatId}`);
+        }
+      } catch (error) {
+        console.error("Error starting chat:", error);
+      }
+    }
+  };
+
   if (loading)
     return (
       <div className="flex justify-center items-center h-screen bg-gray-900">
@@ -82,8 +99,12 @@ const ProfilePage = () => {
           <div className="relative">
             <img
               className="w-32 h-32 rounded-full border-4 border-gray-900 shadow-xl object-cover"
-              src={user.info?.profilePic ? `http://localhost:3000/public${user.info.profilePic}` : '/default-avatar.png'}
-              alt={`${user.name || 'User'}'s profile`}
+              src={
+                user.info?.profilePic
+                  ? `http://localhost:3000/public${user.info.profilePic}`
+                  : "/default-avatar.png"
+              }
+              alt={`${user.name || "User"}'s profile`}
             />
           </div>
         </div>
@@ -93,41 +114,70 @@ const ProfilePage = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-24">
         {/* Profile Header */}
         <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold text-white">{user.name || 'Anonymous User'}</h1>
+          <h1 className="text-3xl font-bold text-white">
+            {user.name || "Anonymous User"}
+          </h1>
           <p className="text-lg text-gray-400">@{user.username}</p>
           <p className="mt-3 text-gray-400 max-w-2xl mx-auto">
             {user.bio || "No bio available"}
           </p>
-          {currentUsername !== user.username && (
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="mt-6 inline-flex items-center px-6 py-3 text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-all duration-200 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transform hover:-translate-y-0.5"
-            >
-              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-              Add Review
-            </button>
-          )}
+          <div className="flex space-x-2">
+            {currentUsername !== username && (
+              <button
+                onClick={handleStartChat}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition duration-300 flex items-center"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 mr-2"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Chat
+              </button>
+            )}
+            {currentUsername !== username && (
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition duration-300"
+              >
+                Leave Review
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
           <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700/50 hover:bg-gray-800 transition-all duration-200">
             <p className="text-sm text-gray-400">Joined</p>
-            <p className="mt-2 text-2xl font-semibold text-white">{joinedTime}</p>
+            <p className="mt-2 text-2xl font-semibold text-white">
+              {joinedTime}
+            </p>
           </div>
           <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700/50 hover:bg-gray-800 transition-all duration-200">
             <p className="text-sm text-gray-400">Skills</p>
-            <p className="mt-2 text-2xl font-semibold text-white">{user.info.skills.length}</p>
+            <p className="mt-2 text-2xl font-semibold text-white">
+              {user.info.skills.length}
+            </p>
           </div>
           <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700/50 hover:bg-gray-800 transition-all duration-200">
             <p className="text-sm text-gray-400">Experience</p>
-            <p className="mt-2 text-2xl font-semibold text-white">{user.info.experience.length}</p>
+            <p className="mt-2 text-2xl font-semibold text-white">
+              {user.info.experience.length}
+            </p>
           </div>
           <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700/50 hover:bg-gray-800 transition-all duration-200">
             <p className="text-sm text-gray-400">Reviews</p>
-            <p className="mt-2 text-2xl font-semibold text-white">{reviews.length}</p>
+            <p className="mt-2 text-2xl font-semibold text-white">
+              {reviews.length}
+            </p>
           </div>
         </div>
 
@@ -194,7 +244,9 @@ const ProfilePage = () => {
                       />
                     ) : (
                       <div className="h-10 w-10 rounded-full border border-gray-700 bg-gray-600 flex items-center justify-center">
-                        <span className="text-gray-300">{review.reviewer?.name?.charAt(0) || '?'}</span>
+                        <span className="text-gray-300">
+                          {review.reviewer?.name?.charAt(0) || "?"}
+                        </span>
                       </div>
                     )}
                     <div className="ml-4">
@@ -202,7 +254,7 @@ const ProfilePage = () => {
                         to={`/user/${review.reviewer?.username}`}
                         className="text-white font-medium hover:text-blue-400 transition-colors duration-200"
                       >
-                        {review.reviewer?.name || 'Anonymous'}
+                        {review.reviewer?.name || "Anonymous"}
                       </Link>
                       <div className="mt-1">
                         <ReactStars
@@ -250,7 +302,7 @@ const getJoinedDuration = (joinedDate) => {
   if (diffDays < 7) return `${diffDays} days ago`;
   if (diffDays < 14) return "1 week ago";
   if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-  
+
   const diffMonths = Math.floor(diffDays / 30);
   const diffYears = Math.floor(diffMonths / 12);
 

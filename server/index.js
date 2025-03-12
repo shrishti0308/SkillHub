@@ -5,6 +5,8 @@ const path = require("path"); // Add this to manage file paths
 const fs = require("fs");
 const mongoose = require("mongoose");
 const bid = require("./models/bid");
+const http = require("http");
+const socketIo = require("socket.io");
 
 // Import middleware
 const { authenticateJWT } = require("./middlewares/authMiddleware");
@@ -39,9 +41,19 @@ const bidRoutes = require("./routes/bidRoutes");
 const projectRoutes = require("./routes/projectRoutes");
 const walletRoutes = require("./routes/walletRoutes");
 const transactionRoutes = require("./routes/transactionRoutes");
+const chatRoutes = require("./routes/chatRoutes");
 
 // Initialize Express app
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: "http://localhost:5173", // Frontend URL
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
+
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || "development";
 
@@ -102,6 +114,7 @@ app.use("/notifications", notificationRoutes);
 app.use("/project", projectRoutes);
 app.use("/wallet", walletRoutes);
 app.use("/transaction", transactionRoutes);
+app.use("/chat", chatRoutes);
 
 // Example of a protected route with authentication middleware
 app.get("/recent-bids", authenticateJWT, async (req, res, next) => {
@@ -121,7 +134,167 @@ app.get("/recent-bids", authenticateJWT, async (req, res, next) => {
 app.use(notFound); // Handle 404 errors
 app.use(errorHandler); // Handle all other errors
 
+// Socket.io setup
+const connectedUsers = {};
+
+// Make io and connectedUsers available to the Express app
+app.set("io", io);
+app.set("connectedUsers", connectedUsers);
+
+io.use((socket, next) => {
+  const token = socket.handshake.auth.token;
+  if (!token) {
+    return next(new Error("Authentication error"));
+  }
+
+  try {
+    const decoded = require("jsonwebtoken").verify(
+      token,
+      "skill_hub_secret_key"
+    );
+    socket.userId = decoded.id;
+    next();
+  } catch (error) {
+    return next(new Error("Authentication error"));
+  }
+});
+
+io.on("connection", (socket) => {
+  console.log(`User connected: ${socket.userId}`);
+
+  // Store the user's socket ID
+  connectedUsers[socket.userId] = socket.id;
+
+  // Join a chat room
+  socket.on("join_chat", (chatId) => {
+    socket.join(chatId);
+    console.log(`User ${socket.userId} joined chat: ${chatId}`);
+  });
+
+  // Leave a chat room
+  socket.on("leave_chat", (chatId) => {
+    socket.leave(chatId);
+    console.log(`User ${socket.userId} left chat: ${chatId}`);
+  });
+
+  // Send a message
+  socket.on("send_message", async (data) => {
+    try {
+      const { chatId, content } = data;
+
+      // Save the message to the database
+      const Chat = require("./models/chat");
+      const User = require("./models/user");
+      const chat = await Chat.findById(chatId);
+
+      if (chat && chat.participants.includes(socket.userId)) {
+        const newMessage = {
+          sender: socket.userId,
+          content,
+          read: false,
+        };
+
+        chat.messages.push(newMessage);
+        chat.lastMessage = new Date();
+        await chat.save();
+
+        // Get the sender user object for the response
+        const sender = await User.findById(socket.userId).select(
+          "username name"
+        );
+
+        // Get the other participant's ID
+        const otherParticipantId = chat.participants.find(
+          (p) => p.toString() !== socket.userId
+        );
+
+        // Create the message object with populated sender
+        const messageWithSender = {
+          ...newMessage,
+          sender: {
+            _id: sender._id,
+            username: sender.username,
+            name: sender.name,
+          },
+          createdAt: new Date(),
+          _id: chat.messages[chat.messages.length - 1]._id,
+        };
+
+        // Only emit to the other participant, not back to the sender
+        // This prevents duplicate messages for the sender
+        if (connectedUsers[otherParticipantId]) {
+          io.to(connectedUsers[otherParticipantId]).emit("receive_message", {
+            chatId,
+            message: messageWithSender,
+          });
+        }
+
+        // Send notification to the other user if they're online
+        if (connectedUsers[otherParticipantId]) {
+          io.to(connectedUsers[otherParticipantId]).emit(
+            "new_message_notification",
+            {
+              chatId,
+              senderId: socket.userId,
+            }
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Error sending message via socket:", error);
+    }
+  });
+
+  // Mark messages as read
+  socket.on("mark_read", async (data) => {
+    try {
+      const { chatId } = data;
+
+      const Chat = require("./models/chat");
+      const chat = await Chat.findById(chatId);
+
+      if (chat && chat.participants.includes(socket.userId)) {
+        // Get the other participant's ID
+        const otherParticipantId = chat.participants.find(
+          (p) => p.toString() !== socket.userId
+        );
+
+        // Mark all unread messages from the other participant as read
+        let updated = false;
+        chat.messages.forEach((message) => {
+          if (
+            !message.read &&
+            message.sender.toString() === otherParticipantId.toString()
+          ) {
+            message.read = true;
+            updated = true;
+          }
+        });
+
+        if (updated) {
+          await chat.save();
+
+          // Notify the sender that their messages were read
+          if (connectedUsers[otherParticipantId]) {
+            io.to(connectedUsers[otherParticipantId]).emit("messages_read", {
+              chatId,
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error marking messages as read via socket:", error);
+    }
+  });
+
+  // Handle disconnection
+  socket.on("disconnect", () => {
+    console.log(`User disconnected: ${socket.userId}`);
+    delete connectedUsers[socket.userId];
+  });
+});
+
 // Start the server
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

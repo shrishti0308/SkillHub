@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -13,6 +13,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserCircle } from "@fortawesome/free-solid-svg-icons";
 import NotificationIcon from "./Notifications/NotificationIcon";
+import ChatNotificationIcon from "./Chat/ChatNotificationIcon";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,11 +32,11 @@ const Navbar = () => {
   const handleLogout = () => {
     dispatch(logoutAndNavigate());
     setIsOpen(false);
-    navigate('/');
+    navigate("/");
   };
 
   const getDashboardLink = () => {
-    return "/dashboard";  // All user types now use the same dashboard route
+    return "/dashboard"; // All user types now use the same dashboard route
   };
 
   return (
@@ -144,6 +145,9 @@ const Navbar = () => {
                     <div className="lg:mx-4 lg:my-0 my-2">
                       <NotificationIcon />
                     </div>
+                    <div className="lg:mx-4 lg:my-0 my-2">
+                      <ChatNotificationIcon />
+                    </div>
                     <button
                       onClick={handleLogout}
                       className="px-3 py-2 mx-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
@@ -175,7 +179,6 @@ const Navbar = () => {
                         </div>
                       </button>
                     </Link>
-                    
                   </>
                 ) : (
                   <Link

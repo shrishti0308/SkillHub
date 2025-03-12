@@ -30,6 +30,27 @@ import TransactionPage from "./components/TransactionPage/TransactionPage";
 import { useSelector } from "react-redux";
 import Footer from "./components/Footer";
 import NotificationsPage from "./components/Notifications/NotificationsPage";
+import { useEffect } from "react";
+import ChatPage from "./components/Chat/ChatPage";
+import { initializeSocket, disconnectSocket } from "./api/socketService";
+import { selectAccessToken } from "./redux/Features/user/authSlice";
+import PropTypes from "prop-types";
+
+// Protected Route component for user routes
+const ProtectedRoute = ({ children }) => {
+  const { accessToken } = useSelector((state) => state.auth);
+  const location = useLocation();
+
+  if (!accessToken) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return children;
+};
+
+ProtectedRoute.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 // Protected Route component for admin routes
 const AdminProtectedRoute = ({ children }) => {
@@ -41,6 +62,10 @@ const AdminProtectedRoute = ({ children }) => {
   }
 
   return children;
+};
+
+AdminProtectedRoute.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 function App() {
@@ -57,7 +82,31 @@ function App() {
     "/admin/analytics",
   ];
 
-  const isDashboardRoute = location.pathname.startsWith("/dashboard");
+  const accessToken = useSelector(selectAccessToken);
+  const isDashboardRoute = location.pathname?.startsWith("/dashboard");
+
+  // Initialize socket connection when user is authenticated
+  useEffect(() => {
+    if (accessToken) {
+      console.log("Initializing socket connection with token");
+      const socket = initializeSocket(accessToken);
+
+      // Log socket connection status
+      if (socket) {
+        console.log("Socket initialized successfully");
+      } else {
+        console.warn("Failed to initialize socket");
+      }
+    } else {
+      console.log("No access token, not initializing socket");
+    }
+
+    // Cleanup socket connection on unmount
+    return () => {
+      console.log("Cleaning up socket connection");
+      disconnectSocket();
+    };
+  }, [accessToken]);
 
   return (
     <div className="flex flex-col min-h-screen justify-between">
@@ -105,6 +154,24 @@ function App() {
           </Route>
 
           <Route path="/features" element={<Features />} />
+
+          {/* Chat Routes */}
+          <Route
+            path="/chat"
+            element={
+              <ProtectedRoute>
+                <ChatPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/chat/:chatId"
+            element={
+              <ProtectedRoute>
+                <ChatPage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </main>
 

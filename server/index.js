@@ -15,7 +15,6 @@ const { createCorsMiddleware } = require("./middlewares/corsMiddleware");
 const {
   requestLogger,
   errorLogger,
-  consoleLogger,
 } = require("./middlewares/loggingMiddleware");
 const {
   apiLimiter,
@@ -64,7 +63,6 @@ connectDB();
 
 // 1. Application-level middleware
 // Logging middleware
-app.use(consoleLogger); // Console logging for all requests
 app.use(requestLogger(NODE_ENV === "development")); // File logging for successful requests
 app.use(errorLogger(NODE_ENV === "development")); // File logging for error requests
 

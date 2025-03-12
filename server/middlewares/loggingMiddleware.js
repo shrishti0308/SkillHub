@@ -62,11 +62,7 @@ const errorLogger = (isDevelopment = false) => {
   });
 };
 
-// Console logging middleware (for development)
-const consoleLogger = morgan("dev");
-
 module.exports = {
   requestLogger,
   errorLogger,
-  consoleLogger,
 };

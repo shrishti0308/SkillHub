@@ -12,27 +12,33 @@ const {
 } = require("../controllers/bidController");
 const { authenticateJWT } = require("../middlewares/authMiddleware");
 
-// Place a bid on a job
-router.post("/place", authenticateJWT, placeBid);
-
+// Public routes (no authentication required)
 // Get all bids for a job
 router.get("/:jobId", getBidsForJob);
 
-// Accept a bid (employer)
-router.put("/accept/:bidId", authenticateJWT, acceptBid);
+// All routes below this middleware require authentication
+router.use(authenticateJWT);
 
-router.get("/recent/bid", authenticateJWT, getRecentBids);
+// Protected routes
+// Place a bid on a job
+router.post("/place", placeBid);
+
+// Accept a bid (employer)
+router.put("/accept/:bidId", acceptBid);
+
+// Get recent bids
+router.get("/recent/bid", getRecentBids);
 
 // Get a specific bid by ID
-router.get("/bid/:bidId", authenticateJWT, getBidById);
+router.get("/bid/:bidId", getBidById);
 
 // Get all bids by user ID
-router.get("/user/:userId", authenticateJWT, getBidsByUserId);
+router.get("/user/:userId", getBidsByUserId);
 
 // Route to get details of a specific bid (including all bids for the job)
-router.get("/:bidId/details", authenticateJWT, getBidDetails);
+router.get("/:bidId/details", getBidDetails);
 
 // Delete a bid
-router.delete("/:bidId", authenticateJWT, deleteBid);
+router.delete("/:bidId", deleteBid);
 
 module.exports = router;

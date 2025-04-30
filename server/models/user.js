@@ -1,6 +1,90 @@
 const mongoose = require("mongoose");
 const fs = require("fs");
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       required:
+ *         - name
+ *         - username
+ *         - email
+ *         - password
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: User's full name
+ *         username:
+ *           type: string
+ *           description: Unique username
+ *         email:
+ *           type: string
+ *           format: email
+ *           description: User's unique email address
+ *         password:
+ *           type: string
+ *           format: password
+ *           description: User's hashed password
+ *         role:
+ *           type: string
+ *           enum: [freelancer, enterprise, hybrid]
+ *           default: freelancer
+ *           description: User's role in the system
+ *         wallet:
+ *           type: number
+ *           default: 0
+ *           description: User's wallet balance
+ *         commissionRate:
+ *           type: number
+ *           description: Commission rate based on user role
+ *         bio:
+ *           type: string
+ *           maxLength: 500
+ *           description: User's biography
+ *         info:
+ *           type: object
+ *           properties:
+ *             skills:
+ *               type: array
+ *               items:
+ *                 type: string
+ *               description: List of user's skills
+ *             portfolio:
+ *               type: string
+ *               description: Link to user's portfolio
+ *             experience:
+ *               type: array
+ *               items:
+ *                 type: string
+ *               description: List of user's experiences
+ *             profilePic:
+ *               type: string
+ *               description: URL to user's profile picture
+ *         previousWorks:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: Title of the work
+ *               description:
+ *                 type: string
+ *                 description: Description of the work
+ *               link:
+ *                 type: string
+ *                 description: Link to the work
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: Timestamp of user creation
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           description: Timestamp of last update
+ */
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },

@@ -7,6 +7,8 @@ const mongoose = require("mongoose");
 const bid = require("./models/bid");
 const http = require("http");
 const socketIo = require("socket.io");
+const dotenv = require("dotenv");
+dotenv.config();
 
 // Import Swagger
 const swaggerUi = require("swagger-ui-express");

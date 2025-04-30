@@ -1,4 +1,5 @@
 const swaggerJsdoc = require("swagger-jsdoc");
+const tags = require("./tags");
 
 const environment = process.env.NODE_ENV || "development";
 const server_url = process.env.SERVER_URL || "http://localhost:3000";
@@ -18,6 +19,7 @@ const options = {
         name: "SkillHub Support",
       },
     },
+    tags: tags,
     servers: [
       {
         url: server_url,

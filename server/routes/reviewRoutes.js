@@ -43,52 +43,6 @@ router.post(
 
 /**
  * @swagger
- * /review/{reviewId}:
- *   put:
- *     summary: Update a review
- *     tags: [Reviews]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: reviewId
- *         required: true
- *         schema:
- *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               rating:
- *                 type: number
- *               comment:
- *                 type: string
- *     responses:
- *       200:
- *         description: Review updated successfully
- *   delete:
- *     summary: Delete a review
- *     tags: [Reviews]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: reviewId
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Review deleted successfully
- */
-router.put("/:reviewId", authenticateJWT, reviewController.updateReview);
-router.delete("/:reviewId", authenticateJWT, reviewController.deleteReview);
-
-/**
- * @swagger
  * /review/user/{userId}:
  *   get:
  *     summary: Get all reviews for a user
@@ -168,5 +122,51 @@ router.get(
   authenticateJWT,
   reviewController.getReviewById
 );
+
+/**
+ * @swagger
+ * /review/{reviewId}:
+ *   put:
+ *     summary: Update a review
+ *     tags: [Reviews]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: reviewId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               rating:
+ *                 type: number
+ *               comment:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Review updated successfully
+ *   delete:
+ *     summary: Delete a review
+ *     tags: [Reviews]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: reviewId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Review deleted successfully
+ */
+router.put("/:reviewId", authenticateJWT, reviewController.updateReview);
+router.delete("/:reviewId", authenticateJWT, reviewController.deleteReview);
 
 module.exports = router;

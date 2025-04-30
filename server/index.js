@@ -8,6 +8,10 @@ const bid = require("./models/bid");
 const http = require("http");
 const socketIo = require("socket.io");
 
+// Import Swagger
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./config/swagger");
+
 // Import middleware
 const { authenticateJWT } = require("./middlewares/authMiddleware");
 const { errorHandler, notFound } = require("./middlewares/errorMiddleware");
@@ -93,6 +97,9 @@ app.use(
     },
   })
 );
+
+// Swagger UI route
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // 2. Router-level middleware
 // Apply specific middleware to routes

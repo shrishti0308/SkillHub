@@ -1,3 +1,61 @@
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Job:
+ *       type: object
+ *       required:
+ *         - title
+ *         - description
+ *         - budget
+ *         - employer
+ *       properties:
+ *         title:
+ *           type: string
+ *           description: Title of the job
+ *         description:
+ *           type: string
+ *           description: Detailed description of the job
+ *         budget:
+ *           type: object
+ *           properties:
+ *             min:
+ *               type: number
+ *               description: Minimum budget for the job
+ *             max:
+ *               type: number
+ *               description: Maximum budget for the job
+ *         employer:
+ *           type: string
+ *           format: objectId
+ *           description: Reference to the employer user
+ *         status:
+ *           type: string
+ *           enum: [open, in-progress, completed, closed]
+ *           default: open
+ *         freelancer:
+ *           type: string
+ *           format: objectId
+ *           description: Reference to the assigned freelancer
+ *         bidAccepted:
+ *           type: boolean
+ *           default: false
+ *         categories:
+ *           type: array
+ *           items:
+ *             type: string
+ *         skillsRequired:
+ *           type: array
+ *           items:
+ *             type: string
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ */
+
 const mongoose = require("mongoose");
 
 const jobSchema = new mongoose.Schema(

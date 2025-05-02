@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test:performance": "node scripts/performanceTest.js",
+    "redis-commander": "redis-commander",
+    "redis:flush": "curl -X POST http://localhost:3000/system/flush-cache"
   },
   "keywords": [],
   "author": "",
@@ -17,7 +21,12 @@
     "express-rate-limit": "^7.5.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.6.3",
+    "mongoose-lean-defaults": "^2.2.1",
+    "mongoose-lean-getters": "^1.1.0",
+    "mongoose-lean-virtuals": "^0.9.1",
     "multer": "^1.4.5-lts.1",
+    "redis": "3.1.2",
+    "redis-commander": "^0.8.0",
     "server": "file:",
     "sharp": "^0.33.5",
     "socket.io": "^4.8.1",
@@ -25,5 +34,8 @@
     "swagger-ui-express": "^5.0.1",
     "validator": "^13.12.0",
     "xss-clean": "^0.1.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
   }
 }

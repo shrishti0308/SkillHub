@@ -90,5 +90,23 @@ const jobSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Add indexes for frequently queried fields
+// Index for job status for faster filtering
+jobSchema.index({ status: 1 });
+// Index for employer for faster lookup of jobs by employer
+jobSchema.index({ employer: 1 });
+// Index for freelancer for faster lookup of jobs assigned to a freelancer
+jobSchema.index({ freelancer: 1 });
+// Compound index for status and createdAt for sorting open jobs by date
+jobSchema.index({ status: 1, createdAt: -1 });
+// Index for categories for faster filtering by job category
+jobSchema.index({ categories: 1 });
+// Index for skillsRequired for faster matching of jobs with freelancer skills
+jobSchema.index({ skillsRequired: 1 });
+// Index for budget range for faster filtering by budget
+jobSchema.index({ "budget.min": 1, "budget.max": 1 });
+// Index for bidAccepted for faster filtering of jobs with accepted bids
+jobSchema.index({ bidAccepted: 1 });
+
 const Job = mongoose.models.Job || mongoose.model("Job", jobSchema);
 module.exports = Job;

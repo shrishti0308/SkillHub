@@ -29,16 +29,14 @@ exports.registerUser = async (req, res) => {
 
     await newUser.save();
     const token = jwt.sign({ id: newUser._id, role: newUser.role }, jwtSecret, {
-      expiresIn: "1h",
+      expiresIn: "24h",
     });
-    res
-      .status(201)
-      .json({
-        success: true,
-        token,
-        role: newUser.role,
-        username: newUser.username,
-      });
+    res.status(201).json({
+      success: true,
+      token,
+      role: newUser.role,
+      username: newUser.username,
+    });
   } catch (error) {
     res
       .status(500)
@@ -66,7 +64,7 @@ exports.loginUser = async (req, res) => {
         .json({ success: false, message: "Invalid credentials" });
 
     const token = jwt.sign({ id: user._id, role: user.role }, jwtSecret, {
-      expiresIn: "1h",
+      expiresIn: "24h",
     });
     res
       .status(200)
@@ -142,13 +140,11 @@ exports.uploadProfilePic = [
   handleProfilePicUpload,
   (req, res) => {
     if (req.profilePicPath) {
-      return res
-        .status(200)
-        .json({
-          success: true,
-          message: "Profile picture uploaded successfully",
-          profilePic: req.profilePicPath,
-        });
+      return res.status(200).json({
+        success: true,
+        message: "Profile picture uploaded successfully",
+        profilePic: req.profilePicPath,
+      });
     } else {
       return res
         .status(400)

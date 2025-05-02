@@ -11,6 +11,8 @@ const {
   getJobsByUserId,
 } = require("../controllers/jobController");
 const { authenticateJWT } = require("../middlewares/authMiddleware");
+const { routeCache } = require("../middleware/cacheMiddleware");
+const { invalidateResourceCache } = require("../utils/cacheUtils");
 
 // Create a job (employer)
 /**
@@ -31,7 +33,22 @@ const { authenticateJWT } = require("../middlewares/authMiddleware");
  *       201:
  *         description: Job created successfully
  */
-router.post("/create", authenticateJWT, createJob);
+router.post("/create", authenticateJWT, async (req, res, next) => {
+  try {
+    await createJob(req, res, next);
+    // Only invalidate cache if the response hasn't been sent yet (e.g., by an error)
+    if (!res.headersSent) {
+      try {
+        await invalidateResourceCache("job", "");
+      } catch (cacheError) {
+        console.error("Cache invalidation error:", cacheError);
+        // Don't pass this error to next() as the main operation succeeded
+      }
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 
 // Get all jobs for marketplace
 /**
@@ -50,7 +67,7 @@ router.post("/create", authenticateJWT, createJob);
  *               items:
  *                 $ref: '#/components/schemas/Job'
  */
-router.get("/marketplace", getMarketplaceJobs);
+router.get("/marketplace", routeCache.standard, getMarketplaceJobs);
 
 // Get a specific job by ID
 /**
@@ -95,10 +112,25 @@ router.get("/marketplace", getMarketplaceJobs);
  *       200:
  *         description: Job updated successfully
  */
-router.get("/:id", getJobById);
+router.get("/:id", routeCache.standard, getJobById);
 
 // Update job status (e.g., when the job is completed)
-router.put("/:id", updateJob);
+router.put("/:id", async (req, res, next) => {
+  try {
+    await updateJob(req, res, next);
+    // Only invalidate cache if the response hasn't been sent yet
+    if (!res.headersSent) {
+      try {
+        await invalidateResourceCache("job", req.params.id);
+      } catch (cacheError) {
+        console.error("Cache invalidation error:", cacheError);
+        // Don't pass this error to next() as the main operation succeeded
+      }
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 
 // Route to get filtered jobs
 /**
@@ -124,7 +156,12 @@ router.put("/:id", updateJob);
  *       200:
  *         description: Filtered list of jobs
  */
-router.get("/jobs/filtered", authenticateJWT, getFilteredJobs);
+router.get(
+  "/jobs/filtered",
+  authenticateJWT,
+  routeCache.shortTerm,
+  getFilteredJobs
+);
 
 // Get all jobs by user ID
 /**
@@ -145,7 +182,12 @@ router.get("/jobs/filtered", authenticateJWT, getFilteredJobs);
  *       200:
  *         description: List of user's jobs
  */
-router.get("/user/:userId", authenticateJWT, getJobsByUserId);
+router.get(
+  "/user/:userId",
+  authenticateJWT,
+  routeCache.standard,
+  getJobsByUserId
+);
 
 // Route to get a specific job by ID
 /**
@@ -175,7 +217,12 @@ router.get("/user/:userId", authenticateJWT, getJobsByUserId);
  *       404:
  *         description: Job not found
  */
-router.get("/user/:id", authenticateJWT, getJobByIdAuthCheck);
+router.get(
+  "/user/:id",
+  authenticateJWT,
+  routeCache.standard,
+  getJobByIdAuthCheck
+);
 
 // Route to place a bid on a job
 /**
@@ -205,6 +252,22 @@ router.get("/user/:id", authenticateJWT, getJobByIdAuthCheck);
  *       201:
  *         description: Bid placed successfully
  */
-router.post("/:jobId/bid", authenticateJWT, createBid);
+router.post("/:jobId/bid", authenticateJWT, async (req, res, next) => {
+  try {
+    await createBid(req, res, next);
+    // Only invalidate cache if the response hasn't been sent yet
+    if (!res.headersSent) {
+      try {
+        await invalidateResourceCache("job", req.params.jobId);
+        await invalidateResourceCache("bid", "");
+      } catch (cacheError) {
+        console.error("Cache invalidation error:", cacheError);
+        // Don't pass this error to next() as the main operation succeeded
+      }
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = router;

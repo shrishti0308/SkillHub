@@ -8,10 +8,19 @@ const bid = require("./models/bid");
 const http = require("http");
 const socketIo = require("socket.io");
 const dotenv = require("dotenv");
+const {
+  redisClient,
+  redisEnabled,
+  waitForRedis,
+  getAsync,
+  setAsync,
+  delAsync,
+  existsAsync,
+  flushallAsync,
+  infoAsync,
+  dbsizeAsync,
+} = require("./config/redis");
 dotenv.config();
-
-// Redis client import
-const { redisClient } = require("./config/redis");
 
 // Import Swagger
 const swaggerUi = require("swagger-ui-express");
@@ -71,6 +80,9 @@ connectDB();
 // Make Redis available globally
 app.set("redisClient", redisClient);
 
+// Global flag to manually disable Redis for testing
+global.isRedisManuallyDisabled = false;
+
 // ===== MIDDLEWARE SETUP =====
 
 // 1. Application-level middleware
@@ -80,7 +92,7 @@ app.use(errorLogger(NODE_ENV === "development")); // File logging for error requ
 
 // Security middleware
 app.use(securityHeaders); // Custom security headers
-app.use(apiLimiter); // Rate limiting for all routes
+// app.use(apiLimiter); // Temporarily disabled for performance testing
 
 // CORS middleware
 app.use(createCorsMiddleware(NODE_ENV)); // CORS configuration based on environment
@@ -191,6 +203,24 @@ if (NODE_ENV === "development") {
   });
 }
 
+// <<< ADD System routes for Redis control >>>
+app.post("/system/redis/disable", (req, res) => {
+  console.log("SYSTEM: Received request to DISABLE Redis.");
+  global.isRedisManuallyDisabled = true;
+  res
+    .status(200)
+    .json({ success: true, message: "Redis manually disabled for caching." });
+});
+
+app.post("/system/redis/enable", (req, res) => {
+  console.log("SYSTEM: Received request to ENABLE Redis.");
+  global.isRedisManuallyDisabled = false;
+  res
+    .status(200)
+    .json({ success: true, message: "Redis manually enabled for caching." });
+});
+// <<< END System routes >>>
+
 app.use("/admin", adminRoutes);
 app.use("/user", userRoutes);
 app.use("/jobs", jobRoutes);
@@ -231,20 +261,28 @@ app.set("connectedUsers", connectedUsers);
 process.on("SIGTERM", gracefulShutdown);
 process.on("SIGINT", gracefulShutdown);
 
-function gracefulShutdown() {
+async function gracefulShutdown() {
   console.log("Starting graceful shutdown...");
-  server.close(() => {
+  try {
+    await new Promise((resolve) => server.close(resolve));
     console.log("HTTP server closed");
-    // Close Redis connection
-    redisClient.quit(() => {
-      console.log("Redis connection closed");
-      // Close MongoDB connection
-      mongoose.connection.close(false, () => {
-        console.log("MongoDB connection closed");
-        process.exit(0);
+
+    await new Promise((resolve, reject) => {
+      redisClient.quit((err) => {
+        if (err) return reject(err);
+        console.log("Redis connection closed");
+        resolve();
       });
     });
-  });
+
+    await mongoose.connection.close();
+    console.log("MongoDB connection closed");
+
+    process.exit(0);
+  } catch (error) {
+    console.error("Error during graceful shutdown:", error);
+    process.exit(1);
+  }
 }
 
 // Socket auth middleware
@@ -402,6 +440,20 @@ io.on("connection", (socket) => {
 });
 
 // Start the server
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT} in ${NODE_ENV} mode`);
+server.listen(PORT, async () => {
+  console.log(`Server starting on port ${PORT} in ${NODE_ENV} mode`);
+
+  // Wait for Redis to connect before declaring ready
+  try {
+    const redisReady = await waitForRedis(10000); // Wait up to 10 seconds
+    if (redisReady) {
+      console.log("Redis connected and ready for caching operations");
+    } else {
+      console.warn("Redis not available - caching will be disabled");
+    }
+  } catch (error) {
+    console.error("Error checking Redis status:", error);
+  }
+
+  console.log(`Server fully initialized and ready for requests`);
 });

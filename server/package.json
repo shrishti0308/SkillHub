@@ -7,7 +7,8 @@
     "dev": "nodemon index.js",
     "test:performance": "node scripts/performanceTest.js",
     "redis-commander": "redis-commander",
-    "redis:flush": "curl -X POST http://localhost:3000/system/flush-cache"
+    "redis:flush": "curl -X POST http://localhost:3000/system/flush-cache",
+    "test": "mocha test/**/*.test.js --timeout 10000 --exit"
   },
   "keywords": [],
   "author": "",
@@ -36,6 +37,10 @@
     "xss-clean": "^0.1.4"
   },
   "devDependencies": {
-    "nodemon": "^3.1.4"
+    "chai": "^5.2.0",
+    "chai-http": "^5.1.2",
+    "mocha": "^11.2.2",
+    "nodemon": "^3.1.4",
+    "sinon": "^20.0.0"
   }
 }

@@ -164,7 +164,9 @@ const Navbar = () => {
                         aria-label="toggle profile dropdown"
                       >
                         <div className="w-8 h-8 overflow-hidden border-2 border-gray-400 rounded-full">
-                          {userProfile.info.profilePic ? (
+                          {userProfile &&
+                          userProfile.info &&
+                          userProfile.info.profilePic ? (
                             <img
                               src={`http://localhost:3000/public${userProfile.info.profilePic}`}
                               alt={`${userProfile.name}'s profile`}

@@ -1,31 +1,62 @@
 const Job = require("../models/job");
+const { getAsync, setAsync } = require("../config/redis"); // Corrected import
 
-// Controller to get recent projects for the logged-in freelancer
+const CACHE_EXPIRATION = 60; // Cache duration in seconds
+
+// Controller to get recent projects for the logged-in freelancer with Caching
 exports.getRecentProjects = async (req, res) => {
+  const userId = req.user.id;
+  const cacheKey = `recent_projects:${userId}`;
+
   try {
-    const userId = req.user.id; // Get logged-in freelancer's ID from JWT token
-
-    // Find jobs where the freelancer is the logged-in user and the job is either in-progress or closed
-    const recentProjects = await Job.find({
-      freelancer: userId,
-      status: { $in: ["in-progress", "closed"] }, // Filter for in-progress or closed status
-    })
-      .sort({ updatedAt: -1 }) // Sort by most recent update
-      .limit(10); // Limit to the 10 most recent projects
-
-    if (!recentProjects.length) {
-      return res
-        .status(404)
-        .json({ message: "No recent projects found for this freelancer" });
+    // 1. Try cache
+    const cachedProjects = await getAsync(cacheKey);
+    if (cachedProjects) {
+      console.log(`Cache hit for ${cacheKey}`);
+      const recentProjects = JSON.parse(cachedProjects);
+      return res.status(200).json({ recentProjects });
     }
 
+    // 2. Fetch from DB
+    console.log(`Cache miss for ${cacheKey}, fetching from DB`);
+    const recentProjects = await Job.find({
+      freelancer: userId,
+      status: { $in: ["in-progress", "closed"] },
+    })
+      .sort({ updatedAt: -1 })
+      .limit(10);
+
+    // Note: Original code had a 404 if no projects found.
+    // Caching the empty array result.
+    // if (!recentProjects.length) {
+    //   return res
+    //     .status(404)
+    //     .json({ message: "No recent projects found for this freelancer" });
+    // }
+
+    // 3. Store in cache
+    try {
+      await setAsync(
+        cacheKey,
+        JSON.stringify(recentProjects),
+        "EX",
+        CACHE_EXPIRATION
+      );
+      console.log(`Stored ${cacheKey} in cache`);
+    } catch (redisSetError) {
+      console.error("Redis set error:", redisSetError);
+    }
+
+    // 4. Return result
     res.status(200).json({ recentProjects });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Error retrieving recent projects",
-        error: error.message,
-      });
+    console.error(
+      `Error retrieving recent projects for user ${userId}:`,
+      error
+    );
+    res.status(500).json({
+      message: "Error retrieving recent projects",
+      error: error.message,
+    });
   }
 };

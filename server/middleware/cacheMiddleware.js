@@ -41,11 +41,18 @@ const cacheMiddleware = (expiry = DEFAULT_EXPIRY) => {
           // Parse the cached response
           const parsedResponse = JSON.parse(cachedResponse);
 
-          // Return the cached response
-          return res.status(200).json({
-            ...parsedResponse,
-            cached: true,
-          });
+          // Handle different response types appropriately
+          if (Array.isArray(parsedResponse)) {
+            // For arrays, return them directly but set a header indicating it's cached
+            res.set("X-Cache", "HIT");
+            return res.status(200).json(parsedResponse);
+          } else {
+            // For objects, we can spread in the cached:true property
+            return res.status(200).json({
+              ...parsedResponse,
+              cached: true,
+            });
+          }
         } catch (parseError) {
           console.error("Error parsing cached response:", parseError);
           // If we can't parse the cached response, proceed to the controller
@@ -60,29 +67,32 @@ const cacheMiddleware = (expiry = DEFAULT_EXPIRY) => {
         if (res.statusCode === 200) {
           // Don't try to cache if body is not valid JSON
           try {
-            // Don't cache error responses
-            const responseBody =
+            // Check if it's already a string (Express sometimes serializes for us)
+            const bodyString =
+              typeof body === "string" ? body : JSON.stringify(body);
+
+            // Try to parse it to ensure it's valid JSON
+            const parsedBody =
               typeof body === "string" ? JSON.parse(body) : body;
 
-            if (
-              !responseBody.error &&
-              !responseBody.message?.includes("error")
-            ) {
+            if (!parsedBody.error && !parsedBody.message?.includes("error")) {
               // Store in cache - with error handling
-              setAsync(
-                cacheKey,
-                JSON.stringify(responseBody),
-                "EX",
-                expiry
-              ).catch((err) => console.error("Redis cache error:", err));
+              setAsync(cacheKey, bodyString, "EX", expiry).catch((err) =>
+                console.error("[CacheMiddleware] Redis cache error:", err)
+              );
             }
+
+            // DO NOT MODIFY THE RESPONSE BODY - let it pass through unchanged
           } catch (error) {
-            // Silently fail if we can't cache - just log the error
-            console.error("Error parsing response for caching:", error);
+            // Just log the error but don't modify response
+            console.error(
+              "[CacheMiddleware] Error parsing response for caching:",
+              error
+            );
           }
         }
 
-        // Call the original send method
+        // Call the original send method - keep the body unchanged
         return originalSend.call(this, body);
       };
 

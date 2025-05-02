@@ -15,26 +15,44 @@ const path = require("path");
 
 const API_BASE_URL = "http://localhost:3000";
 const TEST_ITERATIONS = 100; // Number of requests to make for each endpoint
-const TEST_ENDPOINTS = [
-  "/jobs/marketplace",
-  "/user/profiles",
-  "/bids/recent",
-  // Add more endpoints as needed
-];
+const TEST_ENDPOINTS = ["/jobs/marketplace", "/user/profile", "/notifications"];
 
 // Auth token for protected routes (replace with valid token)
-const AUTH_TOKEN = "your_auth_token";
+const AUTH_TOKEN =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDA2MTUxZDAwZjZlZDM2OTQ2NGIxNCIsInJvbGUiOiJoeWJyaWQiLCJpYXQiOjE3NDYyMDc2MTksImV4cCI6MTc0NjI5NDAxOX0.7Sbr8uVyHUnpMcWAwvf4ALGKMsUVNW2sJgNIJAEDrhk";
+
+/**
+ * Enable/Disable Redis caching via API endpoint
+ * @param {boolean} enable - True to enable, false to disable
+ * @returns {Promise<void>}
+ */
+async function toggleRedis(enable) {
+  const action = enable ? "enable" : "disable";
+  const endpoint = `${API_BASE_URL}/system/redis/${action}`;
+  try {
+    console.log(`⚙️ Sending request to ${action} Redis...`);
+    const response = await axios.post(endpoint);
+    console.log(`✅ Redis successfully ${action}d: ${response.data.message}`);
+    // Add a small delay to ensure the server state updates
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  } catch (error) {
+    console.error(
+      `❌ Failed to ${action} Redis:`,
+      error.response?.data || error.message
+    );
+    throw error; // Critical failure
+  }
+}
 
 /**
  * Run a performance test against an endpoint
  * @param {string} endpoint - API endpoint to test
- * @param {boolean} withCaching - Whether caching is enabled
+ * @param {number} iterations - Number of test iterations
  * @returns {Promise<Object>} - Results including average response time
  */
-async function runEndpointTest(endpoint, withCaching = false) {
+async function runEndpointTest(endpoint, iterations) {
   const results = {
     endpoint,
-    withCaching,
     responseTimes: [],
     avgResponseTime: 0,
     minResponseTime: Number.MAX_SAFE_INTEGER,
@@ -43,17 +61,18 @@ async function runEndpointTest(endpoint, withCaching = false) {
   };
 
   const headers = {
-    Authorization: AUTH_TOKEN ? `Bearer ${AUTH_TOKEN}` : undefined,
-    "Cache-Control": withCaching ? undefined : "no-cache",
+    Authorization: `Bearer ${AUTH_TOKEN}`,
   };
 
   let successCount = 0;
 
-  for (let i = 0; i < TEST_ITERATIONS; i++) {
+  for (let i = 0; i < iterations; i++) {
     try {
       const startTime = process.hrtime();
 
-      const response = await axios.get(`${API_BASE_URL}${endpoint}`, {
+      const response = await axios({
+        method: "get",
+        url: `${API_BASE_URL}${endpoint}`,
         headers,
       });
 
@@ -81,7 +100,7 @@ async function runEndpointTest(endpoint, withCaching = false) {
     }
   }
 
-  results.successRate = (successCount / TEST_ITERATIONS) * 100;
+  results.successRate = (successCount / iterations) * 100;
 
   // Calculate average response time
   if (results.responseTimes.length > 0) {
@@ -94,6 +113,28 @@ async function runEndpointTest(endpoint, withCaching = false) {
 }
 
 /**
+ * Make a single request to prime the cache
+ * @param {string} endpoint - API endpoint to prime
+ * @returns {Promise<void>}
+ */
+async function primeCache(endpoint) {
+  try {
+    console.log(`🔄 Priming cache for ${endpoint}...`);
+    await axios.get(`${API_BASE_URL}${endpoint}`, {
+      headers: {
+        Authorization: `Bearer ${AUTH_TOKEN}`,
+      },
+    });
+    console.log(`✅ Cache primed for ${endpoint}`);
+    // Small delay to ensure caching completes
+    await new Promise((resolve) => setTimeout(resolve, 200));
+  } catch (error) {
+    console.error(`❌ Error priming cache for ${endpoint}: ${error.message}`);
+    throw error; // Critical failure - propagate the error
+  }
+}
+
+/**
  * Run tests on all endpoints
  */
 async function runAllTests() {
@@ -102,40 +143,60 @@ async function runAllTests() {
     endpoints: [],
   };
 
-  // First flush Redis cache to ensure clean testing
-  try {
-    await axios.post(`${API_BASE_URL}/system/flush-cache`);
-    console.log("Redis cache flushed successfully");
-  } catch (error) {
-    console.error("Failed to flush Redis cache:", error.message);
-  }
+  // Ensure Redis is initially enabled for priming if needed later
+  await toggleRedis(true);
 
-  // Run tests for each endpoint without caching
-  console.log("\n🔄 Running tests WITHOUT caching...");
+  // Run tests for each endpoint
   for (const endpoint of TEST_ENDPOINTS) {
-    console.log(`Testing ${endpoint}...`);
-    const result = await runEndpointTest(endpoint, false);
-    allResults.endpoints.push(result);
-    console.log(`✅ Avg response time: ${result.avgResponseTime.toFixed(2)}ms`);
+    console.log(`\n📊 Testing endpoint: ${endpoint}`);
+
+    // TEST 1: Measure database performance (Redis Disabled)
+    console.log(`\n🔄 Testing ${endpoint} WITHOUT cache (Redis Disabled)...`);
+
+    // Disable Redis caching via API
+    await toggleRedis(false);
+
+    // Run test while Redis is disabled - should hit database
+    const withoutCachingResult = await runEndpointTest(
+      endpoint,
+      TEST_ITERATIONS
+    );
+    withoutCachingResult.withCaching = false; // Mark as without caching
+    allResults.endpoints.push(withoutCachingResult);
+    console.log(
+      `✅ Without cache (Redis Disabled): Avg response time: ${withoutCachingResult.avgResponseTime.toFixed(
+        2
+      )}ms`
+    );
+
+    // Short pause between tests
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // TEST 2: Measure cached performance (Redis Enabled)
+    console.log(`\n🔄 Testing ${endpoint} WITH cache (Redis Enabled)...`);
+
+    // Enable Redis caching via API
+    await toggleRedis(true);
+
+    // Prime the cache with a single request (now that Redis is enabled)
+    await primeCache(endpoint);
+
+    // Now run test with Redis enabled and primed cache
+    const withCachingResult = await runEndpointTest(endpoint, TEST_ITERATIONS);
+    withCachingResult.withCaching = true; // Mark as with caching
+    allResults.endpoints.push(withCachingResult);
+    console.log(
+      `✅ With cache (Redis Enabled): Avg response time: ${withCachingResult.avgResponseTime.toFixed(
+        2
+      )}ms`
+    );
+
+    // Short pause before next endpoint
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   }
 
-  // Short pause
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-
-  // Run tests for each endpoint with caching
-  console.log("\n🔄 Running tests WITH caching...");
-  for (const endpoint of TEST_ENDPOINTS) {
-    console.log(`Testing ${endpoint}...`);
-
-    // First request to prime the cache
-    await axios.get(`${API_BASE_URL}${endpoint}`);
-    console.log("Cache primed");
-
-    // Actual test
-    const result = await runEndpointTest(endpoint, true);
-    allResults.endpoints.push(result);
-    console.log(`✅ Avg response time: ${result.avgResponseTime.toFixed(2)}ms`);
-  }
+  // Re-enable Redis at the end just in case
+  await toggleRedis(true);
 
   // Process results
   processResults(allResults);
@@ -186,25 +247,49 @@ function processResults(allResults) {
   const reportJson = JSON.stringify(report, null, 2);
   const reportPath = path.join(__dirname, "../log/performance-report.json");
 
+  // Ensure directory exists
+  const logDir = path.join(__dirname, "../log");
+  if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir, { recursive: true });
+  }
+
   fs.writeFileSync(reportPath, reportJson);
 
   // Print summary
   console.log("\n📊 PERFORMANCE IMPROVEMENT SUMMARY");
-  console.log("==============================");
+  console.log("================================");
 
   for (const imp of improvements) {
     console.log(`\n${imp.endpoint}`);
     console.log(`Without caching: ${imp.withoutCachingAvg.toFixed(2)}ms`);
     console.log(`With caching: ${imp.withCachingAvg.toFixed(2)}ms`);
-    console.log(
-      `Improvement: ${imp.improvementMs.toFixed(
-        2
-      )}ms (${imp.improvementPercent.toFixed(2)}%)`
-    );
+
+    if (imp.improvementMs > 0) {
+      console.log(
+        `Improvement: ${imp.improvementMs.toFixed(
+          2
+        )}ms (${imp.improvementPercent.toFixed(2)}%)`
+      );
+    } else {
+      console.log(
+        `Degradation: ${Math.abs(imp.improvementMs).toFixed(2)}ms (${Math.abs(
+          imp.improvementPercent
+        ).toFixed(2)}%)`
+      );
+    }
   }
 
   console.log(`\n✅ Full report saved to: ${reportPath}`);
 }
 
 // Run the tests
-runAllTests().catch(console.error);
+runAllTests().catch(async (error) => {
+  console.error("\n❌ An error occurred during the test run:", error);
+  // Attempt to re-enable Redis if an error occurred
+  console.log("Attempting to re-enable Redis after error...");
+  try {
+    await toggleRedis(true);
+  } catch (enableError) {
+    console.error("Failed to re-enable Redis after error:", enableError);
+  }
+});

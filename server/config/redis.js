@@ -2,16 +2,19 @@ const redis = require("redis");
 const util = require("util");
 const { EventEmitter } = require("events");
 
+// Connection promise to track Redis connection state
+let redisReadyPromise;
+
 // Check if Redis is installed and available
 let redisClient;
 let redisEnabled = false;
 
 try {
+  console.log("Initializing Redis client...");
   // Create Redis client with basic configuration
   redisClient = redis.createClient({
     host: process.env.REDIS_HOST || "localhost",
     port: process.env.REDIS_PORT || 6379,
-    password: process.env.REDIS_PASSWORD || "",
     retry_strategy: (options) => {
       if (options.error) {
         if (options.error.code === "ECONNREFUSED") {
@@ -27,33 +30,56 @@ try {
     },
   });
 
+  // Use a promise to track connection readiness
+  redisReadyPromise = new Promise((resolve) => {
+    // The 'ready' event is emitted when Redis is fully connected and ready
+    redisClient.on("ready", () => {
+      console.log("Redis client ready and fully connected");
+      redisEnabled = true;
+      resolve(true);
+    });
+  });
+
   // Handle Redis events
   redisClient.on("connect", () => {
     console.log("Redis client connected");
-    redisEnabled = true;
+    // Note: 'connect' fires before 'ready', so we don't set redisEnabled=true here
   });
 
   redisClient.on("error", (err) => {
     console.error("Redis client error:", err);
     redisEnabled = false;
   });
+
+  // Check connection state after a timeout to avoid hanging the server
+  setTimeout(() => {
+    if (!redisEnabled) {
+      console.warn(
+        "Redis not ready after timeout - operations will use fallbacks"
+      );
+    }
+  }, 5000);
 } catch (error) {
   console.error("Failed to initialize Redis client:", error);
+  // Create a promise that resolves to false
+  redisReadyPromise = Promise.resolve(false);
   // Create a dummy client to prevent app crashes if Redis is unavailable
   redisClient = {
-    get: (key, callback) => callback(null, null),
-    set: (key, value, flag, expiry, callback) => callback(null, "OK"),
-    setex: (key, expiry, value, callback) => callback(null, "OK"),
-    del: (key, callback) => callback(null, 0),
-    exists: (key, callback) => callback(null, 0),
-    expire: (key, seconds, callback) => callback(null, 1),
-    flushall: (callback) => callback(null, "OK"),
-    info: (callback) => callback(null, ""),
-    dbsize: (callback) => callback(null, 0),
+    get: () => Promise.resolve(null),
+    set: () => Promise.resolve("OK"),
+    setex: () => Promise.resolve("OK"),
+    del: () => Promise.resolve(0),
+    exists: () => Promise.resolve(0),
+    expire: () => Promise.resolve(1),
+    flushall: () => Promise.resolve("OK"),
+    info: () => Promise.resolve(""),
+    dbsize: () => Promise.resolve(0),
     pipeline: () => ({
       del: () => ({}),
       exec: () => Promise.resolve([]),
     }),
+    connect: () => Promise.resolve(),
+    quit: () => Promise.resolve(),
     scanStream: () => {
       // Create a dummy event emitter that emits no data and ends immediately
       const emitter = new EventEmitter();
@@ -66,52 +92,158 @@ try {
   };
 }
 
-// Simple wrapper functions that will work whether Redis is available or not
-const getAsync = (key) => {
-  if (!redisEnabled) return Promise.resolve(null);
-  return util.promisify(redisClient.get).bind(redisClient)(key);
-};
-
-const setAsync = (key, value, flag, expiry) => {
-  if (!redisEnabled) return Promise.resolve("OK");
-  if (flag === "EX" && expiry) {
-    return util.promisify(redisClient.setex).bind(redisClient)(
-      key,
-      expiry,
-      value
-    );
+// Wait for Redis connection before continuing
+// This can be awaited when the server starts
+const waitForRedis = async (timeout = 5000) => {
+  try {
+    // Use Promise.race to avoid hanging if Redis never connects
+    const result = await Promise.race([
+      redisReadyPromise,
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Redis connection timeout")), timeout)
+      ),
+    ]);
+    return result;
+  } catch (error) {
+    console.warn("Redis connection timed out or failed:", error.message);
+    return false;
   }
-  return util.promisify(redisClient.set).bind(redisClient)(key, value);
 };
 
-const delAsync = (key) => {
-  if (!redisEnabled) return Promise.resolve(0);
-  return util.promisify(redisClient.del).bind(redisClient)(key);
+// Simple wrapper functions that will work whether Redis is available or not
+const getAsync = async (key) => {
+  if (global.isRedisManuallyDisabled) {
+    return null;
+  }
+  if (!redisEnabled) {
+    return null; // Return null directly
+  }
+  try {
+    // Promisify the get call for this specific operation to get actual data
+    const getValuePromise = new Promise((resolve, reject) => {
+      redisClient.get(key, (err, reply) => {
+        if (err) reject(err);
+        else resolve(reply);
+      });
+    });
+
+    return await getValuePromise;
+  } catch (err) {
+    console.error(`Redis get error for key ${key}:`, err);
+    redisEnabled = false; // Consider disabling on error
+    return null;
+  }
 };
 
-const existsAsync = (key) => {
-  if (!redisEnabled) return Promise.resolve(0);
-  return util.promisify(redisClient.exists).bind(redisClient)(key);
+const setAsync = async (key, value, flag, expiry) => {
+  if (global.isRedisManuallyDisabled) {
+    return "OK";
+  }
+  if (!redisEnabled) return "OK"; // Return "OK" directly
+  try {
+    if (flag === "EX" && expiry) {
+      // For Redis v3.1.2, we need to use setex and promisify to handle callbacks
+      const setExPromise = new Promise((resolve, reject) => {
+        redisClient.setex(key, expiry, value, (err, reply) => {
+          if (err) reject(err);
+          else resolve(reply === true ? "OK" : reply);
+        });
+      });
+      return await setExPromise;
+    } else {
+      // Basic set without expiry
+      const setPromise = new Promise((resolve, reject) => {
+        redisClient.set(key, value, (err, reply) => {
+          if (err) reject(err);
+          else resolve(reply === true ? "OK" : reply);
+        });
+      });
+      return await setPromise;
+    }
+  } catch (err) {
+    console.error(`Redis set error for key ${key}:`, err);
+    redisEnabled = false; // Consider disabling on error
+    return null; // Indicate failure
+  }
 };
 
-const flushallAsync = () => {
-  if (!redisEnabled) return Promise.resolve("OK");
-  return util.promisify(redisClient.flushall).bind(redisClient)();
+const delAsync = async (key) => {
+  if (global.isRedisManuallyDisabled) {
+    return 0;
+  }
+  if (!redisEnabled) return 0; // Return 0 directly
+  try {
+    return await redisClient.del(key);
+  } catch (err) {
+    console.error(`Redis del error for key ${key}:`, err);
+    redisEnabled = false; // Consider disabling on error
+    return 0;
+  }
 };
 
-const infoAsync = () => {
-  if (!redisEnabled) return Promise.resolve("");
-  return util.promisify(redisClient.info).bind(redisClient)();
+const existsAsync = async (key) => {
+  if (global.isRedisManuallyDisabled) {
+    return 0;
+  }
+  if (!redisEnabled) return 0; // Return 0 directly
+  try {
+    return await redisClient.exists(key);
+  } catch (err) {
+    console.error(`Redis exists error for key ${key}:`, err);
+    redisEnabled = false; // Consider disabling on error
+    return 0;
+  }
 };
 
-const dbsizeAsync = () => {
-  if (!redisEnabled) return Promise.resolve(0);
-  return util.promisify(redisClient.dbsize).bind(redisClient)();
+const flushallAsync = async () => {
+  if (global.isRedisManuallyDisabled) {
+    return "OK";
+  }
+  if (!redisEnabled) {
+    return "OK"; // Return OK as per dummy client behavior
+  }
+  try {
+    const result = await redisClient.flushall();
+    return result; // Return the actual result
+  } catch (err) {
+    console.error("Redis flushall error:", err);
+    redisEnabled = false;
+    return null;
+  }
+};
+
+const infoAsync = async () => {
+  if (global.isRedisManuallyDisabled) {
+    return "";
+  }
+  if (!redisEnabled) return "";
+  try {
+    return await redisClient.info();
+  } catch (err) {
+    console.error("Redis info error:", err);
+    redisEnabled = false;
+    return "";
+  }
+};
+
+const dbsizeAsync = async () => {
+  if (global.isRedisManuallyDisabled) {
+    return 0;
+  }
+  if (!redisEnabled) return 0;
+  try {
+    return await redisClient.dbSize();
+  } catch (err) {
+    console.error("Redis dbsize error:", err);
+    redisEnabled = false;
+    return 0;
+  }
 };
 
 module.exports = {
   redisClient,
   redisEnabled,
+  waitForRedis,
   getAsync,
   setAsync,
   delAsync,

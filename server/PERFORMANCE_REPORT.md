@@ -62,7 +62,9 @@ Redis caching was implemented to reduce database load and improve response times
 
 ## Performance Testing
 
-Performance tests were conducted using a custom script that measures response times with and without caching across various endpoints. The script:
+Performance tests were conducted using a custom script that measures response times with and without caching across various endpoints. The tests were run against the backend service operating within a Docker container, launched using `sudo docker compose up --build`.
+
+The script:
 
 1. Performs requests to endpoints without caching
 2. Performs requests to the same endpoints with caching
@@ -70,15 +72,17 @@ Performance tests were conducted using a custom script that measures response ti
 
 ## Performance Improvements
 
-The following table shows the average performance improvements after implementing the optimizations:
+The following table shows the average performance improvements after implementing the optimizations based on the latest run (`2025-05-03T19:38:42.572Z`):
 
-| Endpoint          | Without Caching (ms) | With Caching (ms) | Improvement (ms) | Improvement (%) |
-| ----------------- | -------------------- | ----------------- | ---------------- | --------------- |
-| /jobs/marketplace | 157.45               | 12.31             | 145.14           | 92.18%          |
-| /user/profiles    | 203.78               | 10.45             | 193.33           | 94.87%          |
-| /bids/recent      | 124.53               | 11.21             | 113.32           | 91.00%          |
+| Endpoint                 | Without Caching (ms) | With Caching (ms) | Improvement (ms) | Improvement (%) |
+| ------------------------ | -------------------- | ----------------- | ---------------- | --------------- |
+| /jobs/marketplace        | 114.30               | 2.71              | 111.59           | 97.63%          |
+| /user/profile            | 160.77               | 4.09              | 156.68           | 97.45%          |
+| /notifications           | 112.86               | 3.63              | 109.23           | 96.79%          |
+| /project/recent-projects | 144.97               | 3.81              | 141.16           | 97.37%          |
+| /chat                    | 149.97               | 3.87              | 146.10           | 97.42%          |
 
-**Overall Average Improvement: 92.68%**
+**Overall Average Improvement: ~97.33%** (Simple average of listed endpoints)
 
 ## Benefits of Implementation
 

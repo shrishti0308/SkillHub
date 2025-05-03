@@ -15,11 +15,17 @@ const path = require("path");
 
 const API_BASE_URL = "http://localhost:3000";
 const TEST_ITERATIONS = 100; // Number of requests to make for each endpoint
-const TEST_ENDPOINTS = ["/jobs/marketplace", "/user/profile", "/notifications"];
+const TEST_ENDPOINTS = [
+  "/jobs/marketplace",
+  "/user/profile",
+  "/notifications",
+  "/project/recent-projects",
+  "/chat",
+];
 
 // Auth token for protected routes (replace with valid token)
 const AUTH_TOKEN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZDA2MTUxZDAwZjZlZDM2OTQ2NGIxNCIsInJvbGUiOiJoeWJyaWQiLCJpYXQiOjE3NDYyMDc2MTksImV4cCI6MTc0NjI5NDAxOX0.7Sbr8uVyHUnpMcWAwvf4ALGKMsUVNW2sJgNIJAEDrhk";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MTY1ZDFiMDgzNzVhOWJkMTMyZWM2MCIsInJvbGUiOiJoeWJyaWQiLCJpYXQiOjE3NDYzMDA4MTEsImV4cCI6MTc0NjM4NzIxMX0.lQz82xs5kqjW1bf6JAvm_nLojwrOal2QjS5V5EtN4zQ";
 
 /**
  * Enable/Disable Redis caching via API endpoint

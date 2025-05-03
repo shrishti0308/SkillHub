@@ -20,22 +20,37 @@ beforeAll(async () => {
   console.error = jest.fn();
   console.warn = jest.fn();
 
-  // Close any existing connections
-  if (mongoose.connection.readyState !== 0) {
-    await mongoose.disconnect();
+  try {
+    // Close any existing connections (should ideally not happen, but safety check)
+    if (mongoose.connection.readyState !== 0) {
+      await mongoose.disconnect();
+    }
+
+    // Create a new in-memory server
+    console.log = originalConsoleLog; // Temporarily restore log for server startup messages
+    console.error = originalConsoleError;
+    mongoServer = await MongoMemoryServer.create();
+    console.log = jest.fn(); // Re-mock log
+    console.error = jest.fn();
+    const mongoUri = mongoServer.getUri();
+
+    // Connect to the in-memory database
+    await mongoose.connect(mongoUri, {
+      // useNewUrlParser and useUnifiedTopology are deprecated and default to true
+      // No options needed usually unless specific ones required
+    });
+
+    // Restore original console.log only after successful setup
+    console.log = originalConsoleLog;
+  } catch (error) {
+    // Log the error and re-throw to fail tests quickly
+    console.error = originalConsoleError; // Restore error log to see the actual problem
+    console.error("Error during MongoDB Memory Server setup:", error);
+    // Restore other logs if needed
+    console.log = originalConsoleLog;
+    console.warn = originalConsoleWarn;
+    throw error; // Ensure Jest knows the setup failed
   }
-
-  // Create a new in-memory server
-  mongoServer = await MongoMemoryServer.create();
-  const mongoUri = mongoServer.getUri();
-
-  // Connect to the in-memory database
-  await mongoose.connect(mongoUri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-
-  console.log = originalConsoleLog;
 });
 
 // Clear all test data after each test
@@ -54,20 +69,41 @@ afterEach(async () => {
 
 // Stop MongoDB and close connection
 afterAll(async () => {
-  console.log = jest.fn();
-  console.error = jest.fn();
-
-  if (mongoose.connection.readyState !== 0) {
-    await mongoose.connection.dropDatabase();
-    await mongoose.connection.close();
-  }
-
-  if (mongoServer) {
-    await mongoServer.stop();
-  }
-
-  // Restore original console methods
+  // Restore console methods early to see teardown errors if any
   console.log = originalConsoleLog;
   console.error = originalConsoleError;
   console.warn = originalConsoleWarn;
-}, 30000); // Increase timeout to 30 seconds
+
+  try {
+    if (mongoose.connection && mongoose.connection.readyState !== 0) {
+      await mongoose.connection.dropDatabase();
+      await mongoose.connection.close();
+    }
+  } catch (error) {
+    console.error("Error closing Mongoose connection:", error);
+  }
+
+  try {
+    if (mongoServer) {
+      await mongoServer.stop();
+    }
+  } catch (error) {
+    console.error("Error stopping MongoDB Memory Server:", error);
+  }
+
+  // *** ADD REDIS CLIENT QUIT ***
+  try {
+    // Attempt to quit redis client if it exists and has a quit method
+    // This handles cases where the real client might have been initialized
+    const redis = require("../config/redis"); // Get the client instance
+    if (redis.redisClient && typeof redis.redisClient.quit === "function") {
+      await redis.redisClient.quit();
+      console.log("Redis client closed.");
+    }
+  } catch (error) {
+    console.error("Error closing Redis client:", error);
+  }
+  // *** END REDIS CLIENT QUIT ***
+
+  // Clear mocks if any were set globally for mongoose/redis etc. if applicable
+}, 30000); // Keep timeout for teardown

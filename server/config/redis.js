@@ -10,6 +10,43 @@ let redisClient;
 let redisEnabled = false;
 
 try {
+  // *** ADD CHECK FOR TEST ENVIRONMENT ***
+  if (process.env.NODE_ENV === "test") {
+    console.log("Skipping Redis initialization in test environment.");
+    redisEnabled = false;
+    redisReadyPromise = Promise.resolve(false);
+    // Create dummy client immediately
+    redisClient = {
+      get: () => Promise.resolve(null),
+      set: () => Promise.resolve("OK"),
+      setex: () => Promise.resolve("OK"),
+      del: () => Promise.resolve(0),
+      exists: () => Promise.resolve(0),
+      expire: () => Promise.resolve(1),
+      flushall: () => Promise.resolve("OK"),
+      info: () => Promise.resolve(""),
+      dbsize: () => Promise.resolve(0),
+      pipeline: () => ({ del: () => ({}), exec: () => Promise.resolve([]) }),
+      connect: () => Promise.resolve(),
+      quit: () => Promise.resolve(),
+      scanStream: () => {
+        // Create a dummy event emitter that emits no data and ends immediately
+        const emitter = new EventEmitter();
+        setTimeout(() => {
+          emitter.emit("data", []);
+          emitter.emit("end");
+        }, 0);
+        return emitter;
+      },
+      on: () => {}, // Add dummy 'on' to prevent errors if called
+      removeAllListeners: () => {}, // Add dummy removeAllListeners
+    };
+    // Throw a dummy error to bypass the rest of the try block cleanly
+    // (This is a simple way to exit the try block early)
+    throw new Error("TEST_ENV_SKIP");
+  }
+  // *** END CHECK ***
+
   console.log("Initializing Redis client...");
 
   // Determine connection options
@@ -68,36 +105,43 @@ try {
     }
   }, 5000);
 } catch (error) {
-  console.error("Failed to initialize Redis client:", error);
-  // Create a promise that resolves to false
-  redisReadyPromise = Promise.resolve(false);
-  // Create a dummy client to prevent app crashes if Redis is unavailable
-  redisClient = {
-    get: () => Promise.resolve(null),
-    set: () => Promise.resolve("OK"),
-    setex: () => Promise.resolve("OK"),
-    del: () => Promise.resolve(0),
-    exists: () => Promise.resolve(0),
-    expire: () => Promise.resolve(1),
-    flushall: () => Promise.resolve("OK"),
-    info: () => Promise.resolve(""),
-    dbsize: () => Promise.resolve(0),
-    pipeline: () => ({
-      del: () => ({}),
-      exec: () => Promise.resolve([]),
-    }),
-    connect: () => Promise.resolve(),
-    quit: () => Promise.resolve(),
-    scanStream: () => {
-      // Create a dummy event emitter that emits no data and ends immediately
-      const emitter = new EventEmitter();
-      setTimeout(() => {
-        emitter.emit("data", []);
-        emitter.emit("end");
-      }, 0);
-      return emitter;
-    },
-  };
+  // Catch the dummy error specifically, otherwise handle real errors
+  if (error.message !== "TEST_ENV_SKIP") {
+    console.error("Failed to initialize Redis client:", error);
+    // Ensure dummy client is created on real errors too
+    if (!redisClient) {
+      redisReadyPromise = Promise.resolve(false);
+      redisClient = {
+        get: () => Promise.resolve(null),
+        set: () => Promise.resolve("OK"),
+        setex: () => Promise.resolve("OK"),
+        del: () => Promise.resolve(0),
+        exists: () => Promise.resolve(0),
+        expire: () => Promise.resolve(1),
+        flushall: () => Promise.resolve("OK"),
+        info: () => Promise.resolve(""),
+        dbsize: () => Promise.resolve(0),
+        pipeline: () => ({
+          del: () => ({}),
+          exec: () => Promise.resolve([]),
+        }),
+        connect: () => Promise.resolve(),
+        quit: () => Promise.resolve(),
+        scanStream: () => {
+          // Create a dummy event emitter that emits no data and ends immediately
+          const emitter = new EventEmitter();
+          setTimeout(() => {
+            emitter.emit("data", []);
+            emitter.emit("end");
+          }, 0);
+          return emitter;
+        },
+        on: () => {}, // Add dummy 'on' to prevent errors if called
+        removeAllListeners: () => {}, // Add dummy removeAllListeners
+      };
+    }
+  }
+  // If it was the TEST_ENV_SKIP error, we've already set up the dummy client.
 }
 
 // Wait for Redis connection before continuing

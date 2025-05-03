@@ -440,21 +440,26 @@ io.on("connection", (socket) => {
   });
 });
 
-// Start the server
-server.listen(PORT, async () => {
-  console.log(`Server starting on port ${PORT} in ${NODE_ENV} mode`);
+// Start the server only if not in test mode
+if (process.env.NODE_ENV !== "test") {
+  server.listen(PORT, async () => {
+    console.log(`Server starting on port ${PORT} in ${NODE_ENV} mode`);
 
-  // Wait for Redis to connect before declaring ready
-  try {
-    const redisReady = await waitForRedis(10000); // Wait up to 10 seconds
-    if (redisReady) {
-      console.log("Redis connected and ready for caching operations");
-    } else {
-      console.warn("Redis not available - caching will be disabled");
+    // Wait for Redis to connect before declaring ready
+    try {
+      const redisReady = await waitForRedis(10000); // Wait up to 10 seconds
+      if (redisReady) {
+        console.log("Redis connected and ready for caching operations");
+      } else {
+        console.warn("Redis not available - caching will be disabled");
+      }
+    } catch (error) {
+      console.error("Error checking Redis status:", error);
     }
-  } catch (error) {
-    console.error("Error checking Redis status:", error);
-  }
 
-  console.log(`Server fully initialized and ready for requests`);
-});
+    console.log(`Server fully initialized and ready for requests`);
+  });
+}
+
+// Export for testing
+module.exports = { app, server };

@@ -2,6 +2,7 @@ const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { handleProfilePicUpload } = require("../middlewares/uploadMiddleware");
+const solrService = require('../services/solrService');
 
 const jwtSecret = "skill_hub_secret_key";
 
@@ -196,5 +197,45 @@ exports.deleteUser = async (req, res) => {
     res
       .status(500)
       .json({ success: false, message: "Error deleting user", error });
+  }
+};
+
+// Search users with Solr
+exports.searchUsersSolr = async (req, res) => {
+  try {
+    const { query, role, skills, limit, page } = req.query;
+    
+    // Build filters object
+    const filters = {};
+    if (role) filters.role = role;
+    if (skills) {
+      // Handle multiple skills as array or comma-separated string
+      const skillsArray = Array.isArray(skills) ? skills : skills.split(',');
+      filters.skills = skillsArray;
+    }
+    
+    // Calculate pagination
+    const start = page ? (parseInt(page) - 1) * (limit ? parseInt(limit) : 10) : 0;
+    
+    const searchOptions = {
+      start,
+      limit: limit ? parseInt(limit) : 10,
+      filters
+    };
+    
+    const result = await solrService.searchUsers(query || '*:*', searchOptions);
+    
+    res.status(200).json({
+      success: true,
+      count: result.numFound,
+      users: result.docs
+    });
+  } catch (error) {
+    console.error('Error searching users with Solr:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error searching users',
+      error: error.message
+    });
   }
 };

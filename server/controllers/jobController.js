@@ -2,6 +2,7 @@ const Job = require("../models/job");
 const Bid = require("../models/bid");
 const Notification = require("../models/notification");
 const User = require("../models/user");
+const solrService = require('../services/solrService');
 
 // Create a new job
 const createJob = async (req, res) => {
@@ -181,6 +182,51 @@ const getJobsByUserId = async (req, res) => {
   }
 };
 
+// Search jobs with Solr
+const searchJobsSolr = async (req, res) => {
+  try {
+    const { query, status, categories, skills, minBudget, maxBudget, limit, page } = req.query;
+    
+    // Build filters object
+    const filters = {};
+    if (status) filters.status = status;
+    if (categories) {
+      const categoriesArray = Array.isArray(categories) ? categories : categories.split(',');
+      filters.categories = categoriesArray;
+    }
+    if (skills) {
+      const skillsArray = Array.isArray(skills) ? skills : skills.split(',');
+      filters.skillsRequired = skillsArray;
+    }
+    if (minBudget) filters['budget_min:[' + parseInt(minBudget) + ' TO *]'] = '';
+    if (maxBudget) filters['budget_max:[* TO ' + parseInt(maxBudget) + ']'] = '';
+    
+    // Calculate pagination
+    const start = page ? (parseInt(page) - 1) * (limit ? parseInt(limit) : 10) : 0;
+    
+    const searchOptions = {
+      start,
+      limit: limit ? parseInt(limit) : 10,
+      filters
+    };
+    
+    const result = await solrService.searchJobs(query || '*:*', searchOptions);
+    
+    res.status(200).json({
+      success: true,
+      count: result.numFound,
+      jobs: result.docs
+    });
+  } catch (error) {
+    console.error('Error searching jobs with Solr:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error searching jobs',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   createJob,
   getMarketplaceJobs,
@@ -190,4 +236,5 @@ module.exports = {
   getJobByIdAuthCheck,
   createBid,
   getJobsByUserId,
+  searchJobsSolr
 };

@@ -57,6 +57,7 @@
  */
 
 const mongoose = require("mongoose");
+const solrService = require('../services/solrService');
 
 const jobSchema = new mongoose.Schema(
   {
@@ -89,6 +90,24 @@ const jobSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+jobSchema.post('save', async function(doc) {
+  try {
+    await solrService.indexJob(doc);
+  } catch (error) {
+    console.error('Error indexing job to Solr:', error);
+  }
+});
+
+jobSchema.post('findOneAndUpdate', async function(doc) {
+  if (doc) {
+    try {
+      await solrService.indexJob(doc);
+    } catch (error) {
+      console.error('Error indexing updated job to Solr:', error);
+    }
+  }
+});
 
 const Job = mongoose.models.Job || mongoose.model("Job", jobSchema);
 module.exports = Job;

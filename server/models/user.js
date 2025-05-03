@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const fs = require("fs");
+const solrService = require('../services/solrService');
 
 /**
  * @swagger
@@ -142,6 +143,24 @@ userSchema.pre("save", function (next) {
     }
   }
   next();
+});
+
+userSchema.post('save', async function(doc) {
+  try {
+    await solrService.indexUser(doc);
+  } catch (error) {
+    console.error('Error indexing user to Solr:', error);
+  }
+});
+
+userSchema.post('findOneAndUpdate', async function(doc) {
+  if (doc) {
+    try {
+      await solrService.indexUser(doc);
+    } catch (error) {
+      console.error('Error indexing updated user to Solr:', error);
+    }
+  }
 });
 
 module.exports = mongoose.model("User", userSchema);

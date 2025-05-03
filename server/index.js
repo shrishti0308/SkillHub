@@ -47,6 +47,7 @@ const projectRoutes = require("./routes/projectRoutes");
 const walletRoutes = require("./routes/walletRoutes");
 const transactionRoutes = require("./routes/transactionRoutes");
 const chatRoutes = require("./routes/chatRoutes");
+const searchRoutes = require("./routes/searchRoutes");
 
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || "development";
@@ -123,6 +124,7 @@ app.use("/project", projectRoutes);
 app.use("/wallet", walletRoutes);
 app.use("/transaction", transactionRoutes);
 app.use("/chat", chatRoutes);
+app.use("/search", searchRoutes);
 
 // Example of a protected route with authentication middleware
 app.get("/recent-bids", authenticateJWT, async (req, res, next) => {

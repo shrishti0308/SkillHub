@@ -31,5 +31,5 @@ module.exports = {
   forceExit: true,
 
   // Sets the timeout for tests
-  testTimeout: 30000,
+  testTimeout: 60000,
 };

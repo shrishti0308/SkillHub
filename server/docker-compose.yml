@@ -15,7 +15,23 @@ services:
       - PORT=${PORT}
       - MONGODB_URI=${MONGODB_URI}
       - MONGODB_DBNAME=${MONGODB_DBNAME}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     volumes:
       - ./public:/usr/src/app/public
       - ./log:/usr/src/app/log
     restart: unless-stopped
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:alpine
+    container_name: skillhub-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+volumes:
+  redis_data:

@@ -11,10 +11,18 @@ let redisEnabled = false;
 
 try {
   console.log("Initializing Redis client...");
-  // Create Redis client with basic configuration
+
+  // Determine connection options
+  const redisConnectionOptions = process.env.REDIS_URL
+    ? { url: process.env.REDIS_URL }
+    : {
+        host: process.env.REDIS_HOST || "localhost",
+        port: process.env.REDIS_PORT || 6379,
+      };
+
+  // Create Redis client with determined options and common retry strategy
   redisClient = redis.createClient({
-    host: process.env.REDIS_HOST || "localhost",
-    port: process.env.REDIS_PORT || 6379,
+    ...redisConnectionOptions, // Spread the connection options (either URL or host/port)
     retry_strategy: (options) => {
       if (options.error) {
         if (options.error.code === "ECONNREFUSED") {

@@ -14,11 +14,24 @@ exports.authenticateJWT = (req, res, next) => {
       req.user = verified;
       next(); // Continue if token is valid
     } catch (error) {
-      return res.status(401).json({ message: "Invalid token" });
+      if (error.name === "TokenExpiredError") {
+        return res.status(401).json({
+          message: "Token expired",
+          error: "Your session has expired. Please log in again.",
+          code: "TOKEN_EXPIRED",
+        });
+      } else {
+        return res.status(401).json({
+          message: "Invalid token",
+          error: error.message,
+          code: "INVALID_TOKEN",
+        });
+      }
     }
   } else {
-    return res
-      .status(403)
-      .json({ message: "Access denied. No token provided." });
+    return res.status(403).json({
+      message: "Access denied. No token provided.",
+      code: "NO_TOKEN",
+    });
   }
 };

@@ -1,4 +1,9 @@
 const errorHandler = (err, req, res, next) => {
+  // Check if headers have already been sent
+  if (res.headersSent) {
+    return next(err);
+  }
+
   // Default error status and message
   const statusCode = err.statusCode || 500;
   const message = err.message || "Internal Server Error";

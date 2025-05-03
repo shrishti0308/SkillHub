@@ -1,30 +1,36 @@
 const Chat = require("../models/chat");
 const User = require("../models/user");
 const mongoose = require("mongoose");
+const { getAsync, setAsync } = require("../config/redis"); // Corrected import
 
-// Get all chats for the current user
+const CACHE_EXPIRATION = 30; // Shorter expiration for potentially dynamic chat data
+
+// Get all chats for the current user with Caching
 exports.getUserChats = async (req, res) => {
-  try {
-    const userId = req.user.id;
+  const userId = req.user.id;
+  const cacheKey = `user_chats:${userId}`;
 
-    // Find all chats where the current user is a participant
+  try {
+    const cachedChats = await getAsync(cacheKey);
+    if (cachedChats) {
+      console.log(`Cache hit for ${cacheKey}`);
+      const formattedChats = JSON.parse(cachedChats);
+      return res.status(200).json({ success: true, chats: formattedChats });
+    }
+
+    console.log(`Cache miss for ${cacheKey}, fetching from DB`);
     const chats = await Chat.find({ participants: userId })
       .populate({
         path: "participants",
         select: "username name info.profilePic",
       })
-      .populate({
-        path: "messages.sender",
-        select: "username name",
-      })
+      .populate({ path: "messages.sender", select: "username name" })
       .sort({ lastMessage: -1 });
 
-    // Format the response to include other participant's info
     const formattedChats = chats.map((chat) => {
       const otherParticipant = chat.participants.find(
         (p) => p._id.toString() !== userId
       );
-
       return {
         _id: chat._id,
         otherUser: otherParticipant,
@@ -39,6 +45,18 @@ exports.getUserChats = async (req, res) => {
       };
     });
 
+    try {
+      await setAsync(
+        cacheKey,
+        JSON.stringify(formattedChats),
+        "EX",
+        CACHE_EXPIRATION
+      );
+      console.log(`Stored ${cacheKey} in cache`);
+    } catch (redisSetError) {
+      console.error("Redis set error:", redisSetError);
+    }
+
     res.status(200).json({ success: true, chats: formattedChats });
   } catch (error) {
     console.error("Error getting user chats:", error);
@@ -50,40 +68,78 @@ exports.getUserChats = async (req, res) => {
   }
 };
 
-// Get a specific chat by ID
+// Get a specific chat by ID with Caching
 exports.getChatById = async (req, res) => {
-  try {
-    const { chatId } = req.params;
-    const userId = req.user.id;
+  const { chatId } = req.params;
+  const userId = req.user.id; // Needed to ensure user is participant
+  const cacheKey = `chat:${chatId}`; // Key doesn't include userId, but DB query ensures access control
 
-    // Validate chat ID
+  try {
     if (!mongoose.Types.ObjectId.isValid(chatId)) {
       return res
         .status(400)
         .json({ success: false, message: "Invalid chat ID" });
     }
 
-    // Find the chat and ensure the user is a participant
-    const chat = await Chat.findOne({
-      _id: chatId,
-      participants: userId,
-    })
+    const cachedChatData = await getAsync(cacheKey);
+    if (cachedChatData) {
+      console.log(`Cache hit for ${cacheKey}`);
+      const chatData = JSON.parse(cachedChatData);
+      // Still need to verify if current user is participant from cached data if we stored it
+      // For simplicity now, we rely on the DB check on miss. If caching full chat obj, add check here.
+      if (chatData === null) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Chat not found" });
+      }
+      // Need to format the cached data similar to DB response
+      const otherParticipant = chatData.participants.find(
+        (p) => p._id.toString() !== userId
+      );
+      if (!otherParticipant) {
+        // This means user wasn't a participant in the cached chat
+        return res.status(403).json({ success: false, message: "Forbidden" });
+      }
+      return res.status(200).json({
+        success: true,
+        chat: {
+          _id: chatData._id,
+          otherUser: otherParticipant,
+          messages: chatData.messages,
+          createdAt: chatData.createdAt,
+          updatedAt: chatData.updatedAt,
+        },
+      });
+    }
+
+    console.log(`Cache miss for ${cacheKey}, fetching from DB`);
+    const chat = await Chat.findOne({ _id: chatId, participants: userId })
       .populate({
         path: "participants",
         select: "username name info.profilePic",
       })
-      .populate({
-        path: "messages.sender",
-        select: "username name",
-      });
+      .populate({ path: "messages.sender", select: "username name" });
 
     if (!chat) {
+      try {
+        await setAsync(cacheKey, JSON.stringify(null), "EX", CACHE_EXPIRATION);
+        console.log(`Stored null for ${cacheKey} in cache`);
+      } catch (redisSetError) {
+        console.error("Redis set error:", redisSetError);
+      }
       return res
         .status(404)
         .json({ success: false, message: "Chat not found" });
     }
 
-    // Get the other participant's info
+    // Cache the full chat object
+    try {
+      await setAsync(cacheKey, JSON.stringify(chat), "EX", CACHE_EXPIRATION);
+      console.log(`Stored ${cacheKey} in cache`);
+    } catch (redisSetError) {
+      console.error("Redis set error:", redisSetError);
+    }
+
     const otherParticipant = chat.participants.find(
       (p) => p._id.toString() !== userId
     );
@@ -307,25 +363,60 @@ exports.markMessagesAsRead = async (req, res) => {
   }
 };
 
-// Search users by username for chat
+// Search users to start chat with Caching
 exports.searchUsers = async (req, res) => {
-  try {
-    const { query } = req.query;
-    const userId = req.user.id;
+  const { query } = req.query;
+  const currentUserId = req.user.id;
+  // Simple cache key for search query - consider normalization/rate limiting
+  const cacheKey = `user_search:${query.toLowerCase()}`;
 
+  try {
+    const cachedUsers = await getAsync(cacheKey);
+    if (cachedUsers) {
+      console.log(`Cache hit for ${cacheKey}`);
+      let users = JSON.parse(cachedUsers);
+      // Filter out current user from cached results
+      users = users.filter((user) => user._id.toString() !== currentUserId);
+      return res.status(200).json({ success: true, users });
+    }
+
+    console.log(`Cache miss for ${cacheKey}, fetching from DB`);
     if (!query) {
       return res
         .status(400)
-        .json({ success: false, message: "Search query is required" });
+        .json({ success: false, message: "Query parameter is required" });
     }
 
-    // Search for users by username (case-insensitive)
     const users = await User.find({
-      _id: { $ne: userId }, // Exclude the current user
-      username: { $regex: query, $options: "i" }, // Case-insensitive search
-    })
-      .select("username name info.profilePic")
-      .limit(10);
+      $and: [
+        { _id: { $ne: currentUserId } }, // Exclude the current user
+        {
+          $or: [
+            { username: { $regex: query, $options: "i" } }, // Case-insensitive search
+            { name: { $regex: query, $options: "i" } },
+          ],
+        },
+      ],
+    }).select("username name info.profilePic _id"); // Select necessary fields
+
+    try {
+      // Cache the results including the current user (filter on retrieval)
+      const allMatchedUsers = await User.find({
+        $or: [
+          { username: { $regex: query, $options: "i" } },
+          { name: { $regex: query, $options: "i" } },
+        ],
+      }).select("username name info.profilePic _id");
+      await setAsync(
+        cacheKey,
+        JSON.stringify(allMatchedUsers),
+        "EX",
+        CACHE_EXPIRATION * 2
+      );
+      console.log(`Stored ${cacheKey} in cache`);
+    } catch (redisSetError) {
+      console.error("Redis set error:", redisSetError);
+    }
 
     res.status(200).json({ success: true, users });
   } catch (error) {

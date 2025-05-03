@@ -66,14 +66,41 @@ export const login = (usernameOrEmail, password) => async (dispatch) => {
 
     if (response.data.success) {
       const accessToken = response.data.token;
-      const role = response.data.role; // Assuming role is returned in response
-      const username = response.data.username; // Assuming username is returned in response
-      dispatch(setAccessToken(accessToken)); // Dispatch access token
-      dispatch(setRole(role)); // Dispatch role
-      dispatch(setUsername(username)); // Dispatch username
+      const role = response.data.role;
+      const username = response.data.username;
+
+      // Store token and user data in localStorage
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("role", role);
+      localStorage.setItem("username", username);
+
+      // Also update Redux state
+      dispatch(setAccessToken(accessToken));
+      dispatch(setRole(role));
+      dispatch(setUsername(username));
+
+      return { success: true };
+    } else {
+      throw new Error(response.data.message || "Login failed");
     }
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error logging in user");
+    console.error("Login error:", error);
+
+    // Check for specific error types
+    if (error.response) {
+      // Server returned an error
+      const errorMessage =
+        error.response.data.message || "Authentication failed";
+      throw new Error(errorMessage);
+    } else if (error.request) {
+      // Request was made but no response
+      throw new Error(
+        "No response from server. Please check your internet connection."
+      );
+    } else {
+      // Something else went wrong
+      throw new Error(error.message || "Error logging in");
+    }
   }
 };
 
@@ -87,7 +114,8 @@ export const selectRole = (state) => state.auth?.role;
 export const selectUsername = (state) => state.auth?.username;
 
 // Export the actions created automatically by the slice
-export const { setAccessToken, setRole, setUsername, logout } = authSlice.actions;
+export const { setAccessToken, setRole, setUsername, logout } =
+  authSlice.actions;
 
 // Thunk action to handle logout and navigation
 export const logoutAndNavigate = () => (dispatch) => {

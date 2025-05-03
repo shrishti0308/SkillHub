@@ -57,4 +57,22 @@ const bidSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Add indexes for frequently queried fields
+// Index for job to quickly find all bids for a specific job
+bidSchema.index({ job: 1 });
+// Index for freelancer to quickly find all bids by a specific freelancer
+bidSchema.index({ freelancer: 1 });
+// Index for status to quickly filter bids by status
+bidSchema.index({ status: 1 });
+// Compound index for job and status to find specific status bids for a job
+bidSchema.index({ job: 1, status: 1 });
+// Compound index for freelancer and status to find specific status bids by a freelancer
+bidSchema.index({ freelancer: 1, status: 1 });
+// Index for amount for sorting by bid amount
+bidSchema.index({ amount: 1 });
+// Compound index for job and amount for sorting bids on a job by amount
+bidSchema.index({ job: 1, amount: 1 });
+// Index for createdAt for sorting bids by date
+bidSchema.index({ createdAt: -1 });
+
 module.exports = mongoose.model("Bid", bidSchema);

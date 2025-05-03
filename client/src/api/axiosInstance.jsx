@@ -38,9 +38,32 @@ axiosInstance.interceptors.response.use(
     if (error.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
-      console.error("Response error data:", error.response.data);
-      console.error("Response error status:", error.response.status);
-      console.error("Response error headers:", error.response.headers);
+      const { status, data } = error.response;
+
+      // Handle token expiration
+      if (status === 401 && data.code === "TOKEN_EXPIRED") {
+        console.log("Session expired. Redirecting to login...");
+        // Clear the expired token
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("adminToken");
+
+        // Redirect to login (you can use different approach based on your routing)
+        if (window.location.pathname !== "/login") {
+          window.location.href = "/login?expired=true";
+        }
+      }
+
+      // Add more detailed logging for debugging
+      const isDevelopment =
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1";
+      if (isDevelopment) {
+        console.error("Response error data:", error.response.data);
+        console.error("Response error status:", error.response.status);
+        console.error("Response error headers:", error.response.headers);
+        console.error("Failed request URL:", error.config.url);
+        console.error("Failed request method:", error.config.method);
+      }
     } else if (error.request) {
       // The request was made but no response was received
       console.error("No response received:", error.request);
@@ -48,6 +71,8 @@ axiosInstance.interceptors.response.use(
       // Something happened in setting up the request that triggered an Error
       console.error("Error setting up request:", error.message);
     }
+
+    // Pass the error to the calling component
     return Promise.reject(error);
   }
 );

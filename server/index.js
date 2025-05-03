@@ -60,19 +60,20 @@ const walletRoutes = require("./routes/walletRoutes");
 const transactionRoutes = require("./routes/transactionRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 
+const PORT = process.env.PORT || 3000;
+const NODE_ENV = process.env.NODE_ENV || "development";
+const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
+
 // Initialize Express app
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:5173", // Frontend URL
+    origin: CLIENT_URL,
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
-
-const PORT = process.env.PORT || 3000;
-const NODE_ENV = process.env.NODE_ENV || "development";
 
 // Connect to MongoDB
 connectDB();

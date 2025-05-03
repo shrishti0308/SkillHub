@@ -18,6 +18,7 @@ const ProfilePage = () => {
   const [activeSection, setActiveSection] = useState("skills");
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const serverUrl = import.meta.env.VITE_SERVER_URL || "http://localhost:3000";
 
   const currentUsername = useSelector(selectUsername);
 
@@ -93,7 +94,7 @@ const ProfilePage = () => {
     <div className="min-h-screen bg-gray-900">
       {/* Hero Section */}
       <div className="relative h-64 bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900">
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10"></div>
+        {/* <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10"></div> */}
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent"></div>
         <div className="absolute -bottom-16 left-1/2 -translate-x-1/2">
           <div className="relative">
@@ -101,7 +102,7 @@ const ProfilePage = () => {
               className="w-32 h-32 rounded-full border-4 border-gray-900 shadow-xl object-cover"
               src={
                 user.info?.profilePic
-                  ? `http://localhost:3000/public${user.info.profilePic}`
+                  ? `${serverUrl}/public${user.info.profilePic}`
                   : "/default-avatar.png"
               }
               alt={`${user.name || "User"}'s profile`}
@@ -239,7 +240,7 @@ const ProfilePage = () => {
                     {review.reviewer?.info?.profilePic ? (
                       <img
                         className="h-10 w-10 rounded-full border border-gray-700"
-                        src={`http://localhost:3000/public${review.reviewer.info.profilePic}`}
+                        src={`${serverUrl}/public${review.reviewer.info.profilePic}`}
                         alt={review.reviewer.name}
                       />
                     ) : (

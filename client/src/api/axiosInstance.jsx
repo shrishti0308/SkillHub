@@ -1,7 +1,8 @@
 import axios from "axios";
+import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: import.meta.env.VITE_SERVER_URL || "http://localhost:3000",
   headers: {
     "Content-Type": "application/json",
   },
@@ -9,6 +10,26 @@ const axiosInstance = axios.create({
 
 // Add a request interceptor
 axiosInstance.interceptors.request.use(
+  (config) => {
+    // Check for admin routes
+    if (config.url?.startsWith("/admin")) {
+      const adminToken = localStorage.getItem("adminToken");
+      if (adminToken) {
+        config.headers["Authorization"] = `Bearer ${adminToken}`;
+      }
+    } else {
+      // For regular user routes
+      const userToken = localStorage.getItem("accessToken");
+      if (userToken) {
+        config.headers["Authorization"] = `Bearer ${userToken}`;
+      }
+    }
+    return config;
+  },
+  (error) => {
+    console.error("Request interceptor error:", error);
+    return Promise.reject(error);
+  }
   (config) => {
     // Check for admin routes
     if (config.url?.startsWith("/admin")) {

@@ -2,10 +2,11 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 dotenv.config();
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
+const SERVER_URL = process.env.SERVER_URL || "http://localhost:3000";
 
 // Default CORS options
 const defaultCorsOptions = {
-  origin: CLIENT_URL, // Default frontend URL
+  origin: [CLIENT_URL, SERVER_URL], // Default frontend URL
   credentials: true, // Allow credentials
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
@@ -21,7 +22,7 @@ const developmentCorsOptions = {
 };
 
 // Production CORS options (more restrictive)
-const productionCorsOptions = (allowedOrigins = [CLIENT_URL]) => ({
+const productionCorsOptions = (allowedOrigins = [CLIENT_URL, SERVER_URL]) => ({
   ...defaultCorsOptions,
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps, curl, etc.)

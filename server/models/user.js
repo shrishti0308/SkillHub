@@ -125,8 +125,8 @@ const userSchema = new mongoose.Schema(
 );
 
 // Create compound index for username and email for faster lookups
-userSchema.index({ username: 1 });
-userSchema.index({ email: 1 });
+// userSchema.index({ username: 1 }); // Removed - handled by unique: true
+// userSchema.index({ email: 1 }); // Removed - handled by unique: true
 // Create index for role for faster filtering by role
 userSchema.index({ role: 1 });
 // Create index for skills for faster searching of freelancers by skills

@@ -8,10 +8,17 @@
     "test:performance": "node scripts/performanceTest.js",
     "redis-commander": "redis-commander",
     "redis:flush": "curl -X POST http://localhost:3000/system/flush-cache",
-    "test": "jest --forceExit",
+    "test": "jest --runInBand --forceExit --detectOpenHandles",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:report": "jest --coverage --coverageReporters='html'"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "./test/setup.js"
+    ],
+    "testTimeout": 60000
   },
   "keywords": [],
   "author": "",

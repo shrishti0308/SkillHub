@@ -17,7 +17,7 @@ const { invalidateResourceCache } = require("../utils/cacheUtils");
 // Create a job (employer)
 /**
  * @swagger
- * /job/create:
+ * /jobs/create:
  *   post:
  *     summary: Create a new job
  *     tags: [Jobs]
@@ -53,7 +53,7 @@ router.post("/create", authenticateJWT, async (req, res, next) => {
 // Get all jobs for marketplace
 /**
  * @swagger
- * /job/marketplace:
+ * /jobs/marketplace:
  *   get:
  *     summary: Get all jobs for marketplace
  *     tags: [Jobs]
@@ -72,7 +72,7 @@ router.get("/marketplace", routeCache.standard, getMarketplaceJobs);
 // Get a specific job by ID
 /**
  * @swagger
- * /job/{id}:
+ * /jobs/{id}:
  *   get:
  *     summary: Get a specific job
  *     tags: [Jobs]
@@ -135,7 +135,7 @@ router.put("/:id", async (req, res, next) => {
 // Route to get filtered jobs
 /**
  * @swagger
- * /job/jobs/filtered:
+ * /jobs/jobs/filtered:
  *   get:
  *     summary: Get filtered jobs
  *     tags: [Jobs]
@@ -166,7 +166,7 @@ router.get(
 // Get all jobs by user ID
 /**
  * @swagger
- * /job/user/{userId}:
+ * /jobs/user/{userId}:
  *   get:
  *     summary: Get all jobs by user
  *     tags: [Jobs]
@@ -192,7 +192,7 @@ router.get(
 // Route to get a specific job by ID
 /**
  * @swagger
- * /job/user/{id}:
+ * /jobs/user/{id}:
  *   get:
  *     summary: Get a specific job with auth check
  *     tags: [Jobs]
@@ -227,7 +227,7 @@ router.get(
 // Route to place a bid on a job
 /**
  * @swagger
- * /job/{jobId}/bid:
+ * /jobs/{jobId}/bid:
  *   post:
  *     summary: Place a bid on a job
  *     tags: [Jobs]

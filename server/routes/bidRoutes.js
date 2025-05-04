@@ -14,7 +14,7 @@ const { authenticateJWT } = require("../middlewares/authMiddleware");
 
 /**
  * @swagger
- * /bid/{jobId}:
+ * /bids/{jobId}:
  *   get:
  *     summary: Get all bids for a job
  *     tags: [Bids]
@@ -43,7 +43,7 @@ router.use(authenticateJWT);
 
 /**
  * @swagger
- * /bid/place:
+ * /bids/place:
  *   post:
  *     summary: Place a new bid on a job
  *     tags: [Bids]
@@ -73,7 +73,7 @@ router.post("/place", placeBid);
 
 /**
  * @swagger
- * /bid/accept/{bidId}:
+ * /bids/accept/{bidId}:
  *   put:
  *     summary: Accept a bid
  *     tags: [Bids]
@@ -94,7 +94,7 @@ router.put("/accept/:bidId", acceptBid);
 
 /**
  * @swagger
- * /bid/recent/bid:
+ * /bids/recent/bid:
  *   get:
  *     summary: Get recent bids
  *     tags: [Bids]
@@ -109,7 +109,7 @@ router.get("/recent/bid", getRecentBids);
 
 /**
  * @swagger
- * /bid/{bidId}:
+ * /bids/{bidId}:
  *   get:
  *     summary: Get a specific bid
  *     tags: [Bids]
@@ -130,7 +130,7 @@ router.get("/bid/:bidId", getBidById);
 
 /**
  * @swagger
- * /bid/user/{userId}:
+ * /bids/user/{userId}:
  *   get:
  *     summary: Get all bids by a user
  *     tags: [Bids]
@@ -151,7 +151,7 @@ router.get("/user/:userId", getBidsByUserId);
 
 /**
  * @swagger
- * /bid/{bidId}/details:
+ * /bids/{bidId}/details:
  *   get:
  *     summary: Get detailed bid information
  *     tags: [Bids]
@@ -172,7 +172,7 @@ router.get("/:bidId/details", getBidDetails);
 
 /**
  * @swagger
- * /bid/{bidId}:
+ * /bids/{bidId}:
  *   delete:
  *     summary: Delete a bid
  *     tags: [Bids]

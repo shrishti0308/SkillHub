@@ -12,7 +12,7 @@ const {
 
 /**
  * @swagger
- * /notification:
+ * /notifications:
  *   get:
  *     summary: Get all notifications for logged-in user
  *     tags: [Notifications]
@@ -64,7 +64,7 @@ const {
  *       201:
  *         description: Notification created successfully
  *
- * /notification/unread-count:
+ * /notifications/unread-count:
  *   get:
  *     summary: Get number of unread notifications
  *     tags: [Notifications]
@@ -81,7 +81,7 @@ const {
  *                 count:
  *                   type: number
  *
- * /notification/{id}/read:
+ * /notifications/{id}/read:
  *   patch:
  *     summary: Mark a notification as read
  *     tags: [Notifications]
@@ -97,7 +97,7 @@ const {
  *       200:
  *         description: Notification marked as read
  *
- * /notification/mark-all-read:
+ * /notifications/mark-all-read:
  *   patch:
  *     summary: Mark all notifications as read
  *     tags: [Notifications]
@@ -107,7 +107,7 @@ const {
  *       200:
  *         description: All notifications marked as read
  *
- * /notification/{id}:
+ * /notifications/{id}:
  *   delete:
  *     summary: Delete a notification
  *     tags: [Notifications]

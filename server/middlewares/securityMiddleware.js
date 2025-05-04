@@ -14,7 +14,7 @@ const apiLimiter = rateLimit({
 // Login rate limiting middleware (more strict)
 const loginLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 5, // limit each IP to 5 login requests per hour
+  max: 100, // limit each IP to 5 login requests per hour
   standardHeaders: true,
   legacyHeaders: false,
   message:

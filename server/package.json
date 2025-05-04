@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
+    "postinstall": "npm install --include=optional sharp",
     "test:performance": "node scripts/performanceTest.js",
     "redis-commander": "redis-commander",
     "redis:flush": "curl -X POST http://localhost:3000/system/flush-cache",

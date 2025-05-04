@@ -104,6 +104,8 @@ const adminSchema = new mongoose.Schema(
               "viewReports",
               "manageAdmins",
               "manageSettings",
+              "searchUsers",
+              "searchJobs"
             ],
             message: "{VALUE} is not a valid permission",
           },
@@ -163,6 +165,11 @@ adminSchema.virtual("fullName").get(function () {
 
 // Instance method to check if admin has specific permission
 adminSchema.methods.hasPermission = function (permission) {
+  // If permission is an array, check if admin has any of those permissions
+  if (Array.isArray(permission)) {
+    return permission.some(p => this.permissions.includes(p));
+  }
+  // Otherwise check for a single permission
   return this.permissions.includes(permission);
 };
 

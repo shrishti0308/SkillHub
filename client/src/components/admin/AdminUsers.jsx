@@ -421,6 +421,19 @@ const AdminUsers = () => {
                   sx={{
                     borderRadius: 2,
                     color: darkThemeColors.text.primary,
+                    bgcolor: darkThemeColors.background.lighter,
+                    '& .MuiSelect-select': {
+                      bgcolor: darkThemeColors.background.lighter,
+                    },
+                    '& .MuiMenu-paper': {
+                      bgcolor: darkThemeColors.background.lighter,
+                    },
+                    '& .MuiMenuItem-root': {
+                      bgcolor: darkThemeColors.background.lighter,
+                      '&:hover': {
+                        bgcolor: alpha(darkThemeColors.primary.main, 0.1),
+                      },
+                    },
                     "& .MuiOutlinedInput-notchedOutline": {
                       borderColor: darkThemeColors.divider,
                     },
@@ -429,6 +442,16 @@ const AdminUsers = () => {
                     },
                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                       borderColor: darkThemeColors.primary.main,
+                    },
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        bgcolor: darkThemeColors.background.lighter,
+                        borderRadius: 2,
+                        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
+                        border: `1px solid ${darkThemeColors.divider}`,
+                      },
                     },
                   }}
                 >

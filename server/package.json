@@ -38,6 +38,7 @@
     "server": "file:",
     "sharp": "^0.33.5",
     "socket.io": "^4.8.1",
+    "solr-client": "^0.10.0-rc10",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "validator": "^13.12.0",

@@ -2,10 +2,7 @@ const Job = require("../models/job");
 const Bid = require("../models/bid");
 const Notification = require("../models/notification");
 const User = require("../models/user");
-<<<<<<< HEAD
 const solrService = require('../services/solrService');
-=======
->>>>>>> 44e50c9e0ac9a29d6743ec0a6e5fb92993f3dc9e
 const { getAsync, setAsync } = require("../config/redis"); // Corrected import
 
 const CACHE_EXPIRATION = 60; // Cache duration in seconds (e.g., 60 seconds)

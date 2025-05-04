@@ -57,6 +57,7 @@
  */
 
 const mongoose = require("mongoose");
+const solrService = require('../services/solrService');
 
 const jobSchema = new mongoose.Schema(
   {
@@ -107,6 +108,24 @@ jobSchema.index({ skillsRequired: 1 });
 jobSchema.index({ "budget.min": 1, "budget.max": 1 });
 // Index for bidAccepted for faster filtering of jobs with accepted bids
 jobSchema.index({ bidAccepted: 1 });
+
+jobSchema.post('save', async function(doc) {
+  try {
+    await solrService.indexJob(doc);
+  } catch (error) {
+    console.error('Error indexing job to Solr:', error);
+  }
+});
+
+jobSchema.post('findOneAndUpdate', async function(doc) {
+  if (doc) {
+    try {
+      await solrService.indexJob(doc);
+    } catch (error) {
+      console.error('Error indexing updated job to Solr:', error);
+    }
+  }
+});
 
 const Job = mongoose.models.Job || mongoose.model("Job", jobSchema);
 module.exports = Job;

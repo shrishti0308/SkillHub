@@ -33,5 +33,17 @@ services:
       - redis_data:/data
     restart: unless-stopped
 
+  solr:
+    image: solr:latest
+    container_name: skillhub-solr
+    ports:
+      - "8983:8983"
+    volumes:
+      - solr_data:/var/solr
+    command:
+      - solr-precreate
+      - users_core
+
 volumes:
   redis_data:
+  solr_data:

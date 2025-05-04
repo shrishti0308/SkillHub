@@ -3,7 +3,10 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { handleProfilePicUpload } = require("../middlewares/uploadMiddleware");
 const { getAsync, setAsync } = require("../config/redis"); // Corrected import: setexAsync -> setAsync
+<<<<<<< HEAD
 const solrService = require('../services/solrService');
+=======
+>>>>>>> 44e50c9e0ac9a29d6743ec0a6e5fb92993f3dc9e
 
 const jwtSecret = "skill_hub_secret_key";
 const CACHE_EXPIRATION = 60; // Cache duration in seconds

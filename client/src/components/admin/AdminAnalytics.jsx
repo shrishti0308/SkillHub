@@ -772,34 +772,18 @@ const AdminAnalytics = () => {
                       cy="50%"
                       innerRadius={60}
                       outerRadius={80}
-                      fill="#8884d8"
+                      fill={darkThemeColors.primary.main}
+                      paddingAngle={5}
                       dataKey="value"
-                      nameKey="name"
-                      label={({ name, percent }) =>
-                        `${name}: ${(percent * 100).toFixed(0)}%`
-                      }
-                      labelLine={false}
                     >
                       {userStats.roleDistribution.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={COLORS[index % COLORS.length]}
-                        />
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <RechartsTooltip
-                      formatter={(value, name) => [`${value} Users`, name]}
-                      contentStyle={{
-                        backgroundColor: darkThemeColors.background.lighter,
-                        border: `1px solid ${darkThemeColors.divider}`,
-                        color: darkThemeColors.text.primary,
-                      }}
-                    />
+                    <RechartsTooltip content={<CustomTooltip />} />
                     <Legend
                       formatter={(value) => (
-                        <span style={{ color: darkThemeColors.text.primary }}>
-                          {value}
-                        </span>
+                        <span style={{ color: darkThemeColors.text.primary }}>{value}</span>
                       )}
                     />
                   </PieChart>
@@ -861,34 +845,18 @@ const AdminAnalytics = () => {
                       cy="50%"
                       innerRadius={60}
                       outerRadius={80}
-                      fill="#8884d8"
+                      fill={darkThemeColors.primary.main}
+                      paddingAngle={5}
                       dataKey="value"
-                      nameKey="name"
-                      label={({ name, percent }) =>
-                        `${name}: ${(percent * 100).toFixed(0)}%`
-                      }
-                      labelLine={false}
                     >
                       {jobStats.jobStatusDistribution.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={COLORS[index % COLORS.length]}
-                        />
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <RechartsTooltip
-                      formatter={(value, name) => [`${value} Jobs`, name]}
-                      contentStyle={{
-                        backgroundColor: darkThemeColors.background.lighter,
-                        border: `1px solid ${darkThemeColors.divider}`,
-                        color: darkThemeColors.text.primary,
-                      }}
-                    />
+                    <RechartsTooltip content={<CustomTooltip />} />
                     <Legend
                       formatter={(value) => (
-                        <span style={{ color: darkThemeColors.text.primary }}>
-                          {value}
-                        </span>
+                        <span style={{ color: darkThemeColors.text.primary }}>{value}</span>
                       )}
                     />
                   </PieChart>
@@ -903,3 +871,28 @@ const AdminAnalytics = () => {
 };
 
 export default AdminAnalytics;
+
+// Custom tooltip component for pie charts
+const CustomTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    return (
+      <Box
+        sx={{
+          bgcolor: darkThemeColors.background.paper,
+          p: 2,
+          border: `1px solid ${alpha(darkThemeColors.primary.main, 0.2)}`,
+          borderRadius: 1,
+          boxShadow: `0 4px 20px ${alpha('#000', 0.2)}`,
+        }}
+      >
+        <Typography sx={{ color: darkThemeColors.text.primary, fontWeight: 'bold', mb: 1 }}>
+          {payload[0].name}
+        </Typography>
+        <Typography sx={{ color: darkThemeColors.primary.main }}>
+          Count: {payload[0].value}
+        </Typography>
+      </Box>
+    );
+  }
+  return null;
+};

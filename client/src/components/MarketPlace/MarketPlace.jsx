@@ -206,11 +206,11 @@ const Marketplace = () => {
 
   // Use jobs directly instead of filteredJobs
   return (
-    <div className="relative min-h-screen text-white p-8 overflow-hidden ">
+    <div className="relative min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white p-8 overflow-hidden">
       {/* Background Animation */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-blue-500 opacity-10 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
-        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-purple-700 opacity-10 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
+        <div className="absolute -top-32 -left-32 w-96 h-96 bg-blue-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-purple-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
       </div>
 
       {/* Main Content */}
@@ -218,7 +218,7 @@ const Marketplace = () => {
         <motion.h1 
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="text-6xl font-bold mb-10 text-center text-white"
+          className="text-6xl font-bold mb-10 text-center bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent"
         >
           Marketplace
         </motion.h1>
@@ -228,7 +228,7 @@ const Marketplace = () => {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="bg-gray-800 p-6 rounded-xl mb-8 shadow-lg"
+          className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl mb-8 shadow-xl border border-gray-700/50"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
             {/* Search Input */}
@@ -237,7 +237,7 @@ const Marketplace = () => {
                 type="text"
                 name="searchTerm"
                 placeholder="Search jobs..."
-                className="bg-gray-700 border border-gray-600 rounded-lg px-6 py-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-white pl-12"
+                className="w-full bg-gray-900/50 border border-gray-600/30 rounded-lg px-6 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-white pl-12 transition-all duration-300"
                 value={formValues.searchTerm}
                 onChange={handleInputChange}
               />
@@ -247,7 +247,7 @@ const Marketplace = () => {
             {/* Category Select */}
             <select
               name="category"
-              className="bg-gray-700 border border-gray-600 rounded-lg px-6 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-gray-900/50 border border-gray-600/30 rounded-lg px-6 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-300"
               value={formValues.category}
               onChange={handleInputChange}
             >
@@ -264,7 +264,7 @@ const Marketplace = () => {
               type="number"
               name="budgetMin"
               placeholder="Min Budget"
-              className="bg-gray-700 border border-gray-600 rounded-lg px-6 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-gray-900/50 border border-gray-600/30 rounded-lg px-6 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-300"
               value={formValues.budgetMin}
               onChange={handleInputChange}
             />
@@ -272,7 +272,7 @@ const Marketplace = () => {
               type="number"
               name="budgetMax"
               placeholder="Max Budget"
-              className="bg-gray-700 border border-gray-600 rounded-lg px-6 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-gray-900/50 border border-gray-600/30 rounded-lg px-6 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-300"
               value={formValues.budgetMax}
               onChange={handleInputChange}
             />
@@ -282,7 +282,7 @@ const Marketplace = () => {
             {/* Sort Select */}
             <select
               name="sortBy"
-              className="bg-gray-700 border border-gray-600 rounded-lg px-6 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="bg-gray-900/50 border border-gray-600/30 rounded-lg px-6 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-300"
               value={formValues.sortBy}
               onChange={handleInputChange}
             >
@@ -295,7 +295,7 @@ const Marketplace = () => {
             {/* Search Button */}
             <button
               onClick={handleSearch}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg transition-colors duration-300 flex items-center gap-2"
+              className="bg-blue-600 text-white px-8 py-3 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105 flex items-center gap-2 font-medium"
             >
               <FaSearch /> Search Jobs
             </button>
@@ -311,7 +311,7 @@ const Marketplace = () => {
 
         {/* Error State */}
         {error && (
-          <div className="bg-red-900/20 border border-red-500/20 rounded-lg p-4 mb-6">
+          <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6">
             <p className="text-red-400">{error}</p>
           </div>
         )}
@@ -322,19 +322,19 @@ const Marketplace = () => {
             {jobs.map((job) => (
               <motion.div
                 key={job.id}
-                className="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
-                whileHover={{ y: -5 }}
+                className="bg-gray-800/50 backdrop-blur-sm rounded-xl overflow-hidden shadow-xl border border-gray-700/50 hover:border-blue-500/30 transition-all duration-300"
+                whileHover={{ y: -5, scale: 1.02 }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
               >
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-xl font-bold text-white truncate">
+                    <h3 className="text-xl font-bold text-white hover:text-blue-400 transition-colors">
                       {Array.isArray(job.title) ? job.title[0] : job.title}
                     </h3>
                     {isNewJob(job.created_at) && (
-                      <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                      <span className="bg-blue-500/20 text-blue-300 text-xs px-3 py-1 rounded-full border border-blue-500/30">
                         NEW
                       </span>
                     )}
@@ -346,22 +346,22 @@ const Marketplace = () => {
                     {Array.isArray(job.categories) && job.categories.map((category, index) => (
                       <span
                         key={index}
-                        className="bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded"
+                        className="bg-gray-900/50 text-gray-300 text-xs px-3 py-1.5 rounded-full border border-gray-600/30"
                       >
                         {category}
                       </span>
                     ))}
                   </div>
                   <div className="flex justify-between items-center">
-                    <div className="text-green-400 font-bold">
+                    <div className="text-green-400 font-medium bg-green-500/10 px-3 py-1.5 rounded-full border border-green-500/30">
                       ${Array.isArray(job.budget_min) ? job.budget_min[0] : job.budget_min} - 
                       ${Array.isArray(job.budget_max) ? job.budget_max[0] : job.budget_max}
                     </div>
                     <Link
                       to={`/jobs/${job.id}`}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors duration-300"
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all duration-300 font-medium text-sm"
                     >
-                      View Details
+                      View Details →
                     </Link>
                   </div>
                 </div>
@@ -382,20 +382,18 @@ const Marketplace = () => {
             <button
               onClick={handlePrevPage}
               disabled={page === 1}
-              className={`px-4 py-2 rounded-lg ${
-                page === 1
-                  ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700 text-white"
-              } transition-colors duration-300`}
+              className={`px-6 py-2.5 rounded-lg font-medium transition-all duration-300 ${page === 1
+                ? "bg-gray-800/50 text-gray-500 cursor-not-allowed border border-gray-700/50"
+                : "bg-blue-600 text-white hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105"}`}
             >
               Previous
             </button>
-            <span className="px-4 py-2 bg-gray-700 rounded-lg text-white">
+            <span className="px-6 py-2.5 bg-gray-800/50 rounded-lg text-white border border-gray-700/50 font-medium">
               Page {page}
             </span>
             <button
               onClick={handleNextPage}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-300"
+              className="px-6 py-2.5 bg-blue-600 text-white rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105 font-medium"
             >
               Next
             </button>

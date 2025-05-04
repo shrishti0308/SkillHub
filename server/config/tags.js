@@ -40,6 +40,10 @@ const tags = [
     name: "Reviews",
     description: "Review management",
   },
+  {
+    name: "System",
+    description: "System health and maintenance operations",
+  },
 ];
 
 module.exports = tags;

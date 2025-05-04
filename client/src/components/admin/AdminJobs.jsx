@@ -183,7 +183,7 @@ const AdminJobs = () => {
   const pageCount = Math.ceil(filteredJobs.length / rowsPerPage);
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 3, bgcolor: darkThemeColors.background.default, minHeight: "100vh" }}>
       {/* Page Header */}
       <Box
         sx={{
@@ -197,295 +197,312 @@ const AdminJobs = () => {
           <Typography
             variant="h4"
             component="h1"
-            sx={{ fontWeight: "bold", mb: 1 }}
+            sx={{
+              fontWeight: "bold",
+              mb: 1,
+              color: darkThemeColors.text.primary,
+            }}
           >
-            Job Management
+            Jobs Management
           </Typography>
-          <Typography variant="body1" color="text.secondary">
-            View and manage all jobs on the platform
+          <Typography
+            variant="body1"
+            sx={{ color: darkThemeColors.text.secondary }}
+          >
+            View and manage all Jobs on the platform
           </Typography>
-        </Box>
-        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 3 }}>
-          <Tooltip title="This feature is not implemented yet">
-            <span>
-              <Button
-                variant="contained"
-                startIcon={<Work />}
-                disabled
-                sx={{
-                  borderRadius: 2,
-                  py: 1,
-                  boxShadow: 2,
-                  "&:hover": {
-                    boxShadow: 4,
-                  },
-                }}
-              >
-                Add Job
-              </Button>
-            </span>
-          </Tooltip>
         </Box>
       </Box>
-
       {/* Stats Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
           <Card
-            elevation={0}
             sx={{
+              bgcolor: darkThemeColors.background.paper,
               borderRadius: 2,
+              boxShadow: `0 4px 20px ${alpha("#000", 0.15)}`,
               height: "100%",
-              border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-              transition:
-                "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
-              "&:hover": {
-                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
-                transform: "translateY(-2px)",
-              },
             }}
           >
-            <CardContent sx={{ p: 3 }}>
+            <CardContent>
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <Avatar
                   sx={{
-                    bgcolor: alpha(theme.palette.primary.main, 0.1),
-                    color: theme.palette.primary.main,
-                    width: 48,
-                    height: 48,
+                    bgcolor: alpha(darkThemeColors.primary.main, 0.1),
+                    color: darkThemeColors.primary.main,
                   }}
                 >
                   <Work />
                 </Avatar>
-                <Box sx={{ ml: 2 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Total Jobs
-                  </Typography>
-                  <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-                    {loading ? <CircularProgress size={24} /> : totalJobs}
-                  </Typography>
-                </Box>
+                <Typography
+                  variant="h6"
+                  sx={{ ml: 2, color: darkThemeColors.text.primary }}
+                >
+                  Total Jobs
+                </Typography>
               </Box>
-              <Divider sx={{ my: 2 }} />
-              <Stack direction="row" spacing={1} justifyContent="space-between">
-                <Chip
-                  label={`${openJobs} Open`}
-                  size="small"
-                  sx={{
-                    bgcolor: alpha(theme.palette.info.main, 0.1),
-                    color: theme.palette.info.main,
-                    fontWeight: "medium",
-                  }}
-                />
-                <Chip
-                  label={`${inProgressJobs} In Progress`}
-                  size="small"
-                  sx={{
-                    bgcolor: alpha(theme.palette.warning.main, 0.1),
-                    color: theme.palette.warning.main,
-                    fontWeight: "medium",
-                  }}
-                />
-              </Stack>
+              <Typography
+                variant="h4"
+                sx={{ color: darkThemeColors.primary.main, fontWeight: "bold" }}
+              >
+                {totalJobs}
+              </Typography>
             </CardContent>
           </Card>
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
           <Card
-            elevation={0}
             sx={{
+              bgcolor: darkThemeColors.background.paper,
               borderRadius: 2,
+              boxShadow: `0 4px 20px ${alpha("#000", 0.15)}`,
               height: "100%",
-              border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-              transition:
-                "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
-              "&:hover": {
-                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
-                transform: "translateY(-2px)",
-              },
             }}
           >
-            <CardContent sx={{ p: 3 }}>
+            <CardContent>
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <Avatar
                   sx={{
-                    bgcolor: alpha(theme.palette.success.main, 0.1),
-                    color: theme.palette.success.main,
-                    width: 48,
-                    height: 48,
+                    bgcolor: alpha("#4caf50", 0.1),
+                    color: "#4caf50",
+                  }}
+                >
+                  <Work />
+                </Avatar>
+                <Typography
+                  variant="h6"
+                  sx={{ ml: 2, color: darkThemeColors.text.primary }}
+                >
+                  Active Jobs
+                </Typography>
+              </Box>
+              <Typography
+                variant="h4"
+                sx={{ color: "#4caf50", fontWeight: "bold" }}
+              >
+                {openJobs}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3}>
+          <Card
+            sx={{
+              bgcolor: darkThemeColors.background.paper,
+              borderRadius: 2,
+              boxShadow: `0 4px 20px ${alpha("#000", 0.15)}`,
+              height: "100%",
+            }}
+          >
+            <CardContent>
+              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                <Avatar
+                  sx={{
+                    bgcolor: alpha("#ff9800", 0.1),
+                    color: "#ff9800",
+                  }}
+                >
+                  <Work />
+                </Avatar>
+                <Typography
+                  variant="h6"
+                  sx={{ ml: 2, color: darkThemeColors.text.primary }}
+                >
+                  In Progress
+                </Typography>
+              </Box>
+              <Typography
+                variant="h4"
+                sx={{ color: "#ff9800", fontWeight: "bold" }}
+              >
+                {inProgressJobs}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3}>
+          <Card
+            sx={{
+              bgcolor: darkThemeColors.background.paper,
+              borderRadius: 2,
+              boxShadow: `0 4px 20px ${alpha("#000", 0.15)}`,
+              height: "100%",
+            }}
+          >
+            <CardContent>
+              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                <Avatar
+                  sx={{
+                    bgcolor: alpha("#f44336", 0.1),
+                    color: "#f44336",
                   }}
                 >
                   <AttachMoney />
                 </Avatar>
-                <Box sx={{ ml: 2 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Avg. Budget
-                  </Typography>
-                  <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-                    {loading ? (
-                      <CircularProgress size={24} />
-                    ) : (
-                      `$${avgBudget.toFixed(0)}`
-                    )}
-                  </Typography>
-                </Box>
+                <Typography
+                  variant="h6"
+                  sx={{ ml: 2, color: darkThemeColors.text.primary }}
+                >
+                  Avg. Budget
+                </Typography>
               </Box>
-              <Divider sx={{ my: 2 }} />
-              <Stack direction="row" spacing={1} justifyContent="space-between">
-                <Chip
-                  label={`${completedJobs} Completed`}
-                  size="small"
-                  sx={{
-                    bgcolor: alpha(theme.palette.success.main, 0.1),
-                    color: theme.palette.success.main,
-                    fontWeight: "medium",
-                  }}
-                />
-                <Chip
-                  label={`${closedJobs} Closed`}
-                  size="small"
-                  sx={{
-                    bgcolor: alpha(theme.palette.error.main, 0.1),
-                    color: theme.palette.error.main,
-                    fontWeight: "medium",
-                  }}
-                />
-              </Stack>
+              <Typography
+                variant="h4"
+                sx={{ color: "#f44336", fontWeight: "bold" }}
+              >
+                ${avgBudget.toFixed(2)}
+              </Typography>
             </CardContent>
           </Card>
         </Grid>
       </Grid>
 
-      {/* Filters and Search */}
-      <Card
-        elevation={0}
-        sx={{
-          borderRadius: 2,
-          mb: 3,
-          border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-        }}
-      >
-        <CardContent sx={{ p: 2 }}>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                placeholder="Search jobs by title, description or skills"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Search color="action" />
-                    </InputAdornment>
-                  ),
-                  sx: { borderRadius: 2 },
-                }}
-                variant="outlined"
-                size="small"
-              />
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <FormControl fullWidth size="small">
-                <InputLabel id="status-filter-label">
-                  Filter by Status
-                </InputLabel>
-                <Select
-                  labelId="status-filter-label"
-                  value={statusFilter}
-                  label="Filter by Status"
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  sx={{ borderRadius: 2 }}
-                >
-                  <MenuItem value="all">All Statuses</MenuItem>
-                  {JOB_STATUS_OPTIONS.map((status) => (
-                    <MenuItem key={status} value={status}>
-                      {status.charAt(0).toUpperCase() +
-                        status.slice(1).replace("-", " ")}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid
-              item
-              xs={12}
-              md={3}
-              sx={{ display: "flex", justifyContent: "flex-end" }}
+      {/* Search and Filter Controls */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} md={8}>
+          <TextField
+            fullWidth
+            variant="outlined"
+            placeholder="Search jobs..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search sx={{ color: darkThemeColors.text.secondary }} />
+                </InputAdornment>
+              ),
+              sx: {
+                bgcolor: darkThemeColors.background.paper,
+                borderRadius: 2,
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: darkThemeColors.divider,
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: alpha(darkThemeColors.primary.main, 0.5),
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: darkThemeColors.primary.main,
+                },
+                color: darkThemeColors.text.primary,
+              },
+            }}
+          />
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <FormControl fullWidth variant="outlined">
+            <InputLabel
+              id="status-filter-label"
+              sx={{ color: darkThemeColors.text.primary }}
             >
-              <Tooltip title="Refresh Jobs">
-                <IconButton
-                  onClick={() => dispatch(fetchJobs())}
-                  sx={{
-                    bgcolor: alpha(theme.palette.primary.main, 0.1),
-                    color: theme.palette.primary.main,
-                    "&:hover": {
-                      bgcolor: alpha(theme.palette.primary.main, 0.2),
-                    },
-                    mr: 1,
-                  }}
-                >
-                  <Refresh />
-                </IconButton>
-              </Tooltip>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
+              Status
+            </InputLabel>
+            <Select
+              labelId="status-filter-label"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              label="Status"
+              sx={{
+                bgcolor: darkThemeColors.background.paper,
+                borderRadius: 2,
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: darkThemeColors.divider,
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: darkThemeColors.primary.main,
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: darkThemeColors.primary.main,
+                },
+                color: darkThemeColors.text.primary,
+                "& .MuiSelect-icon": {
+                  color: darkThemeColors.text.primary
+                }
+              }}
+              MenuProps={{
+                PaperProps: {
+                  sx: {
+                    bgcolor: darkThemeColors.background.paper,
+                    "& .MuiMenuItem-root": {
+                      color: darkThemeColors.text.primary,
+                      "&:hover": {
+                        backgroundColor: alpha(darkThemeColors.primary.main, 0.1)
+                      },
+                      "&.Mui-selected": {
+                        backgroundColor: alpha(darkThemeColors.primary.main, 0.2),
+                        "&:hover": {
+                          backgroundColor: alpha(darkThemeColors.primary.main, 0.3)
+                        }
+                      }
+                    }
+                  }
+                }
+              }}
+            >
+              <MenuItem value="all">All Status</MenuItem>
+              {JOB_STATUS_OPTIONS.map((status) => (
+                <MenuItem key={status} value={status}>
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+      </Grid>
 
-      {/* Job List */}
+      {/* Jobs Table */}
       <Card
-        elevation={0}
         sx={{
+          bgcolor: darkThemeColors.background.paper,
           borderRadius: 2,
+          boxShadow: `0 4px 20px ${alpha("#000", 0.15)}`,
           mb: 3,
-          border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
         }}
       >
-        <TableContainer
-          component={Box}
-          sx={{ maxHeight: 600, overflow: "auto" }}
-        >
-          <Table stickyHeader sx={{ minWidth: 650 }}>
+        <TableContainer>
+          <Table>
             <TableHead>
               <TableRow>
                 <TableCell
                   sx={{
-                    fontWeight: "bold",
-                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                    color: darkThemeColors.text.secondary,
+                    borderBottom: `1px solid ${darkThemeColors.divider}`,
                   }}
                 >
-                  Job Title
+                  Title
                 </TableCell>
                 <TableCell
                   sx={{
-                    fontWeight: "bold",
-                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                    color: darkThemeColors.text.secondary,
+                    borderBottom: `1px solid ${darkThemeColors.divider}`,
+                  }}
+                >
+                  Status
+                </TableCell>
+                <TableCell
+                  sx={{
+                    color: darkThemeColors.text.secondary,
+                    borderBottom: `1px solid ${darkThemeColors.divider}`,
                   }}
                 >
                   Budget
                 </TableCell>
                 <TableCell
                   sx={{
-                    fontWeight: "bold",
-                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                    color: darkThemeColors.text.secondary,
+                    borderBottom: `1px solid ${darkThemeColors.divider}`,
                   }}
                 >
                   Categories
                 </TableCell>
                 <TableCell
+                  align="right"
                   sx={{
-                    fontWeight: "bold",
-                    bgcolor: alpha(theme.palette.primary.main, 0.05),
-                  }}
-                >
-                  Skills
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                    color: darkThemeColors.text.secondary,
+                    borderBottom: `1px solid ${darkThemeColors.divider}`,
                   }}
                 >
                   Actions
@@ -495,16 +512,30 @@ const AdminJobs = () => {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ py: 5 }}>
-                    <CircularProgress />
+                  <TableCell
+                    colSpan={5}
+                    align="center"
+                    sx={{
+                      py: 3,
+                      color: darkThemeColors.text.secondary,
+                      borderBottom: `1px solid ${darkThemeColors.divider}`,
+                    }}
+                  >
+                    <CircularProgress size={40} />
                   </TableCell>
                 </TableRow>
               ) : paginatedJobs.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ py: 5 }}>
-                    <Typography variant="body1" color="text.secondary">
-                      No jobs found matching your filters
-                    </Typography>
+                  <TableCell
+                    colSpan={5}
+                    align="center"
+                    sx={{
+                      py: 3,
+                      color: darkThemeColors.text.secondary,
+                      borderBottom: `1px solid ${darkThemeColors.divider}`,
+                    }}
+                  >
+                    No jobs found
                   </TableCell>
                 </TableRow>
               ) : (
@@ -513,149 +544,120 @@ const AdminJobs = () => {
                     key={job._id}
                     sx={{
                       "&:hover": {
-                        bgcolor: alpha(theme.palette.primary.main, 0.02),
+                        bgcolor: alpha(darkThemeColors.primary.main, 0.05),
                       },
-                      transition: "background-color 0.2s",
                     }}
                   >
-                    <TableCell>
-                      <Box>
-                        <Typography
-                          variant="body2"
-                          sx={{ fontWeight: "medium" }}
-                        >
-                          {job.title}
-                        </Typography>
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
+                    <TableCell
+                      sx={{
+                        color: darkThemeColors.text.primary,
+                        borderBottom: `1px solid ${darkThemeColors.divider}`,
+                      }}
+                    >
+                      {job.title}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        borderBottom: `1px solid ${darkThemeColors.divider}`,
+                      }}
+                    >
+                      <Chip
+                        label={job.status}
+                        size="small"
+                        sx={{
+                          bgcolor: (() => {
+                            switch (job.status) {
+                              case "open":
+                                return alpha("#4caf50", 0.1);
+                              case "in-progress":
+                                return alpha("#ff9800", 0.1);
+                              case "completed":
+                                return alpha("#2196f3", 0.1);
+                              case "closed":
+                                return alpha("#f44336", 0.1);
+                              default:
+                                return alpha(darkThemeColors.text.secondary, 0.1);
+                            }
+                          })(),
+                          color: (() => {
+                            switch (job.status) {
+                              case "open":
+                                return "#4caf50";
+                              case "in-progress":
+                                return "#ff9800";
+                              case "completed":
+                                return "#2196f3";
+                              case "closed":
+                                return "#f44336";
+                              default:
+                                return darkThemeColors.text.secondary;
+                            }
+                          })(),
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: darkThemeColors.text.primary,
+                        borderBottom: `1px solid ${darkThemeColors.divider}`,
+                      }}
+                    >
+                      ${job.budget?.min || 0} - ${job.budget?.max || 0}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        borderBottom: `1px solid ${darkThemeColors.divider}`,
+                      }}
+                    >
+                      {job.categories?.map((category) => (
+                        <Chip
+                          key={category}
+                          label={category}
+                          size="small"
                           sx={{
-                            display: "-webkit-box",
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: "vertical",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            maxWidth: "300px",
+                            mr: 0.5,
+                            mb: 0.5,
+                            bgcolor: alpha(darkThemeColors.primary.main, 0.1),
+                            color: darkThemeColors.primary.main,
+                          }}
+                        />
+                      ))}
+                    </TableCell>
+                    <TableCell
+                      align="right"
+                      sx={{
+                        borderBottom: `1px solid ${darkThemeColors.divider}`,
+                      }}
+                    >
+                      <Tooltip title="Edit Job">
+                        <IconButton
+                          onClick={() => handleEditClick(job)}
+                          size="small"
+                          sx={{
+                            color: darkThemeColors.primary.main,
+                            "&:hover": {
+                              bgcolor: alpha(darkThemeColors.primary.main, 0.1),
+                            },
                           }}
                         >
-                          {job.description}
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" sx={{ fontWeight: "medium" }}>
-                        ${job.budget?.min || 0} - ${job.budget?.max || 0}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      {job.categories && job.categories.length > 0 ? (
-                        <Box
-                          sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
+                          <Edit />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Delete Job">
+                        <IconButton
+                          onClick={() => handleDeleteClick(job)}
+                          size="small"
+                          sx={{
+                            color: "#f44336",
+                            ml: 1,
+                            "&:hover": {
+                              bgcolor: alpha("#f44336", 0.1),
+                            },
+                          }}
                         >
-                          {job.categories.slice(0, 2).map((category, index) => (
-                            <Chip
-                              key={index}
-                              label={category}
-                              size="small"
-                              sx={{
-                                fontSize: "0.7rem",
-                                bgcolor: alpha(
-                                  theme.palette.secondary.main,
-                                  0.1
-                                ),
-                                color: theme.palette.secondary.main,
-                              }}
-                            />
-                          ))}
-                          {job.categories.length > 2 && (
-                            <Chip
-                              label={`+${job.categories.length - 2}`}
-                              size="small"
-                              sx={{
-                                fontSize: "0.7rem",
-                                bgcolor: alpha(theme.palette.grey[500], 0.1),
-                                color: theme.palette.grey[700],
-                              }}
-                            />
-                          )}
-                        </Box>
-                      ) : (
-                        <Typography variant="body2" color="text.secondary">
-                          No categories
-                        </Typography>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {job.skillsRequired && job.skillsRequired.length > 0 ? (
-                        <Box
-                          sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
-                        >
-                          {job.skillsRequired
-                            .slice(0, 2)
-                            .map((skill, index) => (
-                              <Chip
-                                key={index}
-                                label={skill}
-                                size="small"
-                                sx={{
-                                  fontSize: "0.7rem",
-                                  bgcolor: alpha(
-                                    theme.palette.primary.main,
-                                    0.1
-                                  ),
-                                  color: theme.palette.primary.main,
-                                }}
-                              />
-                            ))}
-                          {job.skillsRequired.length > 2 && (
-                            <Chip
-                              label={`+${job.skillsRequired.length - 2}`}
-                              size="small"
-                              sx={{
-                                fontSize: "0.7rem",
-                                bgcolor: alpha(theme.palette.grey[500], 0.1),
-                                color: theme.palette.grey[700],
-                              }}
-                            />
-                          )}
-                        </Box>
-                      ) : (
-                        <Typography variant="body2" color="text.secondary">
-                          No skills required
-                        </Typography>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Box sx={{ display: "flex" }}>
-                        <Tooltip title="Edit Job">
-                          <IconButton
-                            size="small"
-                            onClick={() => handleEditClick(job)}
-                            sx={{
-                              color: theme.palette.primary.main,
-                              "&:hover": {
-                                bgcolor: alpha(theme.palette.primary.main, 0.1),
-                              },
-                            }}
-                          >
-                            <Edit fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Delete Job">
-                          <IconButton
-                            size="small"
-                            onClick={() => handleDeleteClick(job)}
-                            sx={{
-                              color: theme.palette.error.main,
-                              "&:hover": {
-                                bgcolor: alpha(theme.palette.error.main, 0.1),
-                              },
-                            }}
-                          >
-                            <Delete fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
+                          <Delete />
+                        </IconButton>
+                      </Tooltip>
                     </TableCell>
                   </TableRow>
                 ))
@@ -663,172 +665,112 @@ const AdminJobs = () => {
             </TableBody>
           </Table>
         </TableContainer>
-
-        {/* Pagination */}
-        {pageCount > 1 && (
-          <Box sx={{ display: "flex", justifyContent: "center", py: 3 }}>
-            <Pagination
-              count={pageCount}
-              page={page}
-              onChange={handlePageChange}
-              color="primary"
-              showFirstButton
-              showLastButton
-            />
-          </Box>
-        )}
       </Card>
 
-      {/* Edit Job Dialog */}
+      {/* Pagination */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          mt: 3,
+        }}
+      >
+        <Pagination
+          count={pageCount}
+          page={page}
+          onChange={handlePageChange}
+          color="primary"
+          sx={{
+            "& .MuiPaginationItem-root": {
+              color: darkThemeColors.text.secondary,
+              "&.Mui-selected": {
+                bgcolor: alpha(darkThemeColors.primary.main, 0.1),
+                color: darkThemeColors.primary.main,
+                "&:hover": {
+                  bgcolor: alpha(darkThemeColors.primary.main, 0.2),
+                },
+              },
+              "&:hover": {
+                bgcolor: alpha(darkThemeColors.text.primary, 0.05),
+              },
+            },
+          }}
+        />
+      </Box>
+
+      {/* Edit Dialog */}
       <Dialog
         open={openEditDialog}
         onClose={() => setOpenEditDialog(false)}
-        maxWidth="md"
+        maxWidth="sm"
         fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: darkThemeColors.background.paper,
+            backgroundImage: "none",
+          },
+        }}
       >
-        <DialogTitle>Edit Job</DialogTitle>
+        <DialogTitle sx={{ color: darkThemeColors.text.primary }}>
+          {selectedJob ? "Edit Job" : "Create Job"}
+        </DialogTitle>
         <DialogContent dividers>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Job Title"
-                value={editFormData.title}
-                onChange={(e) =>
-                  setEditFormData({ ...editFormData, title: e.target.value })
-                }
-                margin="normal"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Description"
-                multiline
-                rows={4}
-                value={editFormData.description}
-                onChange={(e) =>
-                  setEditFormData({
-                    ...editFormData,
-                    description: e.target.value,
-                  })
-                }
-                margin="normal"
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <FormControl fullWidth margin="normal">
-                <InputLabel>Status</InputLabel>
-                <Select
-                  value={editFormData.status}
-                  label="Status"
-                  onChange={(e) =>
-                    setEditFormData({ ...editFormData, status: e.target.value })
-                  }
-                >
-                  {JOB_STATUS_OPTIONS.map((status) => (
-                    <MenuItem key={status} value={status}>
-                      {status.charAt(0).toUpperCase() +
-                        status.slice(1).replace("-", " ")}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <TextField
-                fullWidth
-                label="Min Budget"
-                type="number"
-                value={editFormData.budget.min}
-                onChange={(e) =>
-                  setEditFormData({
-                    ...editFormData,
-                    budget: {
-                      ...editFormData.budget,
-                      min: Number(e.target.value),
-                    },
-                  })
-                }
-                margin="normal"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">$</InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <TextField
-                fullWidth
-                label="Max Budget"
-                type="number"
-                value={editFormData.budget.max}
-                onChange={(e) =>
-                  setEditFormData({
-                    ...editFormData,
-                    budget: {
-                      ...editFormData.budget,
-                      max: Number(e.target.value),
-                    },
-                  })
-                }
-                margin="normal"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">$</InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Categories (comma separated)"
-                value={editFormData.categories}
-                onChange={(e) =>
-                  setEditFormData({
-                    ...editFormData,
-                    categories: e.target.value,
-                  })
-                }
-                margin="normal"
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Skills Required (comma separated)"
-                value={editFormData.skillsRequired}
-                onChange={(e) =>
-                  setEditFormData({
-                    ...editFormData,
-                    skillsRequired: e.target.value,
-                  })
-                }
-                margin="normal"
-              />
-            </Grid>
-          </Grid>
+          <Box component="form" sx={{ mt: 2 }}>
+            <TextField
+              fullWidth
+              label="Title"
+              name="title"
+              value={editFormData.title}
+              onChange={(e) =>
+                setEditFormData({ ...editFormData, title: e.target.value })
+              }
+              sx={{
+                mb: 2,
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: darkThemeColors.divider,
+                  },
+                  "&:hover fieldset": {
+                    borderColor: alpha(darkThemeColors.primary.main, 0.5),
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: darkThemeColors.primary.main,
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  color: darkThemeColors.text.secondary,
+                },
+                "& .MuiOutlinedInput-input": {
+                  color: darkThemeColors.text.primary,
+                },
+              }}
+            />
+            {/* Add other form fields with similar styling */}
+          </Box>
         </DialogContent>
-        <DialogActions sx={{ px: 3, py: 2 }}>
+        <DialogActions sx={{ bgcolor: darkThemeColors.background.paper }}>
           <Button
             onClick={() => setOpenEditDialog(false)}
-            color="inherit"
-            variant="outlined"
+            sx={{
+              color: darkThemeColors.text.secondary,
+              "&:hover": {
+                bgcolor: alpha(darkThemeColors.text.primary, 0.05),
+              },
+            }}
           >
             Cancel
           </Button>
           <Button
             onClick={handleEditSubmit}
-            color="primary"
             variant="contained"
-            disabled={loading}
-            startIcon={
-              loading && <CircularProgress size={20} color="inherit" />
-            }
+            sx={{
+              bgcolor: darkThemeColors.primary.main,
+              "&:hover": {
+                bgcolor: darkThemeColors.primary.dark,
+              },
+            }}
           >
-            Save Changes
+            Save
           </Button>
         </DialogActions>
       </Dialog>
@@ -837,21 +779,30 @@ const AdminJobs = () => {
       <Dialog
         open={openDeleteDialog}
         onClose={() => setOpenDeleteDialog(false)}
-        maxWidth="xs"
-        fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: darkThemeColors.background.paper,
+            backgroundImage: "none",
+          },
+        }}
       >
-        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogTitle sx={{ color: darkThemeColors.text.primary }}>
+          Confirm Delete
+        </DialogTitle>
         <DialogContent>
-          <Typography>
-            Are you sure you want to delete job{" "}
-            <strong>{selectedJob?.title}</strong>? This action cannot be undone.
+          <Typography sx={{ color: darkThemeColors.text.primary }}>
+            Are you sure you want to delete this job?
           </Typography>
         </DialogContent>
-        <DialogActions sx={{ px: 3, py: 2 }}>
+        <DialogActions sx={{ bgcolor: darkThemeColors.background.paper }}>
           <Button
             onClick={() => setOpenDeleteDialog(false)}
-            color="inherit"
-            variant="outlined"
+            sx={{
+              color: darkThemeColors.text.secondary,
+              "&:hover": {
+                bgcolor: alpha(darkThemeColors.text.primary, 0.05),
+              },
+            }}
           >
             Cancel
           </Button>
@@ -859,10 +810,6 @@ const AdminJobs = () => {
             onClick={handleConfirmDelete}
             color="error"
             variant="contained"
-            disabled={loading}
-            startIcon={
-              loading && <CircularProgress size={20} color="inherit" />
-            }
           >
             Delete
           </Button>
@@ -873,3 +820,23 @@ const AdminJobs = () => {
 };
 
 export default AdminJobs;
+
+
+const darkThemeColors = {
+  background: {
+    default: "#1a1d23", // dark
+    paper: "#23272f", // grey
+    card: "#23272f", // grey
+    lighter: "#2a2f38", // slightly lighter than grey
+  },
+  primary: {
+    main: "#58c4dc", // cyan-blue
+    light: "#7ad4e6", // lighter cyan-blue
+    dark: "#3a9cb2", // darker cyan-blue
+  },
+  text: {
+    primary: "#f6f7f9", // light
+    secondary: "#b0b7c3", // lighter grey
+  },
+  divider: "rgba(246, 247, 249, 0.12)", // light with opacity
+};

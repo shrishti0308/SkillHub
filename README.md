@@ -11,41 +11,70 @@ SkillHub is a platform designed to connect freelancers and employers, enabling t
 - **Real-time Notifications:** Stay updated with instant notifications for new bids, messages, and project updates
 - **Profile Management:** Comprehensive profile system for showcasing skills, experience, and portfolio
 - **Search & Filter:** Advanced search functionality to find relevant jobs and talents
+- **Performance Optimized:** Utilizes Redis caching and MongoDB indexing for fast response times
+- **Real-time Analytics:** Admin dashboard with real-time platform statistics and visualizations
+- **Secure Payments:** Integrated wallet system with secure transaction handling
 
 ## Technology Stack
 
 ### Frontend
-- React.js
-- Material-UI
-- Redux for state management
+
+- React.js with Vite for fast development
+- Material-UI & TailwindCSS for styling
+- Redux Toolkit for state management
 - Socket.io for real-time features
+- Recharts for data visualization
 
 ### Backend
+
 - Node.js
 - Express.js
-- MongoDB
+- MongoDB with optimized indexing
+- Redis for caching
 - JWT for authentication
+- Socket.io for real-time communication
+- Swagger for API documentation
+
+### DevOps & Testing
+
+- Jest for unit testing
+- Performance testing suite
+- Docker support
+- Continuous monitoring
+- Automated cache management
+
+## Performance Features
+
+- Redis caching for frequently accessed data
+- Optimized MongoDB indexing
+- Rate limiting for API protection
+- Response compression
+- Static asset optimization
+- Lazy loading components
 
 ## Group 06
 
-| Name             | Roll No.          |
-|------------------|-------------------|
-| Mithun U         | S20220010139      |
-| Varshitha B      | S20220010028      |
-| Shrishti         | S20220010202      |
-| Trinay Mitra     | S20220010194      |
-| Vikas            | S20220010185      |
+| Name         | Roll No.     |
+| ------------ | ------------ |
+| Mithun U     | S20220010139 |
+| Varshitha B  | S20220010028 |
+| Shrishti     | S20220010202 |
+| Trinay Mitra | S20220010194 |
+| Vikas        | S20220010185 |
 
 # Getting Started
 
 ## Prerequisites
+
 - Node.js (v14 or higher)
 - MongoDB
+- Redis (v3.1.2)
 - npm or yarn package manager
 
 ## Installation Guide
 
 1. **Clone the Repository:**
+
    ```bash
    git clone https://github.com/codegasms/SkillHub.git
    cd skillhub
@@ -55,76 +84,113 @@ SkillHub is a platform designed to connect freelancers and employers, enabling t
    Create `.env` files in both client and server directories:
 
    Server `.env`:
+
    ```
    PORT=5000
    MONGODB_URI=your_mongodb_connection_string
    JWT_SECRET=your_jwt_secret
+   REDIS_URL=your_redis_url
    ```
 
    Client `.env`:
+
    ```
-   REACT_APP_API_URL=http://localhost:5000
+   VITE_API_URL=http://localhost:5000
    ```
 
 3. **Install Dependencies:**
 
    Install root dependencies:
+
    ```bash
    npm install
    ```
 
    Server setup:
+
    ```bash
    cd server
    npm install
    ```
 
    Client setup:
+
    ```bash
    cd ../client
    npm install
    ```
 
 4. **Database Setup:**
+
    - Ensure MongoDB is running on your system
-   - The server will automatically create the required collections
+   - Start Redis server
+   - The server will automatically create the required collections and indexes
 
 5. **Running the Application:**
 
    Development mode:
+
    ```bash
    # From the root directory
    npm run dev     # Runs both client and server concurrently
    ```
 
    Or run separately:
+
    ```bash
    # Run server (from server directory)
-   npm start
+   npm start      # Regular mode
+   npm run dev    # Development mode with nodemon
 
    # Run client (from client directory)
-   npm run dev
+   npm run dev    # Vite dev server
    ```
 
-   The client will run on `http://localhost:3000` and the server on `http://localhost:5000`
+   The client will run on `http://localhost:5173` and the server on `http://localhost:5000`
+
+6. **Running Tests:**
+   ```bash
+   # From server directory
+   npm test                # Run all tests
+   npm run test:coverage   # Run tests with coverage report
+   npm run test:performance # Run performance tests
+   ```
 
 ## Usage Guide
 
 1. **Registration/Login:**
+
    - Create a new account or login with existing credentials
    - Choose between Freelancer or Employer account type
+   - Complete your profile with skills and portfolio
 
 2. **For Employers:**
-   - Post new jobs with detailed descriptions
+
+   - Post new jobs with detailed descriptions and requirements
    - Review and accept bids from freelancers
-   - Manage ongoing projects
-   - Release payments and provide reviews
+   - Manage ongoing projects through the dashboard
+   - Release payments and provide detailed reviews
+   - Track project progress and communication
 
 3. **For Freelancers:**
-   - Browse available projects
-   - Submit bids on interesting projects
-   - Manage ongoing work
-   - Receive payments and feedback
+
+   - Browse available projects with advanced filters
+   - Submit competitive bids on interesting projects
+   - Manage ongoing work through the dashboard
+   - Receive secure payments
+   - Build reputation through client feedback
+   - Showcase portfolio and skills
+
+4. **For Administrators:**
+   - Access admin dashboard for platform overview
+   - Monitor user activities and transactions
+   - View real-time analytics and reports
+   - Manage user accounts and permissions
+   - Configure system settings
+
+## API Documentation
+
+Access the API documentation at `http://localhost:5000/api-docs` when running the server.
 
 ## Contributing
 
@@ -136,4 +202,9 @@ SkillHub is a platform designed to connect freelancers and employers, enabling t
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- Thanks to all contributors who have helped shape SkillHub
+- Special thanks to our mentors and advisors

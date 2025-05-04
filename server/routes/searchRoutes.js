@@ -77,6 +77,6 @@ router.get('/users', authenticateJWT, searchUsersSolr);
  *       200:
  *         description: List of jobs matching the search criteria
  */
-router.get('/jobs', authenticateJWT, searchJobsSolr);
+router.get('/jobs',authenticateJWT,searchJobsSolr);
 
 module.exports = router;

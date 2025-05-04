@@ -51,7 +51,8 @@ const indexJob = async (job) => {
       categories: job.categories || [],
       skillsRequired: job.skillsRequired || [],
       budget_min: job.budget.min,
-      budget_max: job.budget.max
+      budget_max: job.budget.max,
+      created_at: new Date(job.createdAt).toISOString() // Add creation date
     };
     
     await jobsClient.add(jobDoc);
@@ -120,7 +121,7 @@ const searchUsers = async (query, options = {}) => {
   try {
     // Build query parameters directly
     let queryParams = {
-      q: query,
+      q: query? `(name:${query} OR username:${query} OR email:${query})`: '*:*',
       start: options.start || 0,
       rows: options.limit || 10
     };
@@ -164,10 +165,15 @@ const searchJobs = async (query, options = {}) => {
   try {
     // Build query parameters directly
     let queryParams = {
-      q: query,
+      q: '*:*', // Default to match all
       start: options.start || 0,
       rows: options.limit || 10
     };
+    
+    // If there's a specific query (not *:*), use it for title and description
+    if (query && query !== '*:*') {
+      queryParams.q = `title:${query} OR description:${query}`;
+    }
     
     if (options.fields) {
       queryParams.fl = options.fields.join(',');
@@ -180,21 +186,33 @@ const searchJobs = async (query, options = {}) => {
       Object.entries(options.filters).forEach(([field, value]) => {
         if (Array.isArray(value)) {
           // Handle array values (like skills or categories)
-          value.forEach(val => {
-            filterQueries.push(`${field}:${val}`);
-          });
+          const filterValues = value.map(val => `${field}:"${val}"`);
+          filterQueries.push(filterValues.join(' OR '));
         } else if (field.includes('budget_min')) {
           filterQueries.push(`${field}`);
         } else if (field.includes('budget_max')) {
           filterQueries.push(`${field}`);
         } else {
-          filterQueries.push(`${field}:${value}`);
+          filterQueries.push(`${field}:"${value}"`);
         }
       });
       
       if (filterQueries.length > 0) {
         queryParams.fq = filterQueries;
       }
+    }
+    
+    // Add sort - make sure to use fields that exist in the schema
+    if (options.sort) {
+      // Map frontend sort fields to actual Solr fields
+      const sortMapping = {
+        'createdAt desc': '_version_ desc',
+        'createdAt asc': '_version_ asc',
+        'budget.max desc': 'budget_max desc',
+        'budget.min asc': 'budget_min asc'
+      };
+      
+      queryParams.sort = sortMapping[options.sort] || options.sort;
     }
     
     console.log('Solr query params:', queryParams);
@@ -215,3 +233,5 @@ module.exports = {
   searchUsers,
   searchJobs
 };
+
+

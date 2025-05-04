@@ -185,7 +185,7 @@ const getJobsByUserId = async (req, res) => {
 // Search jobs with Solr
 const searchJobsSolr = async (req, res) => {
   try {
-    const { query, status, categories, skills, minBudget, maxBudget, limit, page } = req.query;
+    const { query, status, categories, skills, minBudget, maxBudget, limit, page, sort } = req.query;
     
     // Build filters object
     const filters = {};
@@ -207,7 +207,8 @@ const searchJobsSolr = async (req, res) => {
     const searchOptions = {
       start,
       limit: limit ? parseInt(limit) : 10,
-      filters
+      filters,
+      sort: sort || 'createdAt desc'
     };
     
     const result = await solrService.searchJobs(query || '*:*', searchOptions);

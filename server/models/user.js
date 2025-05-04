@@ -125,6 +125,18 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Create compound index for username and email for faster lookups
+// userSchema.index({ username: 1 }); // Removed - handled by unique: true
+// userSchema.index({ email: 1 }); // Removed - handled by unique: true
+// Create index for role for faster filtering by role
+userSchema.index({ role: 1 });
+// Create index for skills for faster searching of freelancers by skills
+userSchema.index({ "info.skills": 1 });
+// Create index for wallet for faster financial operations
+userSchema.index({ wallet: 1 });
+// Create index for createdAt for sorting users by join date
+userSchema.index({ createdAt: -1 });
+
 // Middleware to set commission rate based on role
 userSchema.pre("save", function (next) {
   if (this.isNew) {

@@ -1,8 +1,14 @@
 const Admin = require("../models/admin");
 const User = require("../models/user");
 const Job = require("../models/job");
+const Bid = require("../models/bid");
+// const Project = require("../models/project"); // Removed incorrect require
+const Transaction = require("../models/transaction");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { getAsync, setAsync } = require("../config/redis"); // Corrected import
+
+const CACHE_EXPIRATION_ADMIN = 300; // Longer cache for admin data? (e.g., 5 minutes)
 
 // Create a new admin
 exports.createAdmin = async (req, res) => {
@@ -104,10 +110,28 @@ exports.login = async (req, res) => {
   }
 };
 
-// Get all admins (superuser only)
+// Get all admins (superuser only) with Caching
 exports.getAllAdmins = async (req, res) => {
+  const cacheKey = "all_admins";
   try {
+    const cachedAdmins = await getAsync(cacheKey);
+    if (cachedAdmins) {
+      console.log(`Cache hit for ${cacheKey}`);
+      return res.json(JSON.parse(cachedAdmins));
+    }
+    console.log(`Cache miss for ${cacheKey}, fetching from DB`);
     const admins = await Admin.find().select("-password");
+    try {
+      await setAsync(
+        cacheKey,
+        JSON.stringify(admins),
+        "EX",
+        CACHE_EXPIRATION_ADMIN
+      );
+      console.log(`Stored ${cacheKey} in cache`);
+    } catch (redisSetError) {
+      console.error("Redis set error:", redisSetError);
+    }
     res.json(admins);
   } catch (error) {
     res
@@ -116,12 +140,45 @@ exports.getAllAdmins = async (req, res) => {
   }
 };
 
-// Get admin by ID
+// Get admin by ID with Caching
 exports.getAdminById = async (req, res) => {
+  const adminId = req.params.id;
+  const cacheKey = `admin:${adminId}`;
   try {
-    const admin = await Admin.findById(req.params.id).select("-password");
+    const cachedAdmin = await getAsync(cacheKey);
+    if (cachedAdmin) {
+      console.log(`Cache hit for ${cacheKey}`);
+      const admin = JSON.parse(cachedAdmin);
+      if (admin === null)
+        return res.status(404).json({ message: "Admin not found" });
+      return res.json(admin);
+    }
+    console.log(`Cache miss for ${cacheKey}, fetching from DB`);
+    const admin = await Admin.findById(adminId).select("-password");
     if (!admin) {
+      try {
+        await setAsync(
+          cacheKey,
+          JSON.stringify(null),
+          "EX",
+          CACHE_EXPIRATION_ADMIN
+        );
+        console.log(`Stored null for ${cacheKey} in cache`);
+      } catch (redisSetError) {
+        console.error("Redis set error:", redisSetError);
+      }
       return res.status(404).json({ message: "Admin not found" });
+    }
+    try {
+      await setAsync(
+        cacheKey,
+        JSON.stringify(admin),
+        "EX",
+        CACHE_EXPIRATION_ADMIN
+      );
+      console.log(`Stored ${cacheKey} in cache`);
+    } catch (redisSetError) {
+      console.error("Redis set error:", redisSetError);
     }
     res.json(admin);
   } catch (error) {
@@ -220,12 +277,35 @@ exports.updatePermissions = async (req, res) => {
   }
 };
 
-// Get current admin
+// Get current admin with Caching
 exports.getCurrentAdmin = async (req, res) => {
+  const adminId = req.admin.id;
+  const cacheKey = `admin:${adminId}`; // Reuse same cache key as getAdminById
   try {
-    const admin = await Admin.findById(req.admin.id).select("-password");
+    const cachedAdmin = await getAsync(cacheKey);
+    if (cachedAdmin) {
+      console.log(`Cache hit for ${cacheKey} (current)`);
+      const admin = JSON.parse(cachedAdmin);
+      if (admin === null)
+        return res.status(404).json({ message: "Admin not found" });
+      return res.json(admin);
+    }
+    console.log(`Cache miss for ${cacheKey} (current), fetching from DB`);
+    const admin = await Admin.findById(adminId).select("-password");
     if (!admin) {
+      // Should not happen if middleware passed, but handle defensively
       return res.status(404).json({ message: "Admin not found" });
+    }
+    try {
+      await setAsync(
+        cacheKey,
+        JSON.stringify(admin),
+        "EX",
+        CACHE_EXPIRATION_ADMIN
+      );
+      console.log(`Stored ${cacheKey} in cache`);
+    } catch (redisSetError) {
+      console.error("Redis set error:", redisSetError);
     }
     res.json(admin);
   } catch (error) {
@@ -235,15 +315,81 @@ exports.getCurrentAdmin = async (req, res) => {
   }
 };
 
-// User Management
+// User Management - Caching applied here
 exports.getAllUsers = async (req, res) => {
+  const cacheKey = "all_users_admin"; // Different key from non-admin getAllUsers if exists
   try {
+    const cachedUsers = await getAsync(cacheKey);
+    if (cachedUsers) {
+      console.log(`Cache hit for ${cacheKey}`);
+      return res.json(JSON.parse(cachedUsers));
+    }
+    console.log(`Cache miss for ${cacheKey}, fetching from DB`);
     const users = await User.find().select("-password");
+    try {
+      await setAsync(
+        cacheKey,
+        JSON.stringify(users),
+        "EX",
+        CACHE_EXPIRATION_ADMIN
+      );
+      console.log(`Stored ${cacheKey} in cache`);
+    } catch (redisSetError) {
+      console.error("Redis set error:", redisSetError);
+    }
     res.json(users);
   } catch (error) {
     res
       .status(500)
       .json({ message: "Error fetching users", error: error.message });
+  }
+};
+
+// Get User By ID - Caching
+exports.getUserById = async (req, res) => {
+  const userId = req.params.id;
+  const cacheKey = `user_admin:${userId}`;
+  try {
+    const cachedUser = await getAsync(cacheKey);
+    if (cachedUser) {
+      console.log(`Cache hit for ${cacheKey}`);
+      const user = JSON.parse(cachedUser);
+      if (user === null)
+        return res.status(404).json({ message: "User not found" });
+      return res.json(user);
+    }
+    console.log(`Cache miss for ${cacheKey}, fetching from DB`);
+    const user = await User.findById(userId).select("-password");
+    if (!user) {
+      try {
+        await setAsync(
+          cacheKey,
+          JSON.stringify(null),
+          "EX",
+          CACHE_EXPIRATION_ADMIN
+        );
+        console.log(`Stored null for ${cacheKey} in cache`);
+      } catch (redisSetError) {
+        console.error("Redis set error:", redisSetError);
+      }
+      return res.status(404).json({ message: "User not found" });
+    }
+    try {
+      await setAsync(
+        cacheKey,
+        JSON.stringify(user),
+        "EX",
+        CACHE_EXPIRATION_ADMIN
+      );
+      console.log(`Stored ${cacheKey} in cache`);
+    } catch (redisSetError) {
+      console.error("Redis set error:", redisSetError);
+    }
+    res.json(user);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error fetching user", error: error.message });
   }
 };
 
@@ -301,30 +447,85 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
-// Job Management
+// Job Management - Caching
 exports.getAllJobs = async (req, res) => {
+  const cacheKey = "all_jobs_admin";
   try {
-    const jobs = await Job.find().populate("employer", "name email");
+    const cachedJobs = await getAsync(cacheKey);
+    if (cachedJobs) {
+      console.log(`Cache hit for ${cacheKey}`);
+      return res.json(JSON.parse(cachedJobs));
+    }
+    console.log(`Cache miss for ${cacheKey}, fetching from DB`);
+    const jobs = await Job.find()
+      .populate("employer", "name username")
+      .populate("freelancer", "name username");
+    try {
+      await setAsync(
+        cacheKey,
+        JSON.stringify(jobs),
+        "EX",
+        CACHE_EXPIRATION_ADMIN
+      );
+      console.log(`Stored ${cacheKey} in cache`);
+    } catch (redisSetError) {
+      console.error("Redis set error:", redisSetError);
+    }
     res.json(jobs);
   } catch (error) {
-    console.log(error);
     res
       .status(500)
       .json({ message: "Error fetching jobs", error: error.message });
   }
 };
 
-exports.deleteJob = async (req, res) => {
+// Get Job By ID - Caching
+exports.getJobById = async (req, res) => {
+  const jobId = req.params.id;
+  const cacheKey = `job_admin:${jobId}`; // Potentially reuse `job:${jobId}` if data/perms allow?
   try {
-    const job = await Job.findByIdAndDelete(req.params.id);
+    const cachedJob = await getAsync(cacheKey);
+    if (cachedJob) {
+      console.log(`Cache hit for ${cacheKey}`);
+      const job = JSON.parse(cachedJob);
+      if (job === null)
+        return res.status(404).json({ message: "Job not found" });
+      return res.json(job);
+    }
+    console.log(`Cache miss for ${cacheKey}, fetching from DB`);
+    const job = await Job.findById(jobId)
+      .populate("employer", "name username")
+      .populate("freelancer", "name username");
     if (!job) {
+      try {
+        await setAsync(
+          cacheKey,
+          JSON.stringify(null),
+          "EX",
+          CACHE_EXPIRATION_ADMIN
+        );
+        console.log(`Stored null for ${cacheKey} in cache`);
+      } catch (redisSetError) {
+        console.error("Redis set error:", redisSetError);
+      }
       return res.status(404).json({ message: "Job not found" });
     }
-    res.json({ message: "Job deleted successfully" });
+    try {
+      await setAsync(
+        cacheKey,
+        JSON.stringify(job),
+        "EX",
+        CACHE_EXPIRATION_ADMIN
+      );
+      console.log(`Stored ${cacheKey} in cache`);
+    } catch (redisSetError) {
+      console.error("Redis set error:", redisSetError);
+    }
+    res.json(job);
   } catch (error) {
     res
       .status(500)
-      .json({ message: "Error deleting job", error: error.message });
+      .json({ message: "Error fetching job", error: error.message });
   }
 };
 
@@ -364,6 +565,70 @@ exports.updateJob = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error updating job", error: error.message });
+  }
+};
+
+exports.deleteJob = async (req, res) => {
+  try {
+    const job = await Job.findByIdAndDelete(req.params.id);
+    if (!job) {
+      return res.status(404).json({ message: "Job not found" });
+    }
+    res.json({ message: "Job deleted successfully" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error deleting job", error: error.message });
+  }
+};
+
+// Site Statistics - Caching (more complex, depends on calculation)
+// Caching simple stats for now
+exports.getSiteStats = async (req, res) => {
+  const cacheKey = "site_stats";
+  try {
+    const cachedStats = await getAsync(cacheKey);
+    if (cachedStats) {
+      console.log(`Cache hit for ${cacheKey}`);
+      return res.json(JSON.parse(cachedStats));
+    }
+    console.log(`Cache miss for ${cacheKey}, fetching/calculating`);
+
+    const totalUsers = await User.countDocuments();
+    const totalJobs = await Job.countDocuments();
+    const totalCompletedJobs = await Job.countDocuments({ status: "closed" });
+    const totalBids = await Bid.countDocuments();
+    const totalTransactions = await Transaction.countDocuments({
+      status: "completed",
+    });
+    // Add more complex stats if needed
+
+    const stats = {
+      totalUsers,
+      totalJobs,
+      totalCompletedJobs,
+      totalBids,
+      totalTransactions,
+    };
+
+    try {
+      await setAsync(
+        cacheKey,
+        JSON.stringify(stats),
+        "EX",
+        CACHE_EXPIRATION_ADMIN * 2
+      );
+      console.log(`Stored ${cacheKey} in cache`);
+    } catch (redisSetError) {
+      console.error("Redis set error:", redisSetError);
+    }
+
+    res.json(stats);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error fetching site statistics",
+      error: error.message,
+    });
   }
 };
 

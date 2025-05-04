@@ -1,24 +1,50 @@
 // controllers/transactionController.js
 const Transaction = require("../models/transaction");
 const Notification = require("../models/notification");
+const { getAsync, setAsync } = require("../config/redis"); // Corrected import
 
-// Controller to get recent transactions of the logged-in user
+const CACHE_EXPIRATION = 60; // Cache duration in seconds
+
+// Controller to get recent transactions of the logged-in user with Caching
 exports.getRecentTransactions = async (req, res) => {
-  try {
-    const userId = req.user.id; // Get the logged-in user's ID from the JWT token
-    const recentTransactions = await Transaction.find({ user: userId })
-      .populate("job") // Populate job details if needed
-      .sort({ createdAt: -1 }) // Sort by most recent
-      .limit(10); // Limit to recent 10 transactions (you can adjust this)
+  const userId = req.user.id;
+  const cacheKey = `recent_transactions:${userId}`;
 
-    if (!recentTransactions.length) {
-      return res
-        .status(404)
-        .json({ message: "No recent transactions found for this user" });
+  try {
+    const cachedTransactions = await getAsync(cacheKey);
+    if (cachedTransactions) {
+      console.log(`Cache hit for ${cacheKey}`);
+      const recentTransactions = JSON.parse(cachedTransactions);
+      return res.status(200).json({ recentTransactions });
+    }
+
+    console.log(`Cache miss for ${cacheKey}, fetching from DB`);
+    const recentTransactions = await Transaction.find({ user: userId })
+      .populate("job")
+      .sort({ createdAt: -1 })
+      .limit(10);
+
+    // Caching empty array result
+    // if (!recentTransactions.length) { ... }
+
+    try {
+      await setAsync(
+        cacheKey,
+        JSON.stringify(recentTransactions),
+        "EX",
+        CACHE_EXPIRATION
+      );
+      console.log(`Stored ${cacheKey} in cache`);
+    } catch (redisSetError) {
+      console.error("Redis set error:", redisSetError);
     }
 
     res.status(200).json({ recentTransactions });
   } catch (error) {
+    console.error(
+      `Error retrieving recent transactions for user ${userId}:`,
+      error
+    );
     res.status(500).json({
       message: "Error retrieving recent transactions",
       error: error.message,
@@ -26,22 +52,45 @@ exports.getRecentTransactions = async (req, res) => {
   }
 };
 
-// Controller to get all transactions for the logged-in user
+// Controller to get all transactions for the logged-in user with Caching
 exports.getAllTransactions = async (req, res) => {
-  try {
-    const userId = req.user.id; // Get the logged-in user's ID from the JWT token
-    const transactions = await Transaction.find({ user: userId })
-      .populate("job") // Populate job details
-      .sort({ createdAt: -1 }); // Sort by most recent
+  const userId = req.user.id;
+  const cacheKey = `all_transactions:${userId}`;
 
-    if (!transactions.length) {
-      return res
-        .status(404)
-        .json({ message: "No transactions found for this user" });
+  try {
+    const cachedTransactions = await getAsync(cacheKey);
+    if (cachedTransactions) {
+      console.log(`Cache hit for ${cacheKey}`);
+      const transactions = JSON.parse(cachedTransactions);
+      return res.status(200).json({ transactions });
+    }
+
+    console.log(`Cache miss for ${cacheKey}, fetching from DB`);
+    const transactions = await Transaction.find({ user: userId })
+      .populate("job")
+      .sort({ createdAt: -1 });
+
+    // Caching empty array result
+    // if (!transactions.length) { ... }
+
+    try {
+      await setAsync(
+        cacheKey,
+        JSON.stringify(transactions),
+        "EX",
+        CACHE_EXPIRATION
+      );
+      console.log(`Stored ${cacheKey} in cache`);
+    } catch (redisSetError) {
+      console.error("Redis set error:", redisSetError);
     }
 
     res.status(200).json({ transactions });
   } catch (error) {
+    console.error(
+      `Error retrieving all transactions for user ${userId}:`,
+      error
+    );
     res.status(500).json({
       message: "Error retrieving transactions",
       error: error.message,
@@ -49,20 +98,52 @@ exports.getAllTransactions = async (req, res) => {
   }
 };
 
+// Get transaction details by ID with Caching
 exports.getTransactionDetails = async (req, res) => {
-  try {
-    const { transactionId } = req.params;
+  const { transactionId } = req.params;
+  const cacheKey = `transaction:${transactionId}`;
 
+  try {
+    const cachedTransaction = await getAsync(cacheKey);
+    if (cachedTransaction) {
+      console.log(`Cache hit for ${cacheKey}`);
+      const transaction = JSON.parse(cachedTransaction);
+      if (transaction === null) {
+        return res.status(404).json({ message: "Transaction not found" });
+      }
+      return res.status(200).json({ transaction });
+    }
+
+    console.log(`Cache miss for ${cacheKey}, fetching from DB`);
     const transaction = await Transaction.findById(transactionId).populate(
       "job"
     );
 
     if (!transaction) {
+      try {
+        await setAsync(cacheKey, JSON.stringify(null), "EX", CACHE_EXPIRATION);
+        console.log(`Stored null for ${cacheKey} in cache`);
+      } catch (redisSetError) {
+        console.error("Redis set error:", redisSetError);
+      }
       return res.status(404).json({ message: "Transaction not found" });
+    }
+
+    try {
+      await setAsync(
+        cacheKey,
+        JSON.stringify(transaction),
+        "EX",
+        CACHE_EXPIRATION
+      );
+      console.log(`Stored ${cacheKey} in cache`);
+    } catch (redisSetError) {
+      console.error("Redis set error:", redisSetError);
     }
 
     res.status(200).json({ transaction });
   } catch (error) {
+    console.error(`Error retrieving transaction ${transactionId}:`, error);
     res.status(500).json({
       message: "Error retrieving transaction details",
       error: error.message,
@@ -153,23 +234,41 @@ exports.updateTransactionStatus = async (req, res) => {
   }
 };
 
-// Fetch recent transactions with populated job details
+// Fetch recent transactions for earnings summary with Caching
 exports.getEarningsSummary = async (req, res) => {
-  try {
-    const userId = req.user.id;
+  const userId = req.user.id;
+  const cacheKey = `earnings_summary:${userId}`;
 
-    // Fetch the 5 most recent transactions with job details populated
+  try {
+    const cachedSummary = await getAsync(cacheKey);
+    if (cachedSummary) {
+      console.log(`Cache hit for ${cacheKey}`);
+      const recentTransactions = JSON.parse(cachedSummary);
+      return res.status(200).json({ recentTransactions });
+    }
+
+    console.log(`Cache miss for ${cacheKey}, fetching from DB`);
     const recentTransactions = await Transaction.find({ user: userId })
       .populate({
-        path: "job", // Path to populate
-        select: "title description budget", // Select specific fields
+        path: "job",
+        select: "title description budget",
       })
       .sort({ createdAt: -1 })
       .limit(5);
 
-    res.status(200).json({
-      recentTransactions,
-    });
+    try {
+      await setAsync(
+        cacheKey,
+        JSON.stringify(recentTransactions),
+        "EX",
+        CACHE_EXPIRATION
+      );
+      console.log(`Stored ${cacheKey} in cache`);
+    } catch (redisSetError) {
+      console.error("Redis set error:", redisSetError);
+    }
+
+    res.status(200).json({ recentTransactions });
   } catch (error) {
     console.error("Error in getEarningsSummary:", error.message);
     res.status(500).json({

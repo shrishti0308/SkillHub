@@ -7,12 +7,15 @@ RUN apk add --no-cache python3 make g++ vips-dev
 # Create app directory
 WORKDIR /app
 
-# Install app dependencies
-# Copy package.json and package-lock.json
+# Copy package files
 COPY package*.json ./
 
-# Install dependencies with sharp's optional dependencies
-RUN npm install --include=optional
+# Remove any existing sharp installation
+RUN npm uninstall sharp
+
+# Install dependencies and rebuild sharp for Alpine
+RUN npm install --platform=linux --arch=x64 --libc=musl
+RUN npm rebuild sharp
 
 # Bundle app source
 COPY . .

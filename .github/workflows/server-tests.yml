@@ -18,20 +18,21 @@ jobs:
   test-server:
     runs-on: ubuntu-latest
     container:
-      image: node:18
+      image: node:20-alpine
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Install system dependencies
-        run: |
-          apt-get update
-          apt-get install -y python3 make g++ libvips-dev
+        run: apk add --no-cache python3 make g++ vips-dev
 
       - name: Install dependencies in server directory
-        run: npm ci --include=optional
-        working-directory: ./server
+        run: |
+          cd server
+          npm uninstall sharp
+          npm install --platform=linux --arch=x64 --libc=musl
+          npm rebuild sharp
 
       - name: Run tests in server directory
         run: npm test

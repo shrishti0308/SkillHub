@@ -1,6 +1,9 @@
 # Use Node.js LTS version
 FROM node:20-alpine
 
+# Install required dependencies for sharp
+RUN apk add --no-cache python3 make g++ vips-dev
+
 # Create app directory
 WORKDIR /app
 
@@ -8,8 +11,8 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies with sharp's optional dependencies
+RUN npm install --include=optional
 
 # Bundle app source
 COPY . .

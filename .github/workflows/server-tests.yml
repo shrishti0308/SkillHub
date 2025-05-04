@@ -18,14 +18,19 @@ jobs:
   test-server:
     runs-on: ubuntu-latest
     container:
-      image: node:18 # Specify the Node.js container image
+      image: node:18
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install system dependencies
+        run: |
+          apt-get update
+          apt-get install -y python3 make g++ libvips-dev
+
       - name: Install dependencies in server directory
-        run: npm ci
+        run: npm ci --include=optional
         working-directory: ./server
 
       - name: Run tests in server directory

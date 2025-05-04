@@ -26,6 +26,7 @@ import AdminDashboard from "./components/admin/AdminDashboard";
 import AdminUsers from "./components/admin/AdminUsers";
 import AdminJobs from "./components/admin/AdminJobs";
 import AdminAnalytics from "./components/admin/AdminAnalytics";
+import SystemDashboard from "./components/admin/SystemDashboard";
 import TransactionPage from "./components/TransactionPage/TransactionPage";
 import { useSelector } from "react-redux";
 import Footer from "./components/Footer";
@@ -80,6 +81,7 @@ function App() {
     "/admin/jobs",
     "/admin/reports",
     "/admin/analytics",
+    "/admin/system",
   ];
 
   const accessToken = useSelector(selectAccessToken);
@@ -151,6 +153,7 @@ function App() {
             <Route path="users" element={<AdminUsers />} />
             <Route path="jobs" element={<AdminJobs />} />
             <Route path="analytics" element={<AdminAnalytics />} />
+            <Route path="system" element={<SystemDashboard />} />
           </Route>
 
           <Route path="/features" element={<Features />} />

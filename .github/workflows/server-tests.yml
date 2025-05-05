@@ -30,10 +30,10 @@ jobs:
       - name: Install dependencies in server directory
         run: |
           cd server
-          npm uninstall sharp
-          npm install --platform=linux --arch=x64 --libc=musl
-          npm rebuild sharp
+          npm install --platform=linux --libc=musl
 
       - name: Run tests in server directory
+        env:
+          MONGOMS_VERSION: 7.0.6 # Specify MongoDB version for Alpine
         run: npm test
         working-directory: ./server

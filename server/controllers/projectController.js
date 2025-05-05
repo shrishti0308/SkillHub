@@ -21,7 +21,7 @@ exports.getRecentProjects = async (req, res) => {
     console.log(`Cache miss for ${cacheKey}, fetching from DB`);
     const recentProjects = await Job.find({
       freelancer: userId,
-      status: { $in: ["in-progress", "closed"] },
+      status: { $in: ["in-progress", "closed", "completed"] },
     })
       .sort({ updatedAt: -1 })
       .limit(10);

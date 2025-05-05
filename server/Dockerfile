@@ -1,14 +1,21 @@
-# Use Node.js LTS version
-FROM node:20-alpine
+# Use Node.js LTS version (Debian-based)
+FROM node:20
+
+# Install required dependencies using apt-get
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    make \
+    g++ \
+    libvips-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Create app directory
 WORKDIR /app
 
-# Install app dependencies
-# Copy package.json and package-lock.json
+# Copy package files
 COPY package*.json ./
 
-# Install dependencies
+# Install dependencies (standard install)
 RUN npm install
 
 # Bundle app source

@@ -59,6 +59,8 @@ const projectRoutes = require("./routes/projectRoutes");
 const walletRoutes = require("./routes/walletRoutes");
 const transactionRoutes = require("./routes/transactionRoutes");
 const chatRoutes = require("./routes/chatRoutes");
+const searchRoutes = require("./routes/searchRoutes");
+const systemRoutes = require("./routes/systemRoutes");
 
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || "development";
@@ -131,78 +133,81 @@ app.get("/", (req, res) => {
   res.send("Hello, My lord!");
 });
 
-// Route to check Redis status
-app.get("/system/status", (req, res) => {
-  const redisStatus = redisClient.connected ? "connected" : "disconnected";
-  const mongoStatus =
-    mongoose.connection.readyState === 1 ? "connected" : "disconnected";
+// Apply system routes
+app.use("/system", systemRoutes);
 
-  res.json({
-    status: "OK",
-    redis: redisStatus,
-    mongodb: mongoStatus,
-    node_env: NODE_ENV,
-    uptime: process.uptime(),
-  });
-});
+// Route to check Redis status - Now handled by systemRoutes
+// app.get("/system/status", (req, res) => {
+//   const redisStatus = redisClient.connected ? "connected" : "disconnected";
+//   const mongoStatus =
+//     mongoose.connection.readyState === 1 ? "connected" : "disconnected";
 
-// Performance monitoring endpoint
-app.get("/system/performance", async (req, res) => {
-  try {
-    const { infoAsync, dbsizeAsync } = require("./config/redis");
+//   res.json({
+//     status: "OK",
+//     redis: redisStatus,
+//     mongodb: mongoStatus,
+//     node_env: NODE_ENV,
+//     uptime: process.uptime(),
+//   });
+// });
 
-    let redisCacheHits = 0;
-    try {
-      const redisInfo = await infoAsync();
-      const keyspace = redisInfo
-        .split("\n")
-        .find((line) => line.startsWith("# Keyspace"));
-      redisCacheHits = keyspace ? parseInt(keyspace.split(":")[1] || 0) : 0;
-    } catch (err) {
-      console.error("Error getting Redis info:", err);
-    }
+// Performance monitoring endpoint - Now handled by systemRoutes
+// app.get("/system/performance", async (req, res) => {
+//   try {
+//     const { infoAsync, dbsizeAsync } = require("./config/redis");
 
-    const mongoStats = await mongoose.connection.db.stats();
+//     let redisCacheHits = 0;
+//     try {
+//       const redisInfo = await infoAsync();
+//       const keyspace = redisInfo
+//         .split("\n")
+//         .find((line) => line.startsWith("# Keyspace"));
+//       redisCacheHits = keyspace ? parseInt(keyspace.split(":")[1] || 0) : 0;
+//     } catch (err) {
+//       console.error("Error getting Redis info:", err);
+//     }
 
-    res.json({
-      redis: {
-        cacheHits: redisCacheHits,
-        keysCount: await dbsizeAsync().catch(() => 0),
-        status: redisClient.connected ? "connected" : "disconnected",
-      },
-      mongodb: {
-        collections: mongoStats.collections,
-        objects: mongoStats.objects,
-        avgObjSize: mongoStats.avgObjSize,
-        dataSize: mongoStats.dataSize,
-        indexes: mongoStats.indexes,
-        indexSize: mongoStats.indexSize,
-      },
-    });
-  } catch (error) {
-    console.error("Error in performance endpoint:", error);
-    res.status(500).json({ error: "Failed to get performance data" });
-  }
-});
+//     const mongoStats = await mongoose.connection.db.stats();
 
-// Endpoint to flush Redis cache - only available in development mode
-if (NODE_ENV === "development") {
-  app.post("/system/flush-cache", async (req, res) => {
-    try {
-      const { flushallAsync } = require("./config/redis");
-      await flushallAsync();
-      console.log("Redis cache flushed successfully");
-      res.json({ success: true, message: "Redis cache flushed successfully" });
-    } catch (error) {
-      console.error("Error flushing Redis cache:", error);
-      res.status(500).json({
-        success: false,
-        message: "Failed to flush cache",
-        error: error.message,
-      });
-    }
-  });
-}
+//     res.json({
+//       redis: {
+//         cacheHits: redisCacheHits,
+//         keysCount: await dbsizeAsync().catch(() => 0),
+//         status: redisClient.connected ? "connected" : "disconnected",
+//       },
+//       mongodb: {
+//         collections: mongoStats.collections,
+//         objects: mongoStats.objects,
+//         avgObjSize: mongoStats.avgObjSize,
+//         dataSize: mongoStats.dataSize,
+//         indexes: mongoStats.indexes,
+//         indexSize: mongoStats.indexSize,
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Error in performance endpoint:", error);
+//     res.status(500).json({ error: "Failed to get performance data" });
+//   }
+// });
+
+// Endpoint to flush Redis cache - Now handled by systemRoutes
+// if (NODE_ENV === "development") {
+//   app.post("/system/flush-cache", async (req, res) => {
+//     try {
+//       const { flushallAsync } = require("./config/redis");
+//       await flushallAsync();
+//       console.log("Redis cache flushed successfully");
+//       res.json({ success: true, message: "Redis cache flushed successfully" });
+//     } catch (error) {
+//       console.error("Error flushing Redis cache:", error);
+//       res.status(500).json({
+//         success: false,
+//         message: "Failed to flush cache",
+//         error: error.message,
+//       });
+//     }
+//   });
+// }
 
 // <<< ADD System routes for Redis control >>>
 app.post("/system/redis/disable", (req, res) => {
@@ -232,6 +237,7 @@ app.use("/project", projectRoutes);
 app.use("/wallet", walletRoutes);
 app.use("/transaction", transactionRoutes);
 app.use("/chat", chatRoutes);
+app.use("/search", searchRoutes);
 
 // Example of a protected route with authentication middleware
 app.get("/recent-bids", authenticateJWT, async (req, res, next) => {

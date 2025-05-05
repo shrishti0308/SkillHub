@@ -25,6 +25,7 @@ import {
   ExitToApp as LogoutIcon,
   Analytics as AnalyticsIcon,
   ChevronLeft as ChevronLeftIcon,
+  Memory as MemoryIcon,
 } from "@mui/icons-material";
 import { logout } from "../../redux/slices/adminSlice";
 
@@ -83,6 +84,7 @@ const AdminLayout = () => {
     { text: "Users", icon: <PeopleIcon />, path: "/admin/users" },
     { text: "Jobs", icon: <WorkIcon />, path: "/admin/jobs" },
     { text: "Analytics", icon: <AnalyticsIcon />, path: "/admin/analytics" },
+    { text: "System", icon: <MemoryIcon />, path: "/admin/system" },
   ];
 
   const isActive = (path) => {

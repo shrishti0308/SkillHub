@@ -18,22 +18,20 @@ jobs:
   test-server:
     runs-on: ubuntu-latest
     container:
-      image: node:20-alpine
+      image: node:20
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Install system dependencies
-        run: apk add --no-cache python3 make g++ vips-dev mongodb
+        run: apt-get update && apt-get install -y --no-install-recommends python3 make g++ libvips-dev
 
       - name: Install dependencies in server directory
         run: |
           cd server
-          npm install --platform=linux --libc=musl
+          npm install
 
       - name: Run tests in server directory
-        env:
-          MONGOMS_SYSTEM_BINARY: /usr/bin/mongod
         run: npm test
         working-directory: ./server

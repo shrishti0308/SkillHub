@@ -130,7 +130,9 @@ app.use("/user/login", loginLimiter); // Stricter rate limiting for login route
 
 // 3. Route setup
 app.get("/", (req, res) => {
-  res.send("Hello, My lord!");
+  res.send(
+    "Welcome to the SkillHub API. Documentation is available at /api-docs."
+  );
 });
 
 // Apply system routes

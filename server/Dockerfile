@@ -1,8 +1,13 @@
-# Use Node.js LTS version
-FROM node:20-alpine
+# Use Node.js LTS version (Debian-based)
+FROM node:20
 
-# Install required dependencies for sharp
-RUN apk add --no-cache python3 make g++ vips-dev
+# Install required dependencies using apt-get
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    make \
+    g++ \
+    libvips-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Create app directory
 WORKDIR /app
@@ -10,12 +15,8 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Remove any existing sharp installation
-RUN npm uninstall sharp
-
-# Install dependencies and rebuild sharp for Alpine
-RUN npm install --platform=linux --arch=x64 --libc=musl
-RUN npm rebuild sharp
+# Install dependencies (standard install)
+RUN npm install
 
 # Bundle app source
 COPY . .

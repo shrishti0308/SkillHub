@@ -10,7 +10,7 @@ const CustomAlert = ({ message, type, onClose }) => {
 
   return (
     <div
-      className={`fixed top-[90px] z-200 right-4 p-4 rounded shadow-lg text-white ${alertTypeStyles[type]}`}
+      className={`fixed top-[90px] z-50 right-4 p-4 rounded shadow-lg text-white ${alertTypeStyles[type]}`}
       role="alert"
     >
       <span>{message}</span>

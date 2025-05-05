@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { 
-  setRecentProjects, 
+import {
+  setRecentProjects,
   selectRecentProjects,
   setMyJobPosts,
-  selectMyJobPosts 
+  selectMyJobPosts,
 } from "../../../redux/reducers/dashboard/projectsSlice";
 import { selectRole } from "../../../redux/Features/user/authSlice";
 import { selectUserProfile } from "../../../redux/Features/user/ProfileSlice";
@@ -31,7 +31,9 @@ const ProjectsSummary = () => {
       try {
         if (isFreelancer) {
           try {
-            const projectsResponse = await axiosInstance.get("/project/recent-projects");
+            const projectsResponse = await axiosInstance.get(
+              "/project/recent-projects"
+            );
             if (projectsResponse.data.recentProjects) {
               dispatch(setRecentProjects(projectsResponse.data.recentProjects));
             } else {
@@ -48,7 +50,9 @@ const ProjectsSummary = () => {
 
         if (isEmployer && userProfile?._id) {
           try {
-            const jobsResponse = await axiosInstance.get(`/jobs/user/${userProfile._id}`);
+            const jobsResponse = await axiosInstance.get(
+              `/jobs/user/${userProfile._id}`
+            );
             if (jobsResponse.data.data) {
               dispatch(setMyJobPosts(jobsResponse.data.data));
             } else {
@@ -101,8 +105,9 @@ const ProjectsSummary = () => {
     );
   }
 
-  const hasNoData = (!isFreelancer || !projects || projects.length === 0) && 
-                    (!isEmployer || !myJobPosts || myJobPosts.length === 0);
+  const hasNoData =
+    (!isFreelancer || !projects || projects.length === 0) &&
+    (!isEmployer || !myJobPosts || myJobPosts.length === 0);
 
   if (hasNoData) {
     return (
@@ -112,9 +117,9 @@ const ProjectsSummary = () => {
         </h2>
         <div className="text-gray-400 bg-gray-800/50 p-6 rounded-lg border border-gray-600 text-center">
           <div className="text-5xl mb-4">🎯</div>
-          {isFreelancer && isEmployer 
+          {isFreelancer && isEmployer
             ? "No projects or job posts found. Start bidding on jobs or post new jobs to see them here!"
-            : isFreelancer 
+            : isFreelancer
             ? "No projects found. Start bidding on jobs to see them here!"
             : "No job posts found. Start posting jobs to see them here!"}
         </div>
@@ -131,28 +136,34 @@ const ProjectsSummary = () => {
           </h3>
           <div className="grid gap-6">
             {projects.slice(0, 3).map((project) => (
-              <div key={project._id} 
-                className="p-6 bg-gray-800/40 rounded-xl hover:bg-gray-700/40 transition-all duration-300 transform hover:-translate-y-1 border border-gray-600 hover:border-gray-500">
+              <div
+                key={project._id}
+                className="p-6 bg-gray-800/40 rounded-xl hover:bg-gray-700/40 transition-all duration-300 transform hover:-translate-y-1 border border-gray-600 hover:border-gray-500"
+              >
                 <div className="flex justify-between items-start mb-4">
                   <h4 className="text-xl font-semibold text-white hover:text-blue-400 transition-colors">
                     {project.title}
                   </h4>
-                  <span className={`px-4 py-1.5 rounded-full text-sm font-medium ${
-                    project.status === "completed"
-                      ? "bg-green-900/50 text-green-300 border border-green-700"
-                      : "bg-yellow-900/50 text-yellow-300 border border-yellow-700"
-                  }`}>
+                  <span
+                    className={`px-4 py-1.5 rounded-full text-sm font-medium ${
+                      project.status === "completed"
+                        ? "bg-green-900/50 text-green-300 border border-green-700"
+                        : "bg-yellow-900/50 text-yellow-300 border border-yellow-700"
+                    }`}
+                  >
                     {project.status}
                   </span>
                 </div>
-                <p className="text-gray-300 mb-4 line-clamp-2">{project.description}</p>
+                <p className="text-gray-300 mb-4 line-clamp-2">
+                  {project.description}
+                </p>
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-blue-400 bg-blue-900/20 px-3 py-1.5 rounded-full">
                     💰 ${project.budget?.min} - ${project.budget?.max}
                   </span>
-                  <span className="text-purple-400 bg-purple-900/20 px-3 py-1.5 rounded-full">
+                  {/* <span className="text-purple-400 bg-purple-900/20 px-3 py-1.5 rounded-full">
                     ⏰ Due: {new Date(project.deadline).toLocaleDateString()}
-                  </span>
+                  </span> */}
                 </div>
               </div>
             ))}
@@ -167,23 +178,29 @@ const ProjectsSummary = () => {
           </h3>
           <div className="grid gap-6">
             {myJobPosts.slice(0, 3).map((job) => (
-              <div key={job._id} 
-                className="p-6 bg-gray-800/40 rounded-xl hover:bg-gray-700/40 transition-all duration-300 transform hover:-translate-y-1 border border-gray-600 hover:border-gray-500">
+              <div
+                key={job._id}
+                className="p-6 bg-gray-800/40 rounded-xl hover:bg-gray-700/40 transition-all duration-300 transform hover:-translate-y-1 border border-gray-600 hover:border-gray-500"
+              >
                 <div className="flex justify-between items-start mb-4">
                   <h4 className="text-xl font-semibold text-white hover:text-blue-400 transition-colors">
                     {job.title}
                   </h4>
-                  <span className={`px-4 py-1.5 rounded-full text-sm font-medium ${
-                    job.status === "completed"
-                      ? "bg-green-900/50 text-green-300 border border-green-700"
-                      : job.status === "in-progress"
-                      ? "bg-blue-900/50 text-blue-300 border border-blue-700"
-                      : "bg-yellow-900/50 text-yellow-300 border border-yellow-700"
-                  }`}>
+                  <span
+                    className={`px-4 py-1.5 rounded-full text-sm font-medium ${
+                      job.status === "completed"
+                        ? "bg-green-900/50 text-green-300 border border-green-700"
+                        : job.status === "in-progress"
+                        ? "bg-blue-900/50 text-blue-300 border border-blue-700"
+                        : "bg-yellow-900/50 text-yellow-300 border border-yellow-700"
+                    }`}
+                  >
                     {job.status}
                   </span>
                 </div>
-                <p className="text-gray-300 mb-4 line-clamp-2">{job.description}</p>
+                <p className="text-gray-300 mb-4 line-clamp-2">
+                  {job.description}
+                </p>
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-blue-400 bg-blue-900/20 px-3 py-1.5 rounded-full">
                     💰 ${job.budget?.min} - ${job.budget?.max}
